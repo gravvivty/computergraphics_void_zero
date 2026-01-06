@@ -11,8 +11,21 @@ namespace VoidZero.Game.Entities
         public float MaxHealth { get; protected set; }
         public float CurrentHealth { get; protected set; }
 
-        public Vector2 Position;
-        public Vector2 RelativePosition { get; private set; } // relative to screen
+        private Vector2 _position;
+        public Vector2 Position
+        {
+            get => _position;
+            set
+            {
+                _position = value;
+                // Always keep relative position up-to-date
+                RelativePosition = new Vector2(
+                    _position.X / GameServices.Instance.Settings.Width,
+                    _position.Y / GameServices.Instance.Settings.Height
+                );
+            }
+        }
+        public Vector2 RelativePosition { get; protected set; } // relative to screen
         public Vector2 Velocity;
 
         public float Speed { get; protected set; }
@@ -44,6 +57,11 @@ namespace VoidZero.Game.Entities
 
             MaxHealth = 100f;
             CurrentHealth = MaxHealth;
+
+            RelativePosition = new Vector2(
+                position.X / GameServices.Instance.Settings.Width,
+                position.Y / GameServices.Instance.Settings.Height
+            );
         }
 
         public abstract void Update(float dt);
@@ -51,13 +69,22 @@ namespace VoidZero.Game.Entities
 
         public void SetPositionRelative(Vector2 absolutePos, int screenWidth, int screenHeight)
         {
-            RelativePosition = new Vector2(absolutePos.X / screenWidth, absolutePos.Y / screenHeight);
-            Position = absolutePos;
+            _position = absolutePos;
+            RelativePosition = new Vector2(
+                absolutePos.X / screenWidth,
+                absolutePos.Y / screenHeight
+            );
+        }
+
+        public void UpdateAbsolutePosition(int screenWidth, int screenHeight)
+        {
+            Position = new Vector2(RelativePosition.X * screenWidth, RelativePosition.Y * screenHeight);
         }
 
         public void OnResize(int newWidth, int newHeight)
         {
-            Position = new Vector2(RelativePosition.X * newWidth, RelativePosition.Y * newHeight);
+            // Only recalc absolute position from relative
+            _position = new Vector2(RelativePosition.X * newWidth, RelativePosition.Y * newHeight);
         }
     }
 }

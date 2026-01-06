@@ -6,16 +6,19 @@ using VoidZero.Game.Input;
 using OpenTK.Windowing.Desktop;
 using VoidZero.Core;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace VoidZero.States
 {
-    public class PlayState : GameState
+    public class PlayState : GameState, IResizableState
     {
         private readonly InputManager _input;
         private readonly GameWindow _window;
         private readonly GameStateManager _gsm;
         private readonly GameManager _gm;
         public Background _background { get; }
+        public List<Entity> Entities { get; } = new();
+
 
 
         private Player _player;
@@ -31,6 +34,8 @@ namespace VoidZero.States
             var tex = GameServices.Instance.Content.GetTexture("player");
             _player = new Player(tex, new Vector2(500, 500), _input);
             _player.SetPositionRelative(_player.Position,window.Size.X, window.Size.Y);
+
+            Entities.Add(_player);
 
         }
 
@@ -60,8 +65,8 @@ namespace VoidZero.States
 
         public void OnResize(int newWidth, int newHeight)
         {
-            _player.OnResize(newWidth, newHeight);
-            // loop through other entities if you have more
+            foreach (var entity in Entities)
+                entity.OnResize(newWidth, newHeight);
         }
     }
 }

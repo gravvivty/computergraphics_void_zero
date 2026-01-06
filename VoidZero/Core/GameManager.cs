@@ -106,9 +106,10 @@ namespace VoidZero.Core
             _imGui.WindowResized(w, h);
             _background?.Resize(w, h);
 
-            if (_stateManager._current is PlayState playState)
+            // Resize all entities in current state
+            if (_stateManager._current is IResizableState resizable)
             {
-                playState.OnResize(w, h);
+                resizable.OnResize(w, h);
             }
 
         }

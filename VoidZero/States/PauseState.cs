@@ -10,13 +10,13 @@ using VoidZero.Core;
 
 namespace VoidZero.States
 {
-    public class PauseState : GameState
+    public class PauseState : GameState, IResizableState
     {
         private readonly GameStateManager _gsm;
         private readonly GameWindow _window;
         private readonly InputManager _input;
         private readonly GameManager _gameManager;
-        private PlayState _pausedState; // The PlayState we’re pausing
+        public PlayState _pausedState { get; set; } // The PlayState we’re pausing
         private MenuPage _currentPage = MenuPage.Main;
 
         public PauseState(GameStateManager gsm, GameWindow window, InputManager input, PlayState pausedState, GameManager gm)
@@ -45,6 +45,11 @@ namespace VoidZero.States
         public override void DrawUI()
         {
             MenuUI.DrawPauseMenu(_gsm, _window, _input, ref _currentPage, _pausedState, _gameManager);
+        }
+
+        public void OnResize(int newWidth, int newHeight)
+        {
+            _pausedState.OnResize(newWidth, newHeight);
         }
     }
 }

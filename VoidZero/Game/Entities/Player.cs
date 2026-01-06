@@ -32,25 +32,20 @@ namespace VoidZero.Game.Entities
                 inputDir = inputDir.Normalized();
                 Velocity += inputDir * _acceleration * dt;
             }
-            else
+            else if (Velocity.LengthSquared > 0)
             {
-                // Smooth deceleration when no input
-                if (Velocity.LengthSquared > 0)
-                {
-                    Vector2 decel = Velocity.Normalized() * _deceleration * dt;
-
-                    if (decel.LengthSquared > Velocity.LengthSquared)
-                        Velocity = Vector2.Zero;
-                    else
-                        Velocity -= decel;
-                }
+                Vector2 decel = Velocity.Normalized() * _deceleration * dt;
+                Velocity = decel.LengthSquared > Velocity.LengthSquared ? Vector2.Zero : Velocity - decel;
             }
 
-            // Clamp speed
             if (Velocity.Length > _maxSpeed)
+            {
                 Velocity = Velocity.Normalized() * _maxSpeed;
+            }
 
+            // Move the player
             Position += Velocity * dt;
+
 
             // Hooks for later
             if (_input.Shoot)
