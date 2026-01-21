@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -55,54 +54,159 @@ namespace VoidZero.Graphics
         {
             _shader.Use();
             _shader.SetMatrix4("projection", projection);
+
+            GL.ActiveTexture(TextureUnit.Texture0);
             GL.Uniform1(GL.GetUniformLocation(_shader.Handle, "texture0"), 0);
+
             GL.BindVertexArray(_vao);
+
+            GL.Disable(EnableCap.ScissorTest);
+            GL.Disable(EnableCap.DepthTest);
+            GL.Disable(EnableCap.CullFace);
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         }
 
         public void Draw(Texture2D tex, Vector2 pos, Vector2 size)
         {
-            Draw(tex, pos, size, Vector4.One); // Color.White
+            DrawInternal(tex, pos, size, new Vector4(0, 0, 1, 1), Vector4.One);
         }
 
-        public void Draw(Texture2D tex, Vector2 pos, Vector2 size, System.Drawing.Color color)
+        public void DrawDebug(Texture2D tex, Vector2 pos, Vector2 size, Vector4 color)
         {
-            Draw(tex, pos, size, new Vector4(
-                color.R / 255f,
-                color.G / 255f,
-                color.B / 255f,
-                color.A / 255f));
+            DrawInternal(tex, pos, size, new Vector4(0, 0, 1, 1), color);
         }
 
-        private void Draw(Texture2D tex, Vector2 pos, Vector2 size, Vector4 color)
-        {
-            float r = color.X;
-            float g = color.Y;
-            float b = color.Z;
-            float a = color.W;
 
+        public void DrawFrame(Texture2D tex, Vector2 pos, Rectangle source, Vector4 color, float scale = 1f)
+        {
+            float u0 = source.X / (float)tex.Width;
+            float v0 = source.Y / (float)tex.Height;
+            float u1 = (source.X + source.Width) / (float)tex.Width;
+            float v1 = (source.Y + source.Height) / (float)tex.Height;
+
+            float w = source.Width * scale;
+            float h = source.Height * scale;
 
             float[] vertices =
             {
-                // pos              // uv      // color
-                pos.X, pos.Y+size.Y, 0, 1,      r,g,b,a,
-                pos.X+size.X, pos.Y, 1, 0,      r,g,b,a,
-                pos.X, pos.Y,        0, 0,      r,g,b,a,
+                pos.X,     pos.Y,     u0, v0, color.X, color.Y, color.Z, color.W,
+                pos.X + w, pos.Y,     u1, v0, color.X, color.Y, color.Z, color.W,
+                pos.X,     pos.Y + h, u0, v1, color.X, color.Y, color.Z, color.W,
 
-                pos.X, pos.Y+size.Y, 0, 1,      r,g,b,a,
-                pos.X+size.X,pos.Y+size.Y,1,1,  r,g,b,a,
-                pos.X+size.X,pos.Y,  1, 0,      r,g,b,a,
+                pos.X,     pos.Y + h, u0, v1, color.X, color.Y, color.Z, color.W,
+                pos.X + w, pos.Y,     u1, v0, color.X, color.Y, color.Z, color.W,
+                pos.X + w, pos.Y + h, u1, v1, color.X, color.Y, color.Z, color.W
             };
 
+            GL.BindVertexArray(_vao);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
+            GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, tex.Handle);
             GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, vertices.Length * sizeof(float), vertices);
             GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
         }
 
-        public void DrawRectangle(RectangleF rect, Color color)
+        private void DrawInternal(Texture2D tex, Vector2 pos, Vector2 size, Vector4 uv, Vector4 color)
         {
-            Draw(_whiteTexture, new Vector2(rect.X, rect.Y), new Vector2(rect.Width, rect.Height), color);
+            float x = pos.X;
+            float y = pos.Y;
+            float w = size.X;
+            float h = size.Y;
+
+            float u = uv.X;
+            float v = uv.Y;
+            float uw = uv.Z;
+            float vh = uv.W;
+
+            float r = color.X;
+            float g = color.Y;
+            float b = color.Z;
+            float a = color.W;
+
+            float[] vertices =
+            {
+                // pos              // uv            // color
+                x,     y + h, u,     v + vh, r,g,b,a,
+                x + w, y,     u + uw,v,      r,g,b,a,
+                x,     y,     u,     v,      r,g,b,a,
+
+                x,     y + h, u,     v + vh, r,g,b,a,
+                x + w, y + h, u + uw,v + vh, r,g,b,a,
+                x + w, y,     u + uw,v,      r,g,b,a
+            };
+
+            GL.BindVertexArray(_vao);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
+
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, tex.Handle);
+
+            GL.BufferSubData(
+                BufferTarget.ArrayBuffer,
+                IntPtr.Zero,
+                vertices.Length * sizeof(float),
+                vertices);
+
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+        }
+
+        public void DrawRectangle(RectangleF rect, Color color, bool filled = false)
+        {
+            float thickness = 2f;
+
+            if (filled)
+            {
+                DrawDebug(
+                    _whiteTexture,
+                    new Vector2(rect.X, rect.Y),
+                    new Vector2(rect.Width, rect.Height),
+                    new Vector4(
+                        color.R / 255f,
+                        color.G / 255f,
+                        color.B / 255f,
+                        color.A / 255f
+                    )
+                );
+                return;
+            }
+
+            // Top
+            DrawDebug(_whiteTexture,
+                new Vector2(rect.X, rect.Y),
+                new Vector2(rect.Width, thickness),
+                ColorToVec4(color));
+
+            // Bottom
+            DrawDebug(_whiteTexture,
+                new Vector2(rect.X, rect.Y + rect.Height - thickness),
+                new Vector2(rect.Width, thickness),
+                ColorToVec4(color));
+
+            // Left
+            DrawDebug(_whiteTexture,
+                new Vector2(rect.X, rect.Y),
+                new Vector2(thickness, rect.Height),
+                ColorToVec4(color));
+
+            // Right
+            DrawDebug(_whiteTexture,
+                new Vector2(rect.X + rect.Width - thickness, rect.Y),
+                new Vector2(thickness, rect.Height),
+                ColorToVec4(color));
         }
 
         public void End() { }
+
+        private Vector4 ColorToVec4(Color c)
+        {
+            return new Vector4(
+                c.R / 255f,
+                c.G / 255f,
+                c.B / 255f,
+                c.A / 255f
+            );
+        }
     }
 }

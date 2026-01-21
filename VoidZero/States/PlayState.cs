@@ -54,8 +54,6 @@ namespace VoidZero.States
         public override void Draw(SpriteBatch spriteBatch)
         {
             _player.Draw(spriteBatch);
-            // Debug player hitbox
-            //spriteBatch.DrawRectangle(_player.Hitbox, Color.Red);
         }
 
         public override void DrawUI()

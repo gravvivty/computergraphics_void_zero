@@ -81,7 +81,6 @@ namespace VoidZero.Core
         public void Draw()
         {
             ImGui.PushFont(_defaultFont);
-            _background.Draw(_spriteBatch); // draw background first
 
             // 2️⃣ Draw game objects
             Matrix4 projection = Matrix4.CreateOrthographicOffCenter(
@@ -90,11 +89,10 @@ namespace VoidZero.Core
                 -1, 1);
 
             _spriteBatch.Begin(projection);
+            _background.Draw(_spriteBatch); // draw background first
             _stateManager.Draw(_spriteBatch); // only draws state-specific sprites
-            _spriteBatch.End();
-
-            // 3️⃣ Draw UI (ImGui)
             _stateManager.DrawUI();
+            _spriteBatch.End();
             ImGui.PopFont();
             _imGui.Render();
         }

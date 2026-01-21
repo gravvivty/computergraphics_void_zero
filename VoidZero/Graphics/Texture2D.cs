@@ -26,6 +26,8 @@ namespace VoidZero.Graphics
             Handle = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, Handle);
 
+            GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+
             GL.TexImage2D(TextureTarget.Texture2D, 0,
                 PixelInternalFormat.Rgba,
                 Width, Height, 0,
@@ -45,6 +47,8 @@ namespace VoidZero.Graphics
 
             Handle = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, Handle);
+
+            GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 
             GL.TexImage2D(TextureTarget.Texture2D, 0,
                 PixelInternalFormat.Rgba,

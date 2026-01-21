@@ -7,9 +7,11 @@ namespace VoidZero.Game.Entities
     public abstract class Entity
     {
         public Texture2D Texture { get; protected set; }
+        protected AnimationManager Animations { get; }
 
         public float MaxHealth { get; protected set; }
         public float CurrentHealth { get; protected set; }
+        public float Scale { get; set; } = 8f;
 
         private Vector2 _position;
         public Vector2 Position
@@ -62,10 +64,22 @@ namespace VoidZero.Game.Entities
                 position.X / GameServices.Instance.Settings.Width,
                 position.Y / GameServices.Instance.Settings.Height
             );
+
+            Animations = new AnimationManager();
         }
 
         public abstract void Update(float dt);
-        public abstract void Draw(SpriteBatch spriteBatch);
+        public virtual void Draw(SpriteBatch batch)
+        {
+            Animations.Draw(batch, Position, Scale);
+            // Debug
+            batch.DrawRectangle(Hitbox, Color.Red);
+        }
+
+        protected void UpdateAnimation(string key, float dt)
+        {
+            Animations.Update(key, dt);
+        }
 
         public void SetPositionRelative(Vector2 absolutePos, int screenWidth, int screenHeight)
         {

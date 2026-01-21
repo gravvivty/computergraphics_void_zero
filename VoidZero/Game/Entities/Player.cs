@@ -1,6 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using VoidZero.Graphics;
 using VoidZero.Game.Input;
+using System;
 
 namespace VoidZero.Game.Entities
 {
@@ -13,9 +14,21 @@ namespace VoidZero.Game.Entities
         private readonly float _maxSpeed = 1000f;
 
         public Player(Texture2D texture, Vector2 startPos, InputManager input)
-            : base(texture, startPos, 128, 128)
+            : base(texture, startPos, 16, 16)
         {
             _input = input;
+
+            // Do this for every entity
+            this.Scale = 6f;
+            Width = 16 * Scale;
+            Height = 16 * Scale;
+
+            Animations.Add("Up", new Animation(texture, 16, 16, 3, 0.1f, 0));
+            Animations.Add("Right", new Animation(texture, 16, 16, 3, 0.1f, 2));
+            Animations.Add("Down", new Animation(texture, 16, 16, 3, 0.1f, 4));
+            Animations.Add("Left", new Animation(texture, 16, 16, 3, 0.1f, 6));
+
+            Animations.Add("Idle", new Animation(texture, 16, 16, 1, 1f, 0));
         }
 
         public override void Update(float dt)
@@ -57,11 +70,24 @@ namespace VoidZero.Game.Entities
             {
                 // TODO: Switch shield
             }
+
+            UpdateAnimation(GetAnimationKey(inputDir), dt);
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch batch)
         {
-            spriteBatch.Draw(Texture, Position, new Vector2(Width, Height));
+            base.Draw(batch);
+        }
+
+        private string GetAnimationKey(Vector2 dir)
+        {
+            if (dir.LengthSquared == 0)
+                return "Idle";
+
+            if (Math.Abs(dir.X) > Math.Abs(dir.Y))
+                return dir.X > 0 ? "Right" : "Left";
+            else
+                return dir.Y > 0 ? "Down" : "Up";
         }
     }
 }

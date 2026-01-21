@@ -5,8 +5,8 @@ using VoidZero.Graphics;
 using VoidZero.Game.Input;
 using System;
 using VoidZero.UI;
-using static VoidZero.UI.MenuUI;
 using VoidZero.Core;
+using static VoidZero.UI.MenuUI;
 
 namespace VoidZero.States
 {
