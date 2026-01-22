@@ -28,11 +28,11 @@ namespace VoidZero.Graphics
             _animations[_currentKey].Update(dt);
         }
 
-        public void Draw(SpriteBatch batch, Vector2 position, float scale)
+        public void Draw(SpriteBatch batch, Vector2 position, float scale, Vector4 tint)
         {
             if (_currentKey != null)
             {
-                _animations[_currentKey].Draw(batch, position, scale);
+                _animations[_currentKey].Draw(batch, position, scale, tint);
             }
         }
     }

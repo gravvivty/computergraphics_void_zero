@@ -36,7 +36,7 @@ namespace VoidZero.Game.Combat.Patterns
         {
             Vector2 spawnPos = new(
                 shooter.Position.X + shooter.Width / 4f,
-                shooter.Position.Y + (owner == BulletOwner.Player ? 0 : shooter.Height)
+                shooter.Position.Y + (owner == BulletOwner.Player ? 0 : shooter.Height/2f)
             );
 
             // Center

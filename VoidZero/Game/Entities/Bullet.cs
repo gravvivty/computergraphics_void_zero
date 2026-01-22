@@ -2,6 +2,7 @@
 using VoidZero.Graphics;
 using VoidZero.Game.Combat;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace VoidZero.Game.Entities
 {
@@ -50,5 +51,19 @@ namespace VoidZero.Game.Entities
         }
 
         public bool IsExpired => Lifetime <= 0f;
+
+        public override RectangleF Hitbox
+        {
+            get
+            {
+                float shrinkFactor = 0.3f; // shrink 30% from each side
+                float offsetX = Width * shrinkFactor;
+                float offsetY = Height * shrinkFactor;
+                float hitboxWidth = Width * (1f - 2f * shrinkFactor);
+                float hitboxHeight = Height * (1f - 2f * shrinkFactor);
+
+                return new RectangleF(Position.X + offsetX, Position.Y + offsetY, hitboxWidth, hitboxHeight);
+            }
+        }
     }
 }

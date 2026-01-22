@@ -19,6 +19,8 @@ namespace VoidZero.Game.Entities
         public Player(Texture2D texture, Vector2 startPos, InputManager input, BulletManager bulletManager)
             : base(texture, startPos, 16, 16)
         {
+            MaxHealth = 100f;
+            CurrentHealth = MaxHealth;
             _input = input;
 
             var bulletTex = GameServices.Instance.Content.GetTexture("VanillaBullet");
@@ -29,9 +31,10 @@ namespace VoidZero.Game.Entities
                 0.125f,
                 10f
             );
+            _shooter.BulletEnergy = BulletEnergy.Neutral;
 
             // Do this for every entity
-            this.Scale = 6f;
+            this.Scale = 4f;
             Width = 16 * Scale;
             Height = 16 * Scale;
 

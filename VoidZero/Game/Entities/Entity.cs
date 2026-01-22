@@ -1,6 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using System.Drawing;
 using VoidZero.Graphics;
+using VoidZero.Utils;
 
 namespace VoidZero.Game.Entities
 {
@@ -9,9 +10,11 @@ namespace VoidZero.Game.Entities
         public Texture2D Texture { get; protected set; }
         protected AnimationManager Animations { get; }
 
-        public float MaxHealth { get; protected set; }
-        public float CurrentHealth { get; protected set; }
+        public float MaxHealth { get; set; }
+        public float CurrentHealth { get; set; }
         public float Scale { get; set; } = 8f;
+
+        public MovementComponent Movement { get; set; }
 
         private Vector2 _position;
         public Vector2 Position
@@ -36,15 +39,15 @@ namespace VoidZero.Game.Entities
         public float Height { get; protected set; }
 
         // Placeholder hitbox for later collision work
-        public RectangleF Hitbox
+        public virtual RectangleF Hitbox
         {
             get
             {
                 float shrinkFactor = 0.25f; // 25%
-                float offsetX = Width * (shrinkFactor / 2f);
-                float offsetY = Height * (shrinkFactor / 2f);
-                float hitboxWidth = Width * (1f - shrinkFactor);
-                float hitboxHeight = Height * (1f - shrinkFactor);
+                float offsetX = Width * (shrinkFactor);
+                float offsetY = Height * (shrinkFactor);
+                float hitboxWidth = Width * (1f - 2f * shrinkFactor);
+                float hitboxHeight = Height * (1f - 2f * shrinkFactor);
 
                 return new RectangleF(Position.X + offsetX, Position.Y + offsetY, hitboxWidth, hitboxHeight);
             }
@@ -71,7 +74,11 @@ namespace VoidZero.Game.Entities
         public abstract void Update(float dt);
         public virtual void Draw(SpriteBatch batch)
         {
-            Animations.Draw(batch, Position, Scale);
+            Vector4 tint = Vector4.One; // default no tint
+            if (this is Bullet bullet)
+                tint = BulletColorHelper.GetTint(bullet.Energy);
+
+            Animations.Draw(batch, Position, Scale, tint);
             // Debug
             batch.DrawRectangle(Hitbox, Color.Red);
         }

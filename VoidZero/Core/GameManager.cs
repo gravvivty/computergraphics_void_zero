@@ -41,6 +41,7 @@ namespace VoidZero.Core
 
             GameServices.Instance.Content.LoadTexture("player", "Content/player.png");
             GameServices.Instance.Content.LoadTexture("VanillaBullet", "Content/Bullets/VanillaBullet.png");
+            GameServices.Instance.Content.LoadTexture("Witch", "Content/Enemies/Witch.png");
 
             _input = new InputManager();
             _spriteBatch = new SpriteBatch();

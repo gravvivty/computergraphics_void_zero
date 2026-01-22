@@ -10,7 +10,8 @@ namespace VoidZero.Game.Combat
     {
         Green,
         Yellow,
-        Purple
+        Purple,
+        Neutral
     }
 
     public enum BulletOwner

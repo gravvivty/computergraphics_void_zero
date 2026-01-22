@@ -14,6 +14,8 @@ namespace VoidZero.Game.Combat
         private float _timer;
         private BulletEnergy _bulletEnergy = BulletEnergy.Green;
 
+        public IBulletPattern Pattern => _pattern;
+
         public ShooterComponent(
             IBulletPattern pattern,
             BulletManager manager,
