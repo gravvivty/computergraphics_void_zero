@@ -21,5 +21,9 @@ namespace VoidZero.Game.Input
         public bool Shoot => _keyboard.IsKeyDown(Keys.J);
         public bool SwitchShield => _keyboard.IsKeyDown(Keys.K);
         public bool Dash => _keyboard.IsKeyDown(Keys.Space);
+
+        // Debug pattern swap
+        public bool SwitchPatternPressed => _keyboard.IsKeyPressed(Keys.L);
+
     }
 }

@@ -7,6 +7,7 @@ using OpenTK.Windowing.Desktop;
 using VoidZero.Core;
 using System.Drawing;
 using System.Collections.Generic;
+using VoidZero.Game.Combat;
 
 namespace VoidZero.States
 {
@@ -16,6 +17,8 @@ namespace VoidZero.States
         private readonly GameWindow _window;
         private readonly GameStateManager _gsm;
         private readonly GameManager _gm;
+        public BulletManager Bullets { get; } = new();
+
         public Background _background { get; }
         public List<Entity> Entities { get; } = new();
 
@@ -32,7 +35,7 @@ namespace VoidZero.States
             _gm = gm;
 
             var tex = GameServices.Instance.Content.GetTexture("player");
-            _player = new Player(tex, new Vector2(500, 500), _input);
+            _player = new Player(tex, new Vector2(500, 500), _input, Bullets);
             _player.SetPositionRelative(_player.Position,window.Size.X, window.Size.Y);
 
             Entities.Add(_player);
@@ -43,6 +46,8 @@ namespace VoidZero.States
         {
             _background.Update(dt);
             _player.Update(dt);
+            Bullets.Update(dt);
+
 
             // Pause logic
             if (_input.PausePressed)
@@ -54,6 +59,7 @@ namespace VoidZero.States
         public override void Draw(SpriteBatch spriteBatch)
         {
             _player.Draw(spriteBatch);
+            Bullets.Draw(spriteBatch);
         }
 
         public override void DrawUI()

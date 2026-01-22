@@ -2,6 +2,8 @@
 using VoidZero.Graphics;
 using VoidZero.Game.Input;
 using System;
+using VoidZero.Game.Combat;
+using VoidZero.Game.Combat.Patterns;
 
 namespace VoidZero.Game.Entities
 {
@@ -9,14 +11,24 @@ namespace VoidZero.Game.Entities
     {
         private readonly InputManager _input;
 
-        private readonly float _acceleration = 8000f;
-        private readonly float _deceleration = 5000f;
+        private readonly float _acceleration = 10000f; // low -> on ice
+        private readonly float _deceleration = 3000f;
         private readonly float _maxSpeed = 1000f;
+        private ShooterComponent _shooter;
 
-        public Player(Texture2D texture, Vector2 startPos, InputManager input)
+        public Player(Texture2D texture, Vector2 startPos, InputManager input, BulletManager bulletManager)
             : base(texture, startPos, 16, 16)
         {
             _input = input;
+
+            var bulletTex = GameServices.Instance.Content.GetTexture("VanillaBullet");
+            _shooter = new ShooterComponent(
+                new FixedDirectionPattern(bulletTex, -Vector2.UnitY),
+                bulletManager,
+                BulletOwner.Player,
+                0.125f,
+                10f
+            );
 
             // Do this for every entity
             this.Scale = 6f;
@@ -56,7 +68,6 @@ namespace VoidZero.Game.Entities
                 Velocity = Velocity.Normalized() * _maxSpeed;
             }
 
-            // Move the player
             Position += Velocity * dt;
 
 
@@ -71,7 +82,20 @@ namespace VoidZero.Game.Entities
                 // TODO: Switch shield
             }
 
+            _shooter.TryShoot(this, dt, _input.Shoot);
             UpdateAnimation(GetAnimationKey(inputDir), dt);
+
+            // Debug pattern
+            if (_input.SwitchPatternPressed)
+            {
+                _shooter.SetPattern(
+                    new ThreeWaySpreadPattern(
+                        GameServices.Instance.Content.GetTexture("VanillaBullet"),
+                        -Vector2.UnitY,
+                        40f
+                    )
+                );
+            }
         }
 
         public override void Draw(SpriteBatch batch)
