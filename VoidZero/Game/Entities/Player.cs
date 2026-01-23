@@ -4,6 +4,8 @@ using VoidZero.Game.Input;
 using System;
 using VoidZero.Game.Combat;
 using VoidZero.Game.Combat.Patterns;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace VoidZero.Game.Entities
 {
@@ -15,6 +17,8 @@ namespace VoidZero.Game.Entities
         private readonly float _deceleration = 3000f;
         private readonly float _maxSpeed = 550f;
         private ShooterComponent _shooter;
+        public BulletEnergy ActiveShield { get; private set; } = BulletEnergy.Yellow;
+        // Grazing
         private bool _isCurrentlyGrazing = false;
         private float _grazeAccumulatedTime = 0f;
         private float _currentDamageMultiplier = 1f;
@@ -24,7 +28,21 @@ namespace VoidZero.Game.Entities
         const float GrazeDecayRate = 1.5f;
         public float GrazeTimer { get; private set; } = 0f;
         public float DamageMultiplier => _currentDamageMultiplier;
-        public BulletEnergy ActiveShield { get; private set; } = BulletEnergy.Yellow;
+        // Dashing
+        private const float DashDistance = 200f;
+        private const float DashCooldown = 0.2f;
+        private const float DashDuration = 0.08f;
+        private float _dashCooldownTimer = 0f;
+        private float _dashTimer = 0f;
+        private Vector2 _dashVelocity;
+        private bool _isDashing = false;
+        public bool IsInvulnerable { get; private set; }
+        // Afterimages
+        private const int MaxAfterImages = 5;
+        private const float AfterImageSpawnRate = 0.015f;
+        private const float AfterImageLifetime = 0.15f;
+        private float _afterImageTimer = 0f;
+        private readonly Queue<AfterImage> _afterImages = new();
 
 
         public Player(Texture2D texture, Vector2 startPosition, InputManager input, BulletManager bulletManager)
@@ -59,17 +77,25 @@ namespace VoidZero.Game.Entities
 
         public override void Update(float dt)
         {
-            Vector2 inputDirection = _input.MoveAxis;
+            if (_dashCooldownTimer > 0f)
+            {
+                _dashCooldownTimer -= dt;
+            }
 
+            Vector2 inputDirection = _input.MoveAxis;
             bool hasMovementInput = inputDirection.LengthSquared > 0;
             bool movementPriority = hasMovementInput ||  _input.ShootHeld;
 
+            if (_input.DashPressed && !_isDashing && _dashCooldownTimer <= 0f)
+            {
+                TryStartDash();
+            }
+            ApplyAfterImages(dt);
+            UpdateAfterImages(dt);
             ApplyMovement(inputDirection, dt, movementPriority);
             _shooter.TryShoot(this, dt, _input.ShootHeld);
-
             string animationKey = GetAnimationKey(hasMovementInput ? inputDirection : Velocity);
             UpdateAnimation(animationKey, dt);
-
             UpdateGraze(dt);
 
             if (_input.SwitchShieldPressed)
@@ -93,6 +119,15 @@ namespace VoidZero.Game.Entities
 
         public override void Draw(SpriteBatch batch)
         {
+            foreach (AfterImage image in _afterImages)
+            {
+                float alpha = image.Lifetime / image.MaxLifetime;
+                alpha = MathF.Sqrt(alpha);
+                Vector4 tint = new Vector4(1f, 1f, 1f, alpha * 0.5f);
+
+                Animations.Draw(batch, image.Position, Scale, tint);
+            }
+
             base.Draw(batch);
         }
 
@@ -171,6 +206,21 @@ namespace VoidZero.Game.Entities
 
         private void ApplyMovement(Vector2 input, float dt, bool movementPriority)
         {
+            if (_isDashing)
+            {
+                Position += _dashVelocity * dt;
+                _dashTimer -= dt;
+
+                if (_dashTimer <= 0f)
+                {
+                    _isDashing = false;
+                    IsInvulnerable = false;
+                    Velocity = Vector2.Zero; // no sliding after dash
+                }
+
+                return; // skip normal movement
+            }
+
             if (input.LengthSquared > 0)
             {
                 Velocity += input * _acceleration * dt;
@@ -206,6 +256,64 @@ namespace VoidZero.Game.Entities
                 BulletEnergy.Yellow => BulletEnergy.Blue,
                 _ => BulletEnergy.Yellow
             };
+        }
+
+        private void TryStartDash()
+        {
+            Vector2 direction = _input.MoveAxis;
+
+            if (direction.LengthSquared == 0)
+            {
+                return; // no direction, no dash
+            }
+
+            direction = direction.Normalized();
+
+            _afterImageTimer = 0f;
+            _isDashing = true;
+            IsInvulnerable = true;
+            _dashTimer = DashDuration;
+            _dashCooldownTimer = DashCooldown;
+            _dashVelocity = direction * (DashDistance / DashDuration);
+        }
+
+        private void ApplyAfterImages(float dt)
+        {
+            if (_isDashing)
+            {
+                _afterImageTimer -= dt;
+
+                if (_afterImageTimer <= 0f)
+                {
+                    _afterImageTimer = AfterImageSpawnRate;
+
+                    if (_afterImages.Count >= MaxAfterImages)
+                        _afterImages.Dequeue();
+
+                    _afterImages.Enqueue(new AfterImage
+                    {
+                        Position = Position,
+                        Lifetime = AfterImageLifetime,
+                        MaxLifetime = AfterImageLifetime
+                    });
+                }
+            }
+        }
+
+        private void UpdateAfterImages(float dt)
+        {
+            int count = _afterImages.Count;
+
+            for (int i = 0; i < count; i++)
+            {
+                AfterImage image = _afterImages.Dequeue();
+                image.Lifetime -= dt;
+
+                if (image.Lifetime > 0f)
+                {
+                    _afterImages.Enqueue(image);
+                }
+            }
         }
     }
 }

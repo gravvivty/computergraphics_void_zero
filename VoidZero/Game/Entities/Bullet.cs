@@ -52,7 +52,7 @@ namespace VoidZero.Game.Entities
         {
             base.Draw(batch);
             // Debug grazing
-            batch.DrawRectangle(GrazeHitbox, Color.White);
+            //batch.DrawRectangle(GrazeHitbox, Color.White);
         }
 
         public override RectangleF Hitbox

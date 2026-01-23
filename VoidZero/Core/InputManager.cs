@@ -14,6 +14,7 @@ namespace VoidZero.Game.Input
         public Vector2 MoveAxis { get; private set; }
         public bool ShootHeld { get; private set; }
         public bool SwitchShieldPressed { get; private set; }
+        public bool DashPressed { get; private set; }
 
         public bool SwitchPatternPressed { get; private set; }
 
@@ -43,6 +44,7 @@ namespace VoidZero.Game.Input
 
             SwitchPatternPressed = _keyboard.IsKeyPressed(Keys.L);
             SwitchShieldPressed = _keyboard.IsKeyPressed(Keys.K);
+            DashPressed = _keyboard.IsKeyPressed(Keys.Space);
         }
 
         public bool ConsumePausePressed()

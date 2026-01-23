@@ -150,6 +150,12 @@ namespace VoidZero.States
 
                     if (damageHit)
                     {
+                        if (_player.IsInvulnerable)
+                        {
+                            Bullets.Bullets.RemoveAt(i);
+                            continue;
+                        }
+
                         if (shieldAbsorbs)
                         {
                             _playerShield.Flash();
