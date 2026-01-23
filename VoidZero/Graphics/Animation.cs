@@ -11,6 +11,8 @@ namespace VoidZero.Graphics
         private float _frameTime;
         private float _timeLeft;
         private bool _playing = true;
+        public void Start() => _playing = true;
+        public void Stop() => _playing = false;
 
         public Animation(Texture2D texture, int frameWidth, int frameHeight, int frameCount, float frameTime, int column = 0)
         {
@@ -29,9 +31,6 @@ namespace VoidZero.Graphics
                 _frames.Add(new Rectangle(x, y, frameWidth, frameHeight));
             }
         }
-
-        public void Start() => _playing = true;
-        public void Stop() => _playing = false;
 
         public void Reset()
         {

@@ -18,8 +18,8 @@ namespace VoidZero.States
     {
         private readonly InputManager _input;
         private readonly GameWindow _window;
-        private readonly GameStateManager _gsm;
-        private readonly GameManager _gm;
+        private readonly GameStateManager _gameStateManager;
+        private readonly GameManager _gameManager;
         public BulletManager Bullets { get; } = new();
 
         public Background _background { get; }
@@ -31,25 +31,25 @@ namespace VoidZero.States
 
         public PlayState(GameStateManager gsm, GameWindow window, InputManager input, Background bg, GameManager gm)
         {
-            _gsm = gsm;
+            _gameStateManager = gsm;
             _window = window;
             _input = input;
             _background = bg;
-            _gm = gm;
+            _gameManager = gm;
 
-            var tex = GameServices.Instance.Content.GetTexture("player");
-            _player = new Player(tex, new Vector2(500, 500), _input, Bullets);
+            Texture2D playerTexture = GameServices.Instance.Content.GetTexture("player");
+            _player = new Player(playerTexture, new Vector2(500, 500), _input, Bullets);
             _player.SetPositionRelative(_player.Position,window.Size.X, window.Size.Y);
 
-            var shieldTex = GameServices.Instance.Content.GetTexture("shield");
-            _playerShield = new Shield(shieldTex, _player);
+            Texture2D shieldTexture = GameServices.Instance.Content.GetTexture("shield");
+            _playerShield = new Shield(shieldTexture, _player);
 
-            var stationaryEnemyTexture = GameServices.Instance.Content.GetTexture("witch");
-            var stationaryEnemy = new StationaryEnemy(stationaryEnemyTexture, new Vector2(750, 0), Bullets);
+            Texture2D stationaryEnemyTexture = GameServices.Instance.Content.GetTexture("witch");
+            StationaryEnemy stationaryEnemy = new StationaryEnemy(stationaryEnemyTexture, new Vector2(750, 0), Bullets);
             stationaryEnemy.SetPositionRelative(stationaryEnemy.Position, _window.Size.X, _window.Size.Y);
 
-            var rotatingEnemyTexture = GameServices.Instance.Content.GetTexture("witch");
-            var rotatingEnemy = new RotatingEnemy(rotatingEnemyTexture, new Vector2(350, 0), Bullets, 1);
+            Texture2D rotatingEnemyTexture = GameServices.Instance.Content.GetTexture("witch");
+            RotatingEnemy rotatingEnemy = new RotatingEnemy(rotatingEnemyTexture, new Vector2(350, 0), Bullets, 1);
             rotatingEnemy.SetPositionRelative(rotatingEnemy.Position, _window.Size.X, _window.Size.Y);
             rotatingEnemy.Movement = new MovementComponent(Vector2.UnitX, 200f, 5f);
 
@@ -64,21 +64,22 @@ namespace VoidZero.States
         {
             _background.Update(dt);
             foreach (var entity in Entities.ToList())
+            {
                 entity.Update(dt);
+            }
             Bullets.Update(dt);
             HandleBulletHits(dt);
-
 
             // Pause logic
             if (_input.ConsumePausePressed())
             {
-                _gsm.ChangeState(new PauseState(_gsm, _window, _input, this, _gm));
+                _gameStateManager.ChangeState(new PauseState(_gameStateManager, _window, _input, this, _gameManager));
             }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            foreach (var entity in Entities)
+            foreach (Entity entity in Entities)
             {
                 entity.Draw(spriteBatch);
             }
@@ -94,20 +95,22 @@ namespace VoidZero.States
 
         public void OnResize(int newWidth, int newHeight)
         {
-            foreach (var entity in Entities)
+            foreach (Entity entity in Entities)
+            {
                 entity.OnResize(newWidth, newHeight);
+            }
         }
 
         private void HandleBulletHits(float dt)
         {
             for (int i = Bullets.Bullets.Count - 1; i >= 0; i--)
             {
-                var bullet = Bullets.Bullets[i];
+                Bullet bullet = Bullets.Bullets[i];
 
                 // Player bullets hitting enemies
                 if (bullet.Owner == BulletOwner.Player)
                 {
-                    foreach (var entity in Entities)
+                    foreach (Entity entity in Entities)
                     {
                         // Check if entity is any type of enemy
                         if (entity is RotatingEnemy || entity is StationaryEnemy)
@@ -118,7 +121,9 @@ namespace VoidZero.States
                                 Bullets.Bullets.RemoveAt(i);
 
                                 if (entity.CurrentHealth <= 0)
+                                {
                                     Entities.Remove(entity);
+                                }  
 
                                 break;
                             }
@@ -159,6 +164,5 @@ namespace VoidZero.States
                 }
             }
         }
-
     }
 }

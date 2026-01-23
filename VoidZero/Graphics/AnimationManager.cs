@@ -8,15 +8,21 @@ namespace VoidZero.Graphics
         private readonly Dictionary<string, Animation> _animations = new();
         private string _currentKey;
 
-        public void Add(string key, Animation anim)
+        public void Add(string key, Animation animation)
         {
-            _animations[key] = anim;
-            if (_currentKey == null) _currentKey = key;
+            _animations[key] = animation;
+            if (_currentKey == null)
+            {
+                _currentKey = key;
+            }
         }
 
         public void Update(string key, float dt)
         {
-            if (!_animations.ContainsKey(key)) return;
+            if (!_animations.ContainsKey(key))
+            {
+                return;
+            }
 
             if (_currentKey != key)
             {

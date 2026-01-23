@@ -7,13 +7,13 @@ using System;
 
 public class CardinalPattern : IBulletPattern
 {
-    private readonly Texture2D _tex;
+    private readonly Texture2D _bulletTexture;
     private readonly float _bulletSpeed;
     private float _rotation;
 
-    public CardinalPattern(Texture2D tex, float bulletSpeed = 1500f)
+    public CardinalPattern(Texture2D bulletTexture, float bulletSpeed = 1500f)
     {
-        _tex = tex;
+        _bulletTexture = bulletTexture;
         _bulletSpeed = bulletSpeed;
         _rotation = 0f;
     }
@@ -25,7 +25,7 @@ public class CardinalPattern : IBulletPattern
 
     public void Shoot(Entity shooter, BulletManager bullets, BulletOwner owner, float damage, BulletEnergy energy)
     {
-        Vector2[] dirs =
+        Vector2[] directions =
         {
             Vector2.UnitX,
             -Vector2.UnitX,
@@ -38,17 +38,17 @@ public class CardinalPattern : IBulletPattern
             shooter.Position.Y + (owner == BulletOwner.Player ? 0 : shooter.Height/2f)
         );
 
-        for (int i = 0; i < dirs.Length; i++)
+        for (int i = 0; i < directions.Length; i++)
         {
-            dirs[i] = Rotate(dirs[i], _rotation);
+            directions[i] = Rotate(directions[i], _rotation);
         }
 
-        foreach (var dir in dirs)
+        foreach (Vector2 direction in directions)
         {
             bullets.Add(new Bullet(
-                _tex,
+                _bulletTexture,
                 spawnPos,
-                dir,
+                direction,
                 _bulletSpeed,
                 damage,
                 energy,
@@ -57,13 +57,13 @@ public class CardinalPattern : IBulletPattern
         }
     }
 
-    private static Vector2 Rotate(Vector2 v, float radians)
+    private static Vector2 Rotate(Vector2 vector, float radians)
     {
         float cos = MathF.Cos(radians);
         float sin = MathF.Sin(radians);
         return new Vector2(
-            v.X * cos - v.Y * sin,
-            v.X * sin + v.Y * cos
+            vector.X * cos - vector.Y * sin,
+            vector.X * sin + vector.Y * cos
         ).Normalized();
     }
 }

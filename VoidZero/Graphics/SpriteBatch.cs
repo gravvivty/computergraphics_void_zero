@@ -46,7 +46,7 @@ namespace VoidZero.Graphics
             GL.EnableVertexAttribArray(2);
 
             // Create a 1x1 white texture
-            _whiteTexture = new Texture2D(1, 1, new byte[] { 255, 255, 255, 255 });
+            _whiteTexture = new Texture2D(1, 1, [255, 255, 255, 255]);
 
         }
 
@@ -68,50 +68,50 @@ namespace VoidZero.Graphics
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         }
 
-        public void Draw(Texture2D tex, Vector2 pos, Vector2 size)
+        public void Draw(Texture2D texture, Vector2 position, Vector2 size)
         {
-            DrawInternal(tex, pos, size, new Vector4(0, 0, 1, 1), Vector4.One);
+            DrawInternal(texture, position, size, new Vector4(0, 0, 1, 1), Vector4.One);
         }
 
-        public void DrawDebug(Texture2D tex, Vector2 pos, Vector2 size, Vector4 color)
+        public void DrawDebug(Texture2D texture, Vector2 position, Vector2 size, Vector4 color)
         {
-            DrawInternal(tex, pos, size, new Vector4(0, 0, 1, 1), color);
+            DrawInternal(texture, position, size, new Vector4(0, 0, 1, 1), color);
         }
 
 
-        public void DrawFrame(Texture2D tex, Vector2 pos, Rectangle source, Vector4 color, float scale = 1f)
+        public void DrawFrame(Texture2D texture, Vector2 position, Rectangle source, Vector4 color, float scale = 1f)
         {
-            float u0 = source.X / (float)tex.Width;
-            float v0 = source.Y / (float)tex.Height;
-            float u1 = (source.X + source.Width) / (float)tex.Width;
-            float v1 = (source.Y + source.Height) / (float)tex.Height;
+            float u0 = source.X / (float)texture.Width;
+            float v0 = source.Y / (float)texture.Height;
+            float u1 = (source.X + source.Width) / (float)texture.Width;
+            float v1 = (source.Y + source.Height) / (float)texture.Height;
 
             float w = source.Width * scale;
             float h = source.Height * scale;
 
             float[] vertices =
             {
-                pos.X,     pos.Y,     u0, v0, color.X, color.Y, color.Z, color.W,
-                pos.X + w, pos.Y,     u1, v0, color.X, color.Y, color.Z, color.W,
-                pos.X,     pos.Y + h, u0, v1, color.X, color.Y, color.Z, color.W,
+                position.X,     position.Y,     u0, v0, color.X, color.Y, color.Z, color.W,
+                position.X + w, position.Y,     u1, v0, color.X, color.Y, color.Z, color.W,
+                position.X,     position.Y + h, u0, v1, color.X, color.Y, color.Z, color.W,
 
-                pos.X,     pos.Y + h, u0, v1, color.X, color.Y, color.Z, color.W,
-                pos.X + w, pos.Y,     u1, v0, color.X, color.Y, color.Z, color.W,
-                pos.X + w, pos.Y + h, u1, v1, color.X, color.Y, color.Z, color.W
+                position.X,     position.Y + h, u0, v1, color.X, color.Y, color.Z, color.W,
+                position.X + w, position.Y,     u1, v0, color.X, color.Y, color.Z, color.W,
+                position.X + w, position.Y + h, u1, v1, color.X, color.Y, color.Z, color.W
             };
 
             GL.BindVertexArray(_vao);
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
             GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, tex.Handle);
+            GL.BindTexture(TextureTarget.Texture2D, texture.Handle);
             GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, vertices.Length * sizeof(float), vertices);
             GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
         }
 
-        private void DrawInternal(Texture2D tex, Vector2 pos, Vector2 size, Vector4 uv, Vector4 color)
+        private void DrawInternal(Texture2D texture, Vector2 position, Vector2 size, Vector4 uv, Vector4 color)
         {
-            float x = pos.X;
-            float y = pos.Y;
+            float x = position.X;
+            float y = position.Y;
             float w = size.X;
             float h = size.Y;
 
@@ -141,7 +141,7 @@ namespace VoidZero.Graphics
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
 
             GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, tex.Handle);
+            GL.BindTexture(TextureTarget.Texture2D, texture.Handle);
 
             GL.BufferSubData(
                 BufferTarget.ArrayBuffer,
@@ -152,7 +152,7 @@ namespace VoidZero.Graphics
             GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
         }
 
-        public void DrawRectangle(RectangleF rect, Color color, bool filled = false)
+        public void DrawRectangle(RectangleF rectangle, Color color, bool filled = false)
         {
             float thickness = 2f;
 
@@ -160,8 +160,8 @@ namespace VoidZero.Graphics
             {
                 DrawDebug(
                     _whiteTexture,
-                    new Vector2(rect.X, rect.Y),
-                    new Vector2(rect.Width, rect.Height),
+                    new Vector2(rectangle.X, rectangle.Y),
+                    new Vector2(rectangle.Width, rectangle.Height),
                     new Vector4(
                         color.R / 255f,
                         color.G / 255f,
@@ -174,26 +174,26 @@ namespace VoidZero.Graphics
 
             // Top
             DrawDebug(_whiteTexture,
-                new Vector2(rect.X, rect.Y),
-                new Vector2(rect.Width, thickness),
+                new Vector2(rectangle.X, rectangle.Y),
+                new Vector2(rectangle.Width, thickness),
                 ColorToVec4(color));
 
             // Bottom
             DrawDebug(_whiteTexture,
-                new Vector2(rect.X, rect.Y + rect.Height - thickness),
-                new Vector2(rect.Width, thickness),
+                new Vector2(rectangle.X, rectangle.Y + rectangle.Height - thickness),
+                new Vector2(rectangle.Width, thickness),
                 ColorToVec4(color));
 
             // Left
             DrawDebug(_whiteTexture,
-                new Vector2(rect.X, rect.Y),
-                new Vector2(thickness, rect.Height),
+                new Vector2(rectangle.X, rectangle.Y),
+                new Vector2(thickness, rectangle.Height),
                 ColorToVec4(color));
 
             // Right
             DrawDebug(_whiteTexture,
-                new Vector2(rect.X + rect.Width - thickness, rect.Y),
-                new Vector2(thickness, rect.Height),
+                new Vector2(rectangle.X + rectangle.Width - thickness, rectangle.Y),
+                new Vector2(thickness, rectangle.Height),
                 ColorToVec4(color));
         }
 

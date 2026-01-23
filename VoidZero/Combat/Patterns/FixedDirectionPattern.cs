@@ -7,13 +7,13 @@ namespace VoidZero.Game.Combat.Patterns
 {
     public class FixedDirectionPattern : IBulletPattern
     {
-        private readonly Texture2D _bulletTex;
+        private readonly Texture2D _bulletTexture;
         private readonly Vector2 _direction;
         private readonly float _bulletSpeed;
 
-        public FixedDirectionPattern(Texture2D bulletTex, Vector2 direction, float bulletSpeed = 1500f)
+        public FixedDirectionPattern(Texture2D bulletTexture, Vector2 direction, float bulletSpeed = 1500f)
         {
-            _bulletTex = bulletTex;
+            _bulletTexture = bulletTexture;
             _direction = direction.Normalized();
             _bulletSpeed = bulletSpeed;
         }
@@ -32,7 +32,7 @@ namespace VoidZero.Game.Combat.Patterns
             );
 
             bullets.Add(new Bullet(
-                _bulletTex,
+                _bulletTexture,
                 spawnPos,
                 _direction,
                 _bulletSpeed,

@@ -18,7 +18,6 @@ namespace VoidZero.Game.Entities.Enemies
         {
             MaxHealth = 60f;
             CurrentHealth = MaxHealth;
-
             Scale = 6f;
             Width = 24 * Scale;
             Height = 24 * Scale;
@@ -26,7 +25,6 @@ namespace VoidZero.Game.Entities.Enemies
             _rotationSpeed = rotationSpeed;
             _currentAngle = 0f;
 
-            // Idle animation (can be static)
             Animations.Add("Idle", new Animation(texture, 24, 24, 3, 1f, 0));
 
             // Setup shooter with CardinalPattern
@@ -47,11 +45,15 @@ namespace VoidZero.Game.Entities.Enemies
             // Rotate enemy
             _currentAngle += _rotationSpeed * dt;
             if (_currentAngle > MathF.PI * 2f)
+            {
                 _currentAngle -= MathF.PI * 2f;
+            }
 
             // Apply rotation to pattern
             if (_shooter.Pattern is CardinalPattern cardinal)
+            {
                 cardinal.SetRotation(_currentAngle);
+            }
 
             _shooter.TryShoot(this, dt, trigger: true);
 

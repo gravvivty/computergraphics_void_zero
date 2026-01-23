@@ -10,13 +10,11 @@ namespace VoidZero.Game.Entities
     {
         public Vector2 Direction { get; set; }
         public float Lifetime { get; set; } = 10f;
-
         public BulletEnergy Energy { get; set; }
         public BulletOwner Owner { get; set; }
-
         public float Damage { get; set; }
-
-        // For later collision logic
+        public bool IsExpired => Lifetime <= 0f;
+        // For later collision logic -> bullets should only hit once per hit
         public HashSet<Entity> HitEntities { get; } = new();
 
         public Bullet(
@@ -56,8 +54,6 @@ namespace VoidZero.Game.Entities
             // Debug grazing
             batch.DrawRectangle(GrazeHitbox, Color.White);
         }
-
-        public bool IsExpired => Lifetime <= 0f;
 
         public override RectangleF Hitbox
         {

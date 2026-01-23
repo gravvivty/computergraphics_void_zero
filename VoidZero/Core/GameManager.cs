@@ -53,22 +53,22 @@ namespace VoidZero.Core
             // Start with MenuState
             _stateManager.ChangeState(new MenuState(_stateManager, _window, _input, _background, this));
 
-            // GLOBAL IMGUI STYLE (one-time)
+            // Gloval ImGui Style
             var style = ImGui.GetStyle();
 
             // Button shape
             style.FrameBorderSize = 1.5f;
 
             // Transparent buttons
-            style.Colors[(int)ImGuiNET.ImGuiCol.Button] = new System.Numerics.Vector4(0f, 0f, 0f, 0f);
-            style.Colors[(int)ImGuiNET.ImGuiCol.ButtonHovered] = new System.Numerics.Vector4(1f, 1f, 1f, 0.2f);
-            style.Colors[(int)ImGuiNET.ImGuiCol.ButtonActive] = new System.Numerics.Vector4(1f, 1f, 1f, 0.4f);
+            style.Colors[(int)ImGuiCol.Button] = new System.Numerics.Vector4(0f, 0f, 0f, 0f);
+            style.Colors[(int)ImGuiCol.ButtonHovered] = new System.Numerics.Vector4(1f, 1f, 1f, 0.2f);
+            style.Colors[(int)ImGuiCol.ButtonActive] = new System.Numerics.Vector4(1f, 1f, 1f, 0.4f);
 
             // White borders
-            style.Colors[(int)ImGuiNET.ImGuiCol.Border] = new System.Numerics.Vector4(1f, 1f, 1f, 1f);
+            style.Colors[(int)ImGuiCol.Border] = new System.Numerics.Vector4(1f, 1f, 1f, 1f);
 
-            // Text color (optional)
-            style.Colors[(int)ImGuiNET.ImGuiCol.Text] = new System.Numerics.Vector4(1f, 1f, 1f, 1f);
+            // Text color
+            style.Colors[(int)ImGuiCol.Text] = new System.Numerics.Vector4(1f, 1f, 1f, 1f);
         }
 
         public void Update(float dt)
@@ -78,21 +78,23 @@ namespace VoidZero.Core
             _stateManager.Update(dt);
             _input.Update(_window);
             if (!_gameStarted)
+            {
                 _background.Update(dt);
+            }
         }
 
         public void Draw()
         {
             ImGui.PushFont(_defaultFont);
 
-            // 2️⃣ Draw game objects
+            // Draw game objects
             Matrix4 projection = Matrix4.CreateOrthographicOffCenter(
                 0, _window.Size.X,
                 _window.Size.Y, 0,
                 -1, 1);
 
             _spriteBatch.Begin(projection);
-            _background.Draw(_spriteBatch); // draw background first
+            _background.Draw(_spriteBatch);
             _stateManager.Draw(_spriteBatch); // only draws state-specific sprites
             _stateManager.DrawUI();
             _spriteBatch.End();
@@ -100,17 +102,17 @@ namespace VoidZero.Core
             _imGui.Render();
         }
 
-        public void OnResize(int w, int h)
+        public void OnResize(int width, int height)
         {
-            GameServices.Instance.Settings.Width = w;
-            GameServices.Instance.Settings.Height = h;
-            _imGui.WindowResized(w, h);
-            _background?.Resize(w, h);
+            GameServices.Instance.Settings.Width = width;
+            GameServices.Instance.Settings.Height = height;
+            _imGui.WindowResized(width, height);
+            _background?.Resize(width, height);
 
             // Resize all entities in current state
             if (_stateManager._current is IResizableState resizable)
             {
-                resizable.OnResize(w, h);
+                resizable.OnResize(width, height);
             }
 
         }

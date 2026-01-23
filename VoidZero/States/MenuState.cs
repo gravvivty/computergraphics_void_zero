@@ -11,7 +11,7 @@ namespace VoidZero.States
 {
     public class MenuState : GameState
     {
-        private readonly GameStateManager _gsm;
+        private readonly GameStateManager _gameStateManager;
         private enum MenuPage { Main, Options, Credits }
         private MenuUI.MenuPage _currentPage = MenuUI.MenuPage.Main;
         private readonly GameWindow _window;
@@ -22,7 +22,7 @@ namespace VoidZero.States
 
         public MenuState(GameStateManager gsm, GameWindow window, InputManager input, Background background, GameManager gm)
         {
-            _gsm = gsm;
+            _gameStateManager = gsm;
             _window = window;
             _input = input;
             _background = background;
@@ -34,7 +34,7 @@ namespace VoidZero.States
 
         public override void DrawUI()
         {
-            MenuUI.DrawMenu(_gsm, _window, _input, ref _currentPage, _background, _gameManager);
+            MenuUI.DrawMenu(_gameStateManager, _window, _input, ref _currentPage, _background, _gameManager);
         }
     }
 }

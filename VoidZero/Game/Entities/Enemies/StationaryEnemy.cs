@@ -22,7 +22,7 @@ namespace VoidZero.Game.Entities.Enemies
 
             var bulletTex = GameServices.Instance.Content.GetTexture("VanillaBullet");
             _shooter = new ShooterComponent(
-                new ThreeWaySpreadPattern(bulletTex, Vector2.UnitY, 40f, 500f), // Shoots down
+                new ThreeWaySpreadPattern(bulletTex, Vector2.UnitY, 40f, 500f),
                 bulletManager,
                 BulletOwner.Enemy,
                 cooldown: 1.0f,
@@ -34,7 +34,7 @@ namespace VoidZero.Game.Entities.Enemies
         public override void Update(float dt)
         {
             Movement?.Update(this, dt);
-            // Shoot continuously
+
             _shooter.TryShoot(this, dt, trigger: true);
 
             // Animate idle

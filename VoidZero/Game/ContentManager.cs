@@ -9,18 +9,19 @@ namespace VoidZero.Game
 {
     public class ContentManager
     {
+        public Texture2D GetTexture(string name) => _textures[name];
         private readonly Dictionary<string, Texture2D> _textures = new();
 
         public Texture2D LoadTexture(string name, string path)
         {
-            if (_textures.TryGetValue(name, out var tex))
-                return tex;
+            if (_textures.TryGetValue(name, out var texture))
+            {
+                return texture;
+            }
 
-            tex = new Texture2D(path);
-            _textures[name] = tex;
-            return tex;
+            texture = new Texture2D(path);
+            _textures[name] = texture;
+            return texture;
         }
-
-        public Texture2D GetTexture(string name) => _textures[name];
     }
 }

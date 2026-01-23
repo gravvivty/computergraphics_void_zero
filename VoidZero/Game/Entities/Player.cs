@@ -12,8 +12,8 @@ namespace VoidZero.Game.Entities
         private readonly InputManager _input;
 
         private readonly float _acceleration = 10000f; // low -> on ice
-        private readonly float _deceleration = 6000f;
-        private readonly float _maxSpeed = 750f;
+        private readonly float _deceleration = 3000f;
+        private readonly float _maxSpeed = 550f;
         private ShooterComponent _shooter;
         private bool _isCurrentlyGrazing = false;
         private float _grazeAccumulatedTime = 0f;
@@ -24,12 +24,11 @@ namespace VoidZero.Game.Entities
         const float GrazeDecayRate = 1.5f;
         public float GrazeTimer { get; private set; } = 0f;
         public float DamageMultiplier => _currentDamageMultiplier;
-
         public BulletEnergy ActiveShield { get; private set; } = BulletEnergy.Yellow;
 
 
-        public Player(Texture2D texture, Vector2 startPos, InputManager input, BulletManager bulletManager)
-            : base(texture, startPos, 16, 16)
+        public Player(Texture2D texture, Vector2 startPosition, InputManager input, BulletManager bulletManager)
+            : base(texture, startPosition, 16, 16)
         {
             MaxHealth = 100f;
             CurrentHealth = MaxHealth;
@@ -60,20 +59,18 @@ namespace VoidZero.Game.Entities
 
         public override void Update(float dt)
         {
-            Vector2 inputDir = _input.MoveAxis;
+            Vector2 inputDirection = _input.MoveAxis;
 
-            bool hasMovementInput = inputDir.LengthSquared > 0;
-            bool movementPriority =
-                hasMovementInput ||
-                _input.ShootHeld;
+            bool hasMovementInput = inputDirection.LengthSquared > 0;
+            bool movementPriority = hasMovementInput ||  _input.ShootHeld;
 
-            ApplyMovement(inputDir, dt, movementPriority);
-
+            ApplyMovement(inputDirection, dt, movementPriority);
             _shooter.TryShoot(this, dt, _input.ShootHeld);
 
-            UpdateAnimation(GetAnimationKey(
-                hasMovementInput ? inputDir : Velocity
-            ), dt);
+            string animationKey = GetAnimationKey(hasMovementInput ? inputDirection : Velocity);
+            UpdateAnimation(animationKey, dt);
+
+            UpdateGraze(dt);
 
             if (_input.SwitchShieldPressed)
             {
@@ -90,8 +87,6 @@ namespace VoidZero.Game.Entities
                     )
                 );
             }
-
-            UpdateGraze(dt);
             // Debug
             Console.WriteLine($"GrazeMultiplier: {DamageMultiplier:0.00}");
         }
@@ -105,7 +100,9 @@ namespace VoidZero.Game.Entities
         {
             GrazeTimer += dt;
             if (GrazeTimer > _maxGrazeDamageAfter)
+            {
                 GrazeTimer = _maxGrazeDamageAfter;
+            } 
         }
 
         public void UpdateGraze(float dt)
@@ -115,7 +112,9 @@ namespace VoidZero.Game.Entities
                 // Update multiplier based on accumulated graze time
                 _grazeAccumulatedTime += dt;
                 if (_grazeAccumulatedTime > _maxGrazeDamageAfter)
+                {
                     _grazeAccumulatedTime = _maxGrazeDamageAfter;
+                } 
 
                 _currentDamageMultiplier = MathHelper.Lerp(1f, MaxGrazeMultiplier, _grazeAccumulatedTime / _maxGrazeDamageAfter);
             }
@@ -125,12 +124,16 @@ namespace VoidZero.Game.Entities
                 float decayPerSecond = (MaxGrazeMultiplier - 1f) / _grazeDecayTimer;
                 _currentDamageMultiplier -= decayPerSecond * dt;
                 if (_currentDamageMultiplier < 1f)
+                {
                     _currentDamageMultiplier = 1f;
+                }
 
                 // Decay graze accumulation too
                 _grazeAccumulatedTime -= dt;
                 if (_grazeAccumulatedTime < 0f)
+                {
                     _grazeAccumulatedTime = 0f;
+                }
             }
 
             // Reset grazing flag for next frame
@@ -144,18 +147,26 @@ namespace VoidZero.Game.Entities
             // Increase graze accumulation
             _grazeAccumulatedTime += dt;
             if (_grazeAccumulatedTime > _maxGrazeDamageAfter)
+            {
                 _grazeAccumulatedTime = _maxGrazeDamageAfter;
+            }
         }
 
         private string GetAnimationKey(Vector2 dir)
         {
             if (dir.LengthSquared == 0)
+            {
                 return "Idle";
+            } 
 
             if (Math.Abs(dir.X) > Math.Abs(dir.Y))
+            {
                 return dir.X > 0 ? "Right" : "Left";
+            }
             else
+            {
                 return dir.Y > 0 ? "Down" : "Up";
+            }
         }
 
         private void ApplyMovement(Vector2 input, float dt, bool movementPriority)
@@ -180,7 +191,9 @@ namespace VoidZero.Game.Entities
             }
 
             if (Velocity.Length > _maxSpeed)
+            {
                 Velocity = Velocity.Normalized() * _maxSpeed;
+            }
 
             Position += Velocity * dt;
         }

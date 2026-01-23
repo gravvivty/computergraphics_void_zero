@@ -11,7 +11,6 @@ namespace VoidZero.Game
         public static GameServices Instance { get; } = new();
         public ContentManager Content { get; } = new();
         public GameSettings Settings { get; } = new();
-
         private GameServices() { }
     }
 }

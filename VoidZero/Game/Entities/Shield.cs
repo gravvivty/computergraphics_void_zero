@@ -10,7 +10,7 @@ namespace VoidZero.Game.Entities
     {
         private readonly Player _player;
         private float _flashTimer = 0f;
-        private const float FlashDuration = 0.5f;
+        private float FlashDuration = 0.5f;
 
         public Shield(Texture2D texture, Player player)
             : base(texture, player.Position, 32, 32)
@@ -33,7 +33,9 @@ namespace VoidZero.Game.Entities
                 );
 
             if (_flashTimer > 0f)
+            {
                 _flashTimer -= dt;
+            }
 
             UpdateAnimation("Idle", dt);
         }
@@ -42,19 +44,18 @@ namespace VoidZero.Game.Entities
         {
             Vector4 baseTint = BulletColorHelper.GetTint(_player.ActiveShield);
 
-            float t = _flashTimer / FlashDuration;
-            t = MathF.Max(0f, MathF.Min(1f, t));
+            float time = _flashTimer / FlashDuration;
+            time = MathF.Max(0f, MathF.Min(1f, time));
 
-            float pop = MathF.Sqrt(t);
+            float shieldFlash = MathF.Sqrt(time);
 
-            // Base shield (already centered correctly)
             Animations.Draw(batch, Position, Scale, baseTint);
 
             // Flash ring (bigger, centered)
-            if (pop > 0f)
+            if (shieldFlash > 0f)
             {
                 float flashScale = Scale * 1.25f;
-                Vector4 flashTint = Vector4.One * pop;
+                Vector4 flashTint = Vector4.One * shieldFlash;
 
                 float scaleRatio = flashScale / Scale;
 

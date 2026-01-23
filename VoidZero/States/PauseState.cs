@@ -12,7 +12,7 @@ namespace VoidZero.States
 {
     public class PauseState : GameState, IResizableState
     {
-        private readonly GameStateManager _gsm;
+        private readonly GameStateManager _gameStateManager;
         private readonly GameWindow _window;
         private readonly InputManager _input;
         private readonly GameManager _gameManager;
@@ -21,7 +21,7 @@ namespace VoidZero.States
 
         public PauseState(GameStateManager gsm, GameWindow window, InputManager input, PlayState pausedState, GameManager gm)
         {
-            _gsm = gsm;
+            _gameStateManager = gsm;
             _window = window;
             _input = input;
             _pausedState = pausedState; // store the paused game
@@ -33,7 +33,7 @@ namespace VoidZero.States
             // Press ESC again to resume
             if (_input.ConsumePausePressed())
             {
-                _gsm.ChangeState(_pausedState);
+                _gameStateManager.ChangeState(_pausedState);
             }
         }
 
@@ -44,7 +44,7 @@ namespace VoidZero.States
 
         public override void DrawUI()
         {
-            MenuUI.DrawPauseMenu(_gsm, _window, _input, ref _currentPage, _pausedState, _gameManager);
+            DrawPauseMenu(_gameStateManager, _window, _input, ref _currentPage, _pausedState, _gameManager);
         }
 
         public void OnResize(int newWidth, int newHeight)

@@ -5,6 +5,7 @@ using VoidZero.Game.Input;
 using VoidZero.States;
 using System;
 using VoidZero.Core;
+using System.Numerics;
 
 namespace VoidZero.UI
 {
@@ -55,21 +56,21 @@ namespace VoidZero.UI
             float windowHeight = ImGui.GetWindowHeight();
             ImGui.SetCursorPosY((windowHeight - totalHeight) / 2f);
 
-            var avail = ImGui.GetContentRegionAvail();
+            Vector2 available = ImGui.GetContentRegionAvail();
 
             // Draw title
             string title = "void_zero";
             float textWidth = ImGui.CalcTextSize(title).X;
-            ImGui.SetCursorPosX((avail.X - textWidth) / 2f);
+            ImGui.SetCursorPosX((available.X - textWidth) / 2f);
             ImGui.Text(title);
-            ImGui.Dummy(new System.Numerics.Vector2(0, spacing * 2));
+            ImGui.Dummy(new Vector2(0, spacing * 2));
 
-            foreach (var label in labels)
+            foreach (string label in labels)
             {
-                float centerX = (avail.X - buttonWidth) / 2f;
+                float centerX = (available.X - buttonWidth) / 2f;
                 ImGui.SetCursorPosX(centerX);
 
-                if (ImGui.Button(label, new System.Numerics.Vector2(buttonWidth, buttonHeight)))
+                if (ImGui.Button(label, new Vector2(buttonWidth, buttonHeight)))
                 {
                     switch (label)
                     {
@@ -88,7 +89,7 @@ namespace VoidZero.UI
                             break;
                     }
                 }
-                ImGui.Dummy(new System.Numerics.Vector2(0, spacing));
+                ImGui.Dummy(new Vector2(0, spacing));
             }
 
             ImGui.End();
@@ -97,7 +98,7 @@ namespace VoidZero.UI
         public static void DrawOptionsMenu(ref MenuPage currentPage, GameStateManager gsm, GameWindow window, InputManager input)
         {
             var io = ImGui.GetIO();
-            ImGui.SetNextWindowPos(System.Numerics.Vector2.Zero);
+            ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(io.DisplaySize);
 
             ImGui.Begin("Options",
@@ -115,7 +116,7 @@ namespace VoidZero.UI
             float totalHeight = 3 * buttonHeight + 2 * spacing + 60;
             BeginCenteredBlock(totalHeight);
 
-            var settings = GameServices.Instance.Settings;
+            GameSettings settings = GameServices.Instance.Settings;
 
             CenterNextItem(buttonWidth);
             bool fullscreen = settings.Fullscreen;
@@ -125,7 +126,7 @@ namespace VoidZero.UI
                 ApplyGraphicsSettings(window);
             }
 
-            ImGui.Dummy(new System.Numerics.Vector2(0, spacing));
+            ImGui.Dummy(new Vector2(0, spacing));
 
             string[] resolutions = { "800x600", "1280x720", "1600x900", "1920x1080", "2560x1440" };
             int currentIndex = Array.FindIndex(resolutions, r => r == $"{settings.Width}x{settings.Height}");
@@ -135,17 +136,19 @@ namespace VoidZero.UI
             ImGui.SetNextItemWidth(buttonWidth);
             if (ImGui.Combo("Resolution", ref currentIndex, resolutions, resolutions.Length))
             {
-                var parts = resolutions[currentIndex].Split('x');
+                string[] parts = resolutions[currentIndex].Split('x');
                 settings.Width = int.Parse(parts[0]);
                 settings.Height = int.Parse(parts[1]);
                 ApplyGraphicsSettings(window);
             }
 
-            ImGui.Dummy(new System.Numerics.Vector2(0, spacing));
+            ImGui.Dummy(new Vector2(0, spacing));
 
             CenterNextItem(buttonWidth);
-            if (ImGui.Button("Back", new System.Numerics.Vector2(buttonWidth, buttonHeight)))
+            if (ImGui.Button("Back", new Vector2(buttonWidth, buttonHeight)))
+            {
                 currentPage = MenuPage.Main;
+            }
 
             ImGui.End();
         }
@@ -153,7 +156,7 @@ namespace VoidZero.UI
         public static void DrawCreditsMenu(ref MenuPage currentPage, GameStateManager gsm, GameWindow window, InputManager input)
         {
             var io = ImGui.GetIO();
-            ImGui.SetNextWindowPos(System.Numerics.Vector2.Zero);
+            ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(io.DisplaySize);
 
             ImGui.Begin("Credits",
@@ -176,17 +179,19 @@ namespace VoidZero.UI
             float totalHeight = lines.Length * ImGui.GetTextLineHeight() + spacing * 4 + 60;
             BeginCenteredBlock(totalHeight);
 
-            foreach (var line in lines)
+            foreach (string line in lines)
             {
                 float textWidth = ImGui.CalcTextSize(line).X;
                 CenterNextItem(textWidth);
                 ImGui.Text(line);
-                ImGui.Dummy(new System.Numerics.Vector2(0, spacing));
+                ImGui.Dummy(new Vector2(0, spacing));
             }
 
             CenterNextItem(200f);
-            if (ImGui.Button("Back", new System.Numerics.Vector2(200, 50)))
+            if (ImGui.Button("Back", new Vector2(200, 50)))
+            {
                 currentPage = MenuPage.Main;
+            } 
 
             ImGui.End();
         }
@@ -206,7 +211,7 @@ namespace VoidZero.UI
             }
 
             var io = ImGui.GetIO();
-            ImGui.SetNextWindowPos(System.Numerics.Vector2.Zero);
+            ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(io.DisplaySize);
 
             ImGui.Begin("Pause Menu",
@@ -225,19 +230,23 @@ namespace VoidZero.UI
             BeginCenteredBlock(totalHeight);
 
             CenterNextItem(buttonWidth);
-            if (ImGui.Button("Resume", new System.Numerics.Vector2(buttonWidth, buttonHeight)))
+            if (ImGui.Button("Resume", new Vector2(buttonWidth, buttonHeight)))
+            {
                 gsm.ChangeState(pausedState);
+            }
 
-            ImGui.Dummy(new System.Numerics.Vector2(0, spacing));
+            ImGui.Dummy(new Vector2(0, spacing));
 
             CenterNextItem(buttonWidth);
-            if (ImGui.Button("Options", new System.Numerics.Vector2(buttonWidth, buttonHeight)))
+            if (ImGui.Button("Options", new Vector2(buttonWidth, buttonHeight)))
+            {
                 currentPage = MenuPage.Options;
+            }
 
-            ImGui.Dummy(new System.Numerics.Vector2(0, spacing));
+            ImGui.Dummy(new Vector2(0, spacing));
 
             CenterNextItem(buttonWidth);
-            if (ImGui.Button("Main Menu", new System.Numerics.Vector2(buttonWidth, buttonHeight)))
+            if (ImGui.Button("Main Menu", new Vector2(buttonWidth, buttonHeight)))
             {
                 gm.ExitGame();
                 gsm.ChangeState(new MenuState(gsm, window, input, pausedState._background, gm));
@@ -249,7 +258,7 @@ namespace VoidZero.UI
 
         private static void ApplyGraphicsSettings(GameWindow window)
         {
-            var settings = GameServices.Instance.Settings;
+            GameSettings settings = GameServices.Instance.Settings;
             if (window != null)
             {
                 window.WindowState = settings.Fullscreen
@@ -267,8 +276,8 @@ namespace VoidZero.UI
         }
         private static void CenterNextItem(float itemWidth)
         {
-            float avail = ImGui.GetContentRegionAvail().X;
-            ImGui.SetCursorPosX((avail - itemWidth) / 2f);
+            float available = ImGui.GetContentRegionAvail().X;
+            ImGui.SetCursorPosX((available - itemWidth) / 2f);
         }
     }
 }

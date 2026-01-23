@@ -12,8 +12,8 @@ namespace VoidZero
     {
         static void Main()
         {
-            Window wnd = new Window();
-            wnd.Run();
+            Window window = new Window();
+            window.Run();
         }
     }
 }

@@ -26,24 +26,19 @@ namespace VoidZero.Core
             public float Scale;
         }
 
-        // ===== SCROLLING OFFSETS =====
         private float _spaceOffset = 500f;
 
-        // ===== BASE SPEEDS =====
-        private const float BaseSpaceSpeed = 80f;   // background clouds/nebula
-        private const float BaseStarSpeed = 40f;    // distant stars
-        private const float BasePlanetSpeed = 120f;  // planets
+        private const float BaseSpaceSpeed = 80f;
+        private const float BaseStarSpeed = 40f;
+        private const float BasePlanetSpeed = 120f;
 
-        // ===== TEXTURES =====
         private readonly Texture2D _spaceTexture;
         private readonly Texture2D _starsTexture;
         private readonly Texture2D _planetsTexture;
 
-        // ===== SCREEN =====
         private int _screenWidth;
         private int _screenHeight;
 
-        // ===== PLANETS / STARS =====
         private readonly List<Planet> _planets = new();
         private readonly List<Star> _stars = new();
         private readonly Random _rng = new();
@@ -62,15 +57,22 @@ namespace VoidZero.Core
 
             // Spawn initial planets and stars
             for (int i = 0; i < MaxPlanets; i++)
+            {
                 SpawnPlanet(false);
+            }
 
             for (int i = 0; i < StarCount; i++)
+            {
                 SpawnStar(false);
+            }
         }
 
         public void Resize(int width, int height)
         {
-            if (width < 1 || height < 1) return;
+            if (width < 1 || height < 1)
+            {
+                return;
+            }
 
             _screenWidth = width;
             _screenHeight = height;
@@ -92,7 +94,7 @@ namespace VoidZero.Core
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            DrawLayer(spriteBatch, _spaceTexture, _spaceOffset, FillScale()); // background
+            DrawLayer(spriteBatch, _spaceTexture, _spaceOffset, FillScale());
             DrawStars(spriteBatch);
             DrawPlanets(spriteBatch);
         }
@@ -143,17 +145,17 @@ namespace VoidZero.Core
         {
             for (int i = _planets.Count - 1; i >= 0; i--)
             {
-                var p = _planets[i];
-                p.Y += p.Speed * dt * multiplier;
+                Planet planet = _planets[i];
+                planet.Y += planet.Speed * dt * multiplier;
 
-                if (p.Y > _screenHeight + _planetsTexture.Height * p.Scale)
+                if (planet.Y > _screenHeight + _planetsTexture.Height * planet.Scale)
                 {
                     _planets.RemoveAt(i);
                     SpawnPlanet(true); // spawn at top only
                 }
                 else
                 {
-                    _planets[i] = p;
+                    _planets[i] = planet;
                 }
             }
         }
@@ -162,38 +164,38 @@ namespace VoidZero.Core
         {
             for (int i = _stars.Count - 1; i >= 0; i--)
             {
-                var s = _stars[i];
-                s.Y += s.Speed * dt * multiplier;
+                Star star = _stars[i];
+                star.Y += star.Speed * dt * multiplier;
 
-                if (s.Y > _screenHeight + _starsTexture.Height * s.Scale)
+                if (star.Y > _screenHeight + _starsTexture.Height * star.Scale)
                 {
                     _stars.RemoveAt(i);
                     SpawnStar(true);
                 }
                 else
                 {
-                    _stars[i] = s;
+                    _stars[i] = star;
                 }
             }
         }
 
         private void DrawPlanets(SpriteBatch spriteBatch)
         {
-            foreach (var p in _planets)
+            foreach (Planet planet in _planets)
             {
-                Vector2 size = new Vector2(_planetsTexture.Width * p.Scale, _planetsTexture.Height * p.Scale);
-                Vector2 pos = new Vector2(p.XNorm * _screenWidth, p.Y);
-                spriteBatch.Draw(_planetsTexture, pos, size);
+                Vector2 size = new Vector2(_planetsTexture.Width * planet.Scale, _planetsTexture.Height * planet.Scale);
+                Vector2 position = new Vector2(planet.XNorm * _screenWidth, planet.Y);
+                spriteBatch.Draw(_planetsTexture, position, size);
             }
         }
 
         private void DrawStars(SpriteBatch spriteBatch)
         {
-            foreach (var s in _stars)
+            foreach (Star star in _stars)
             {
-                Vector2 size = new Vector2(_starsTexture.Width * s.Scale, _starsTexture.Height * s.Scale);
-                Vector2 pos = new Vector2(s.XNorm * _screenWidth, s.Y);
-                spriteBatch.Draw(_starsTexture, pos, size);
+                Vector2 size = new Vector2(_starsTexture.Width * star.Scale, _starsTexture.Height * star.Scale);
+                Vector2 position = new Vector2(star.XNorm * _screenWidth, star.Y);
+                spriteBatch.Draw(_starsTexture, position, size);
             }
         }
 
@@ -205,7 +207,9 @@ namespace VoidZero.Core
         private void WrapOffset(ref float offset, float height)
         {
             if (offset >= height)
+            {
                 offset -= height;
+            }
         }
     }
 }

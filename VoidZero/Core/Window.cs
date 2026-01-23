@@ -25,7 +25,7 @@ namespace VoidZero.Core
                 new NativeWindowSettings
                 {
                     ClientSize = new Vector2i(1600, 900),
-                    APIVersion = new Version(3, 3)
+                    APIVersion = new Version(4, 1)
                 })
         { }
 

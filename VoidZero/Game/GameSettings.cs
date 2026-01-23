@@ -13,6 +13,6 @@ namespace VoidZero.Game
         public int Height { get; set; } = 900;
         public float BackgroundSpeedMultiplier { get; set; } = 4f;
 
-        // Add more settings here if needed (volume, difficulty, etc.)
+        // Add more settings here (volume, etc.)
     }
 }

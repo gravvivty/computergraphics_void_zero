@@ -12,9 +12,9 @@ namespace VoidZero.Game.Combat
         private readonly float _damage;
         private float _cooldown;
         private float _timer;
-        private BulletEnergy _bulletEnergy = BulletEnergy.Green;
 
         public IBulletPattern Pattern => _pattern;
+        public BulletEnergy BulletEnergy { get; set; }
 
         public ShooterComponent(
             IBulletPattern pattern,
@@ -30,12 +30,6 @@ namespace VoidZero.Game.Combat
             _damage = damage;
         }
 
-        public BulletEnergy BulletEnergy
-        {
-            get => _bulletEnergy;
-            set => _bulletEnergy = value;
-        }
-
         public void SetPattern(IBulletPattern newPattern)
         {
             _pattern = newPattern;
@@ -45,10 +39,15 @@ namespace VoidZero.Game.Combat
         {
             _timer -= dt;
             // Clamp to zero to avoid bursts if dt spikes
-            if (_timer < 0f) _timer = 0f;
+            if (_timer < 0f)
+            {
+                _timer = 0f;
+            }
 
             if (!trigger || _timer > 0f)
+            {
                 return;
+            }
 
             _timer = _cooldown;
 

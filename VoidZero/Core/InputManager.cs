@@ -28,8 +28,9 @@ namespace VoidZero.Game.Input
             if (_keyboard.IsKeyDown(Keys.D)) axis.X += 1;
 
             if (axis.LengthSquared > 1)
+            {
                 axis = axis.Normalized();
-
+            }
             MoveAxis = axis;
 
             ShootHeld = _keyboard.IsKeyDown(Keys.J);

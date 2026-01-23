@@ -24,7 +24,9 @@ namespace VoidZero.Graphics
 
             GL.GetProgram(Handle, GetProgramParameterName.LinkStatus, out int success);
             if (success == 0)
+            {
                 throw new Exception(GL.GetProgramInfoLog(Handle));
+            }
 
             GL.DetachShader(Handle, vertexShader);
             GL.DetachShader(Handle, fragmentShader);
@@ -40,7 +42,9 @@ namespace VoidZero.Graphics
 
             GL.GetShader(shader, ShaderParameter.CompileStatus, out int success);
             if (success == 0)
+            {
                 throw new Exception(GL.GetShaderInfoLog(shader));
+            }
 
             return shader;
         }

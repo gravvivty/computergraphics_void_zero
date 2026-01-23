@@ -24,14 +24,18 @@ namespace VoidZero.Game.Combat
                 Bullets[i].Update(dt);
 
                 if (Bullets[i].IsExpired)
+                {
                     Bullets.RemoveAt(i);
+                }
             }
         }
 
         public void Draw(SpriteBatch batch)
         {
-            foreach (var bullet in Bullets)
+            foreach (Bullet bullet in Bullets)
+            {
                 bullet.Draw(batch);
+            }
         }
     }
 }
