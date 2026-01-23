@@ -30,7 +30,7 @@ namespace VoidZero.Game.Entities
         public float DamageMultiplier => _currentDamageMultiplier;
         // Dashing
         private const float DashDistance = 200f;
-        private const float DashCooldown = 0.2f;
+        private const float DashCooldown = 0.5f;
         private const float DashDuration = 0.08f;
         private float _dashCooldownTimer = 0f;
         private float _dashTimer = 0f;
