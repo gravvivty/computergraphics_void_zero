@@ -50,6 +50,13 @@ namespace VoidZero.Game.Entities
             UpdateAnimation("Travel", dt);
         }
 
+        public override void Draw(SpriteBatch batch)
+        {
+            base.Draw(batch);
+            // Debug grazing
+            batch.DrawRectangle(GrazeHitbox, Color.White);
+        }
+
         public bool IsExpired => Lifetime <= 0f;
 
         public override RectangleF Hitbox
@@ -63,6 +70,23 @@ namespace VoidZero.Game.Entities
                 float hitboxHeight = Height * (1f - 2f * shrinkFactor);
 
                 return new RectangleF(Position.X + offsetX, Position.Y + offsetY, hitboxWidth, hitboxHeight);
+            }
+        }
+
+        public RectangleF GrazeHitbox
+        {
+            get
+            {
+                float expandFactor = 0.3f; // 30% outward
+                float expandX = Width * expandFactor;
+                float expandY = Height * expandFactor;
+
+                return new RectangleF(
+                    Position.X - expandX,
+                    Position.Y - expandY,
+                    Width + expandX * 2f,
+                    Height + expandY * 2f
+                );
             }
         }
     }

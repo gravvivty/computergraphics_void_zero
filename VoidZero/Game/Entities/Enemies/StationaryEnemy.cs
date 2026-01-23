@@ -28,7 +28,7 @@ namespace VoidZero.Game.Entities.Enemies
                 cooldown: 1.0f,
                 damage: 5f
             );
-            _shooter.BulletEnergy = BulletEnergy.Purple;
+            _shooter.BulletEnergy = BulletEnergy.Yellow;
         }
 
         public override void Update(float dt)

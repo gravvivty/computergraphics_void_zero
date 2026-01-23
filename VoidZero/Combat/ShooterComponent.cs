@@ -51,7 +51,15 @@ namespace VoidZero.Game.Combat
                 return;
 
             _timer = _cooldown;
-            _pattern.Shoot(entity, _bulletManager, _owner, _damage, BulletEnergy);
+
+            float finalDamage = _damage;
+
+            if (entity is Player player)
+            {
+                finalDamage *= player.DamageMultiplier;
+            }
+
+            _pattern.Shoot(entity, _bulletManager, _owner, finalDamage, BulletEnergy);
         }
     }
 }

@@ -25,9 +25,9 @@ namespace VoidZero.States
         public Background _background { get; }
         public List<Entity> Entities { get; } = new();
 
-
-
         private Player _player;
+        private Shield _playerShield;
+
 
         public PlayState(GameStateManager gsm, GameWindow window, InputManager input, Background bg, GameManager gm)
         {
@@ -41,11 +41,14 @@ namespace VoidZero.States
             _player = new Player(tex, new Vector2(500, 500), _input, Bullets);
             _player.SetPositionRelative(_player.Position,window.Size.X, window.Size.Y);
 
-            var stationaryEnemyTexture = GameServices.Instance.Content.GetTexture("Witch");
+            var shieldTex = GameServices.Instance.Content.GetTexture("shield");
+            _playerShield = new Shield(shieldTex, _player);
+
+            var stationaryEnemyTexture = GameServices.Instance.Content.GetTexture("witch");
             var stationaryEnemy = new StationaryEnemy(stationaryEnemyTexture, new Vector2(750, 0), Bullets);
             stationaryEnemy.SetPositionRelative(stationaryEnemy.Position, _window.Size.X, _window.Size.Y);
 
-            var rotatingEnemyTexture = GameServices.Instance.Content.GetTexture("Witch");
+            var rotatingEnemyTexture = GameServices.Instance.Content.GetTexture("witch");
             var rotatingEnemy = new RotatingEnemy(rotatingEnemyTexture, new Vector2(350, 0), Bullets, 1);
             rotatingEnemy.SetPositionRelative(rotatingEnemy.Position, _window.Size.X, _window.Size.Y);
             rotatingEnemy.Movement = new MovementComponent(Vector2.UnitX, 200f, 5f);
@@ -53,20 +56,21 @@ namespace VoidZero.States
             Entities.Add(stationaryEnemy);
             Entities.Add(rotatingEnemy);
             Entities.Add(_player);
+            Entities.Add(_playerShield);
 
         }
 
         public override void Update(float dt)
         {
             _background.Update(dt);
-            foreach (var entity in Entities.ToList()) // ToList() in case you remove enemies during update
+            foreach (var entity in Entities.ToList())
                 entity.Update(dt);
             Bullets.Update(dt);
-            HandleBulletHits();
+            HandleBulletHits(dt);
 
 
             // Pause logic
-            if (_input.PausePressed)
+            if (_input.ConsumePausePressed())
             {
                 _gsm.ChangeState(new PauseState(_gsm, _window, _input, this, _gm));
             }
@@ -94,7 +98,7 @@ namespace VoidZero.States
                 entity.OnResize(newWidth, newHeight);
         }
 
-        private void HandleBulletHits()
+        private void HandleBulletHits(float dt)
         {
             for (int i = Bullets.Bullets.Count - 1; i >= 0; i--)
             {
@@ -124,17 +128,33 @@ namespace VoidZero.States
                 // Enemy bullets hitting player
                 else if (bullet.Owner == BulletOwner.Enemy)
                 {
-                    if (_player.Hitbox.IntersectsWith(bullet.Hitbox))
-                    {
-                        _player.CurrentHealth -= bullet.Damage;
-                        Bullets.Bullets.RemoveAt(i);
+                    bool shieldAbsorbs =
+                        bullet.Energy == _player.ActiveShield &&
+                        bullet.Energy != BulletEnergy.Green;
 
-                        if (_player.CurrentHealth <= 0)
+                    bool damageHit = _player.Hitbox.IntersectsWith(bullet.Hitbox);
+                    bool grazeHit =
+                        bullet.GrazeHitbox.IntersectsWith(_player.Hitbox) &&
+                        !damageHit &&
+                        !shieldAbsorbs;
+
+                    if (grazeHit)
+                    {
+                        _player.RegisterGraze(dt);
+                    }
+
+                    if (damageHit)
+                    {
+                        if (shieldAbsorbs)
                         {
-                            // Player died, handle game over
-                            Console.WriteLine("Player died!");
-                            // Optionally reset or change state
+                            _playerShield.Flash();
                         }
+                        else
+                        {
+                            _player.CurrentHealth -= bullet.Damage;
+                        }
+
+                        Bullets.Bullets.RemoveAt(i);
                     }
                 }
             }

@@ -31,7 +31,7 @@ namespace VoidZero.States
         public override void Update(float dt)
         {
             // Press ESC again to resume
-            if (_input.PausePressed)
+            if (_input.ConsumePausePressed())
             {
                 _gsm.ChangeState(_pausedState);
             }

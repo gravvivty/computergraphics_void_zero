@@ -16,7 +16,7 @@ namespace VoidZero.Utils
             {
                 BulletEnergy.Green => new Vector4(0f, 1f, 0f, 1f),   // green
                 BulletEnergy.Yellow => new Vector4(1f, 1f, 0f, 1f),   // yellow
-                BulletEnergy.Purple => new Vector4(0.7f, 0f, 1f, 1f), // purple
+                BulletEnergy.Blue => new Vector4(0.1f, 0.8f, 1f, 1f), // blue
                 BulletEnergy.Neutral => Vector4.One,                  // no tint
                 _ => Vector4.One
             };

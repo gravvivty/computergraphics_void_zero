@@ -8,9 +8,9 @@ namespace VoidZero.Game.Combat
 {
     public enum BulletEnergy
     {
-        Green,
+        Blue,
         Yellow,
-        Purple,
+        Green,
         Neutral
     }
 

@@ -12,9 +12,21 @@ namespace VoidZero.Game.Entities
         private readonly InputManager _input;
 
         private readonly float _acceleration = 10000f; // low -> on ice
-        private readonly float _deceleration = 3000f;
-        private readonly float _maxSpeed = 1000f;
+        private readonly float _deceleration = 6000f;
+        private readonly float _maxSpeed = 750f;
         private ShooterComponent _shooter;
+        private bool _isCurrentlyGrazing = false;
+        private float _grazeAccumulatedTime = 0f;
+        private float _currentDamageMultiplier = 1f;
+        const float _maxGrazeDamageAfter = 1f;
+        const float _grazeDecayTimer = 10f;
+        const float MaxGrazeMultiplier = 3f;
+        const float GrazeDecayRate = 1.5f;
+        public float GrazeTimer { get; private set; } = 0f;
+        public float DamageMultiplier => _currentDamageMultiplier;
+
+        public BulletEnergy ActiveShield { get; private set; } = BulletEnergy.Yellow;
+
 
         public Player(Texture2D texture, Vector2 startPos, InputManager input, BulletManager bulletManager)
             : base(texture, startPos, 16, 16)
@@ -48,47 +60,26 @@ namespace VoidZero.Game.Entities
 
         public override void Update(float dt)
         {
-            Vector2 inputDir = Vector2.Zero;
+            Vector2 inputDir = _input.MoveAxis;
 
-            if (_input.MoveUp) inputDir.Y -= 1;
-            if (_input.MoveDown) inputDir.Y += 1;
-            if (_input.MoveLeft) inputDir.X -= 1;
-            if (_input.MoveRight) inputDir.X += 1;
+            bool hasMovementInput = inputDir.LengthSquared > 0;
+            bool movementPriority =
+                hasMovementInput ||
+                _input.ShootHeld;
 
-            if (inputDir.LengthSquared > 0)
-            {
-                inputDir = inputDir.Normalized();
-                Velocity += inputDir * _acceleration * dt;
-            }
-            else if (Velocity.LengthSquared > 0)
-            {
-                Vector2 decel = Velocity.Normalized() * _deceleration * dt;
-                Velocity = decel.LengthSquared > Velocity.LengthSquared ? Vector2.Zero : Velocity - decel;
-            }
+            ApplyMovement(inputDir, dt, movementPriority);
 
-            if (Velocity.Length > _maxSpeed)
+            _shooter.TryShoot(this, dt, _input.ShootHeld);
+
+            UpdateAnimation(GetAnimationKey(
+                hasMovementInput ? inputDir : Velocity
+            ), dt);
+
+            if (_input.SwitchShieldPressed)
             {
-                Velocity = Velocity.Normalized() * _maxSpeed;
+                CycleShield();
             }
 
-            Position += Velocity * dt;
-
-
-            // Hooks for later
-            if (_input.Shoot)
-            {
-                // TODO: Shoot
-            }
-
-            if (_input.SwitchShield)
-            {
-                // TODO: Switch shield
-            }
-
-            _shooter.TryShoot(this, dt, _input.Shoot);
-            UpdateAnimation(GetAnimationKey(inputDir), dt);
-
-            // Debug pattern
             if (_input.SwitchPatternPressed)
             {
                 _shooter.SetPattern(
@@ -99,11 +90,61 @@ namespace VoidZero.Game.Entities
                     )
                 );
             }
+
+            UpdateGraze(dt);
+            // Debug
+            Console.WriteLine($"GrazeMultiplier: {DamageMultiplier:0.00}");
         }
 
         public override void Draw(SpriteBatch batch)
         {
             base.Draw(batch);
+        }
+
+        public void AddGraze(float dt)
+        {
+            GrazeTimer += dt;
+            if (GrazeTimer > _maxGrazeDamageAfter)
+                GrazeTimer = _maxGrazeDamageAfter;
+        }
+
+        public void UpdateGraze(float dt)
+        {
+            if (_isCurrentlyGrazing)
+            {
+                // Update multiplier based on accumulated graze time
+                _grazeAccumulatedTime += dt;
+                if (_grazeAccumulatedTime > _maxGrazeDamageAfter)
+                    _grazeAccumulatedTime = _maxGrazeDamageAfter;
+
+                _currentDamageMultiplier = MathHelper.Lerp(1f, MaxGrazeMultiplier, _grazeAccumulatedTime / _maxGrazeDamageAfter);
+            }
+            else
+            {
+                // Not grazing -> decay multiplier over _grazeDecayTimer seconds
+                float decayPerSecond = (MaxGrazeMultiplier - 1f) / _grazeDecayTimer;
+                _currentDamageMultiplier -= decayPerSecond * dt;
+                if (_currentDamageMultiplier < 1f)
+                    _currentDamageMultiplier = 1f;
+
+                // Decay graze accumulation too
+                _grazeAccumulatedTime -= dt;
+                if (_grazeAccumulatedTime < 0f)
+                    _grazeAccumulatedTime = 0f;
+            }
+
+            // Reset grazing flag for next frame
+            _isCurrentlyGrazing = false;
+        }
+
+        public void RegisterGraze(float dt)
+        {
+            _isCurrentlyGrazing = true;
+
+            // Increase graze accumulation
+            _grazeAccumulatedTime += dt;
+            if (_grazeAccumulatedTime > _maxGrazeDamageAfter)
+                _grazeAccumulatedTime = _maxGrazeDamageAfter;
         }
 
         private string GetAnimationKey(Vector2 dir)
@@ -115,6 +156,43 @@ namespace VoidZero.Game.Entities
                 return dir.X > 0 ? "Right" : "Left";
             else
                 return dir.Y > 0 ? "Down" : "Up";
+        }
+
+        private void ApplyMovement(Vector2 input, float dt, bool movementPriority)
+        {
+            if (input.LengthSquared > 0)
+            {
+                Velocity += input * _acceleration * dt;
+            }
+            else if (!movementPriority)
+            {
+                // Full deceleration
+                float speed = Velocity.Length;
+                if (speed > 0)
+                {
+                    float drop = _deceleration * dt;
+                    Velocity *= MathF.Max(speed - drop, 0) / speed;
+                }
+            }
+            else
+            {
+                Velocity *= 0.959f; // high value -> drifting on ice
+            }
+
+            if (Velocity.Length > _maxSpeed)
+                Velocity = Velocity.Normalized() * _maxSpeed;
+
+            Position += Velocity * dt;
+        }
+
+        private void CycleShield()
+        {
+            ActiveShield = ActiveShield switch
+            {
+                BulletEnergy.Blue => BulletEnergy.Yellow,
+                BulletEnergy.Yellow => BulletEnergy.Blue,
+                _ => BulletEnergy.Yellow
+            };
         }
     }
 }
