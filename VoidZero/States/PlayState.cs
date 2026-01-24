@@ -20,12 +20,13 @@ namespace VoidZero.States
         private readonly GameWindow _window;
         private readonly GameStateManager _gameStateManager;
         private readonly GameManager _gameManager;
+        private float _criticalBlinkTimer = 0f;
         public BulletManager Bullets { get; } = new();
 
         public Background _background { get; }
         public List<Entity> Entities { get; } = new();
 
-        private Player _player;
+        public Player _player { get; }
         private Shield _playerShield;
 
 
@@ -88,9 +89,12 @@ namespace VoidZero.States
             Bullets.Draw(spriteBatch);
         }
 
-        public override void DrawUI()
+        public override void DrawUI(SpriteBatch spriteBatch, float dt)
         {
-            // HUD etc
+            if (_player.IsCriticalHealth)
+            {
+                DrawCriticalBorder(spriteBatch, dt);
+            }
         }
 
         public void OnResize(int newWidth, int newHeight)
@@ -162,12 +166,60 @@ namespace VoidZero.States
                         }
                         else
                         {
-                            _player.CurrentHealth -= bullet.Damage;
+                            if (_player.CurrentHealth == 0)
+                            {
+                                _player.CurrentHealth = 0;
+                            }
+                            else
+                            {
+                                _player.CurrentHealth -= bullet.Damage;
+                            }
+                            
+                            _player.OnDamaged();
+                            _gameManager.Shake(0.25f, 20f);
                         }
 
                         Bullets.Bullets.RemoveAt(i);
                     }
                 }
+            }
+        }
+
+        private void DrawCriticalBorder(SpriteBatch spriteBatch, float dt)
+        {
+            if (_player.IsCriticalHealth)
+            {
+                _criticalBlinkTimer += dt;
+
+                // Red blinking factor
+                float blink = (MathF.Sin(_criticalBlinkTimer * 6f) + 1f) * 0.5f; // 0..1
+                blink = MathHelper.Lerp(0.2f, 0.6f, blink); // min/max alpha
+
+                // Only fade based on health regen if player is regenerating from 1 HP
+                float healthFade = 1f; // fully visible by default
+                if (_player.CurrentHealth < _player.MaxHealth)
+                {
+                    healthFade = 1f - _player.HealthRegenProgress; // fade as color returns
+                }
+
+                float alpha = blink * healthFade;
+
+                Color borderColor = Color.FromArgb(
+                    (int)(alpha * 255),
+                    255, 50, 50
+                );
+
+                RectangleF rect = new RectangleF(0, 0,
+                    GameServices.Instance.Settings.Width,
+                    GameServices.Instance.Settings.Height);
+
+                float thickness = 15f;
+                spriteBatch.DrawRectangle(rect, borderColor, false, thickness);
+            }
+            else
+            {
+                // Reset blink timer if player is not at critical HP
+                _criticalBlinkTimer = 0f;
             }
         }
     }

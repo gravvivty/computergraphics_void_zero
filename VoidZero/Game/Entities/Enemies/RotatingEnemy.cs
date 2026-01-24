@@ -34,7 +34,7 @@ namespace VoidZero.Game.Entities.Enemies
                 bulletManager,
                 BulletOwner.Enemy,
                 cooldown: 0.25f,
-                damage: 5f
+                damage: 1f
             );
             _shooter.BulletEnergy = BulletEnergy.Green;
         }

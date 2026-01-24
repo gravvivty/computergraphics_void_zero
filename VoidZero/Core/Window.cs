@@ -51,7 +51,7 @@ namespace VoidZero.Core
             base.OnRenderFrame(e);
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
-            _game.Draw();
+            _game.Draw((float)e.Time);
             SwapBuffers();
         }
 

@@ -6,6 +6,7 @@ using VoidZero.Game.Combat;
 using VoidZero.Game.Combat.Patterns;
 using System.Collections.Generic;
 using System.Linq;
+using System.Drawing;
 
 namespace VoidZero.Game.Entities
 {
@@ -14,7 +15,7 @@ namespace VoidZero.Game.Entities
         private readonly InputManager _input;
 
         private readonly float _acceleration = 10000f; // low -> on ice
-        private readonly float _deceleration = 3000f;
+        private readonly float _deceleration = 6000f;
         private readonly float _maxSpeed = 550f;
         private ShooterComponent _shooter;
         public BulletEnergy ActiveShield { get; private set; } = BulletEnergy.Yellow;
@@ -43,12 +44,25 @@ namespace VoidZero.Game.Entities
         private const float AfterImageLifetime = 0.15f;
         private float _afterImageTimer = 0f;
         private readonly Queue<AfterImage> _afterImages = new();
+        // Damage flicker
+        private float _damageFlashTimer = 0f;
+        private const float DamageFlashDuration = 0.4f;
+        private const float FlickerInterval = 0.06f;
+        private float _flickerTimer = 0f;
+        private bool _visibleThisFrame = true;
+        // Health
+        private const float HealthRegenDelay = 3f;
+        private float _healthRegenTimer = 0f;
+        public float HealthRegenTimer => _healthRegenTimer;
+
+        private bool _isRegeneratingHealth = false;
+        public bool IsCriticalHealth => CurrentHealth <= 1f;
 
 
         public Player(Texture2D texture, Vector2 startPosition, InputManager input, BulletManager bulletManager)
             : base(texture, startPosition, 16, 16)
         {
-            MaxHealth = 100f;
+            MaxHealth = 3f;
             CurrentHealth = MaxHealth;
             _input = input;
 
@@ -90,6 +104,7 @@ namespace VoidZero.Game.Entities
             {
                 TryStartDash();
             }
+            UpdateDamageFlicker(dt);
             ApplyAfterImages(dt);
             UpdateAfterImages(dt);
             ApplyMovement(inputDirection, dt, movementPriority);
@@ -97,6 +112,7 @@ namespace VoidZero.Game.Entities
             string animationKey = GetAnimationKey(hasMovementInput ? inputDirection : Velocity);
             UpdateAnimation(animationKey, dt);
             UpdateGraze(dt);
+            UpdateHealthRegen(dt);
 
             if (_input.SwitchShieldPressed)
             {
@@ -113,22 +129,33 @@ namespace VoidZero.Game.Entities
                     )
                 );
             }
-            // Debug
-            Console.WriteLine($"GrazeMultiplier: {DamageMultiplier:0.00}");
         }
 
         public override void Draw(SpriteBatch batch)
         {
+            if (!_visibleThisFrame)
+                return;
+
+            Vector4 tint = Vector4.One;
+
+            if (_damageFlashTimer > 0f)
+            {
+                tint = new Vector4(1f, 0.2f, 0.2f, 1f); // bright red
+            }
+
+            // Afterimages first
             foreach (AfterImage image in _afterImages)
             {
                 float alpha = image.Lifetime / image.MaxLifetime;
                 alpha = MathF.Sqrt(alpha);
-                Vector4 tint = new Vector4(1f, 1f, 1f, alpha * 0.5f);
-
-                Animations.Draw(batch, image.Position, Scale, tint);
+                Vector4 afterTint = new Vector4(1f, 1f, 1f, alpha * 0.5f);
+                Animations.Draw(batch, image.Position, Scale, afterTint);
             }
 
-            base.Draw(batch);
+            Animations.Draw(batch, Position, Scale, tint);
+
+            // Debug hitbox
+            batch.DrawRectangle(Hitbox, Color.Red);
         }
 
         public void AddGraze(float dt)
@@ -177,6 +204,11 @@ namespace VoidZero.Game.Entities
 
         public void RegisterGraze(float dt)
         {
+            if (IsInvulnerable)
+            {
+                return;
+            }
+
             _isCurrentlyGrazing = true;
 
             // Increase graze accumulation
@@ -184,6 +216,29 @@ namespace VoidZero.Game.Entities
             if (_grazeAccumulatedTime > _maxGrazeDamageAfter)
             {
                 _grazeAccumulatedTime = _maxGrazeDamageAfter;
+            }
+        }
+
+        public void OnDamaged()
+        {
+            _damageFlashTimer = DamageFlashDuration;
+            _flickerTimer = 0f;
+            IsInvulnerable = true;
+            // Reset health regen
+            _healthRegenTimer = 0f;
+            _isRegeneratingHealth = false;
+        }
+
+        public float HealthRegenProgress
+        {
+            get
+            {
+                if (CurrentHealth <= 1f)
+                {
+                    _healthRegenTimer = MathF.Min(_healthRegenTimer, HealthRegenDelay);
+                    return Math.Clamp(_healthRegenTimer / HealthRegenDelay, 0f, 1f);
+                }
+                return 1f; // full color
             }
         }
 
@@ -237,7 +292,7 @@ namespace VoidZero.Game.Entities
             }
             else
             {
-                Velocity *= 0.959f; // high value -> drifting on ice
+                Velocity *= 0.929f; // high value -> drifting on ice
             }
 
             if (Velocity.Length > _maxSpeed)
@@ -313,6 +368,54 @@ namespace VoidZero.Game.Entities
                 {
                     _afterImages.Enqueue(image);
                 }
+            }
+        }
+
+        private void UpdateDamageFlicker(float dt)
+        {
+            if (_damageFlashTimer > 0f)
+            {
+                _damageFlashTimer -= dt;
+                _flickerTimer -= dt;
+
+                if (_flickerTimer <= 0f)
+                {
+                    _flickerTimer = FlickerInterval;
+                    _visibleThisFrame = !_visibleThisFrame;
+                }
+
+                if (_damageFlashTimer <= 0f)
+                {
+                    _damageFlashTimer = 0f;
+                    _visibleThisFrame = true;
+                    IsInvulnerable = false;
+                }
+            }
+        }
+
+        private void UpdateHealthRegen(float dt)
+        {
+            // Only regen if not at max
+            if (CurrentHealth >= MaxHealth)
+            {
+                _healthRegenTimer = 0f;
+                _isRegeneratingHealth = false;
+                return;
+            }
+
+            _healthRegenTimer += dt;
+            _isRegeneratingHealth = true;
+
+            if (_healthRegenTimer >= HealthRegenDelay)
+            {
+                CurrentHealth += 1f;
+                if (CurrentHealth > MaxHealth)
+                    CurrentHealth = MaxHealth;
+
+                _healthRegenTimer = 0f;
+
+                // If still not full, keep chaining regen
+                _isRegeneratingHealth = CurrentHealth < MaxHealth;
             }
         }
     }

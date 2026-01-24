@@ -14,6 +14,9 @@ namespace VoidZero.Graphics
         private int _vao, _vbo;
         private Shader _shader;
         private Texture2D _whiteTexture;
+        public Vector4 GlobalTint { get; set; } = Vector4.One;
+        public float Grayscale { get; set; } = 0f;
+
 
         public SpriteBatch()
         {
@@ -50,8 +53,9 @@ namespace VoidZero.Graphics
 
         }
 
-        public void Begin(Matrix4 projection)
+        public void Begin(Matrix4 projection, float grayscale = 0f)
         {
+            Grayscale = grayscale;
             _shader.Use();
             _shader.SetMatrix4("projection", projection);
 
@@ -81,6 +85,7 @@ namespace VoidZero.Graphics
 
         public void DrawFrame(Texture2D texture, Vector2 position, Rectangle source, Vector4 color, float scale = 1f)
         {
+            // Convert source rect to normalized UVs
             float u0 = source.X / (float)texture.Width;
             float v0 = source.Y / (float)texture.Height;
             float u1 = (source.X + source.Width) / (float)texture.Width;
@@ -89,27 +94,26 @@ namespace VoidZero.Graphics
             float w = source.Width * scale;
             float h = source.Height * scale;
 
-            float[] vertices =
-            {
-                position.X,     position.Y,     u0, v0, color.X, color.Y, color.Z, color.W,
-                position.X + w, position.Y,     u1, v0, color.X, color.Y, color.Z, color.W,
-                position.X,     position.Y + h, u0, v1, color.X, color.Y, color.Z, color.W,
-
-                position.X,     position.Y + h, u0, v1, color.X, color.Y, color.Z, color.W,
-                position.X + w, position.Y,     u1, v0, color.X, color.Y, color.Z, color.W,
-                position.X + w, position.Y + h, u1, v1, color.X, color.Y, color.Z, color.W
-            };
-
-            GL.BindVertexArray(_vao);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, texture.Handle);
-            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, vertices.Length * sizeof(float), vertices);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+            // Pass the UV rectangle as (u, v, width, height)
+            DrawInternal(
+                texture,
+                position,
+                new Vector2(w, h),
+                new Vector4(u0, v0, u1 - u0, v1 - v0), // UV rectangle
+                color
+            );
         }
 
         private void DrawInternal(Texture2D texture, Vector2 position, Vector2 size, Vector4 uv, Vector4 color)
         {
+            Vector4 finalColor = color * GlobalTint;
+
+            if (Grayscale > 0f)
+            {
+                Vector4 grayColor = ToGrayscale(finalColor);
+                finalColor = Vector4.Lerp(finalColor, grayColor, Grayscale);
+            }
+
             float x = position.X;
             float y = position.Y;
             float w = size.X;
@@ -120,10 +124,10 @@ namespace VoidZero.Graphics
             float uw = uv.Z;
             float vh = uv.W;
 
-            float r = color.X;
-            float g = color.Y;
-            float b = color.Z;
-            float a = color.W;
+            float r = finalColor.X;
+            float g = finalColor.Y;
+            float b = finalColor.Z;
+            float a = finalColor.W;
 
             float[] vertices =
             {
@@ -152,10 +156,8 @@ namespace VoidZero.Graphics
             GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
         }
 
-        public void DrawRectangle(RectangleF rectangle, Color color, bool filled = false)
+        public void DrawRectangle(RectangleF rectangle, Color color, bool filled = false, float thickness = 2f)
         {
-            float thickness = 2f;
-
             if (filled)
             {
                 DrawDebug(
@@ -199,9 +201,16 @@ namespace VoidZero.Graphics
 
         public void End() { }
 
+        public static Vector4 ToGrayscale(Vector4 color)
+        {
+            float gray = color.X * 0.2126f + color.Y * 0.7152f + color.Z * 0.0722f;
+            return new Vector4(gray, gray, gray, color.W);
+        }
+
         private Vector4 ColorToVec4(Color c)
         {
             return new Vector4(
+
                 c.R / 255f,
                 c.G / 255f,
                 c.B / 255f,

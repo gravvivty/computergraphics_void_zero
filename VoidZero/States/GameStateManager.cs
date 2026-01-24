@@ -28,9 +28,9 @@ namespace VoidZero.States
             _current?.Draw(spriteBatch);
         }
 
-        public void DrawUI()
+        public void DrawUI(SpriteBatch spriteBatch, float dt)
         {
-            _current?.DrawUI();
+            _current?.DrawUI(spriteBatch, dt);
         }
     }
 }

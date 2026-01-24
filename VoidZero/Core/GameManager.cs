@@ -17,6 +17,7 @@ namespace VoidZero.Core
         private ImGuiController _imGui;
         private Background _background;
         private InputManager _input;
+        private ScreenShake _screenShake;
         private ImFontPtr _defaultFont;
         private bool _gameStarted = false;
 
@@ -47,6 +48,7 @@ namespace VoidZero.Core
             _input = new InputManager();
             _spriteBatch = new SpriteBatch();
             _stateManager = new GameStateManager();
+            _screenShake = new ScreenShake();
             _imGui = new ImGuiController(_window.Size.X, _window.Size.Y);
             LoadImGuiFont("Content/Fonts/lowrespixel.otf", 20f); // adjust path & size
 
@@ -74,6 +76,7 @@ namespace VoidZero.Core
         public void Update(float dt)
         {
             _imGui.Update(_window, dt);
+            _screenShake.Update(dt);
             // Update current state
             _stateManager.Update(dt);
             _input.Update(_window);
@@ -83,20 +86,32 @@ namespace VoidZero.Core
             }
         }
 
-        public void Draw()
+        public void Draw(float dt)
         {
             ImGui.PushFont(_defaultFont);
 
+            float targetGray = calculateGrayScale();
+
+            // Smooth transition
+            _spriteBatch.Grayscale = MathHelper.Lerp(
+                _spriteBatch.Grayscale,
+                targetGray,
+                dt * 6f
+            );
+
             // Draw game objects
             Matrix4 projection = Matrix4.CreateOrthographicOffCenter(
-                0, _window.Size.X,
-                _window.Size.Y, 0,
-                -1, 1);
+                0 + _screenShake.Offset.X,
+                _window.Size.X + _screenShake.Offset.X,
+                _window.Size.Y + _screenShake.Offset.Y,
+                0 + _screenShake.Offset.Y,
+                -1, 1
+            );
 
-            _spriteBatch.Begin(projection);
+            _spriteBatch.Begin(projection, targetGray);
             _background.Draw(_spriteBatch);
             _stateManager.Draw(_spriteBatch); // only draws state-specific sprites
-            _stateManager.DrawUI();
+            _stateManager.DrawUI(_spriteBatch, dt);
             _spriteBatch.End();
             ImGui.PopFont();
             _imGui.Render();
@@ -130,6 +145,45 @@ namespace VoidZero.Core
         private void LoadImGuiFont(string fontPath, float fontSize)
         {
             _imGui.LoadFont(fontPath, fontSize, out _defaultFont);
+        }
+
+        public void Shake(float duration, float strength)
+        {
+            _screenShake.Start(duration, strength);
+        }
+
+        private float calculateGrayScale()
+        {
+            float targetGray = 0f;
+
+            if (_stateManager._current is PlayState playState)
+            {
+                var player = playState._player;
+
+                if (player.IsCriticalHealth)
+                {
+                    const float totalRegen = 3f;
+                    const float fadeDuration = 0.5f;
+                    const float holdDuration = totalRegen - fadeDuration; // 2.5s
+
+                    float t = player.HealthRegenTimer;
+
+                    if (t < holdDuration)
+                    {
+                        // Stay fully gray
+                        targetGray = 1f;
+                    }
+                    else
+                    {
+                        // Fade back to color in last 0.5s
+                        float fadeT = Math.Clamp((t - holdDuration) / fadeDuration, 0f, 1f);
+                        fadeT = fadeT * fadeT * (3f - 2f * fadeT); // smoothstep
+                        targetGray = MathHelper.Lerp(1f, 0f, fadeT);
+                    }
+                }
+            }
+
+            return targetGray;
         }
     }
 }

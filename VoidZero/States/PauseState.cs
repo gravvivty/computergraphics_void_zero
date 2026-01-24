@@ -42,7 +42,7 @@ namespace VoidZero.States
             _pausedState.Draw(spriteBatch);
         }
 
-        public override void DrawUI()
+        public override void DrawUI(SpriteBatch spriteBatch, float dt)
         {
             DrawPauseMenu(_gameStateManager, _window, _input, ref _currentPage, _pausedState, _gameManager);
         }

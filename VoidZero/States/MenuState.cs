@@ -32,7 +32,7 @@ namespace VoidZero.States
         public override void Update(float dt) { }
         public override void Draw(SpriteBatch spriteBatch) { }
 
-        public override void DrawUI()
+        public override void DrawUI(SpriteBatch spriteBatch, float dt)
         {
             MenuUI.DrawMenu(_gameStateManager, _window, _input, ref _currentPage, _background, _gameManager);
         }

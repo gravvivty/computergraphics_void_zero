@@ -14,6 +14,6 @@ namespace VoidZero.States
 
         public abstract void Update(float dt);
         public abstract void Draw(SpriteBatch spriteBatch);
-        public abstract void DrawUI();
+        public abstract void DrawUI(SpriteBatch spriteBatch, float dt);
     }
 }
