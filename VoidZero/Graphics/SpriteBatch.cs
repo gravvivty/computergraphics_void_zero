@@ -58,6 +58,7 @@ namespace VoidZero.Graphics
             Grayscale = grayscale;
             _shader.Use();
             _shader.SetMatrix4("projection", projection);
+            _shader.SetFloat("grayscale", Grayscale);
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.Uniform1(GL.GetUniformLocation(_shader.Handle, "texture0"), 0);
@@ -107,12 +108,6 @@ namespace VoidZero.Graphics
         private void DrawInternal(Texture2D texture, Vector2 position, Vector2 size, Vector4 uv, Vector4 color)
         {
             Vector4 finalColor = color * GlobalTint;
-
-            if (Grayscale > 0f)
-            {
-                Vector4 grayColor = ToGrayscale(finalColor);
-                finalColor = Vector4.Lerp(finalColor, grayColor, Grayscale);
-            }
 
             float x = position.X;
             float y = position.Y;
@@ -200,12 +195,6 @@ namespace VoidZero.Graphics
         }
 
         public void End() { }
-
-        public static Vector4 ToGrayscale(Vector4 color)
-        {
-            float gray = color.X * 0.2126f + color.Y * 0.7152f + color.Z * 0.0722f;
-            return new Vector4(gray, gray, gray, color.W);
-        }
 
         private Vector4 ColorToVec4(Color c)
         {

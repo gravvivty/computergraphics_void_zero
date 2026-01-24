@@ -60,6 +60,12 @@ namespace VoidZero.Graphics
             GL.UniformMatrix4(location, false, ref value);
         }
 
+        public void SetFloat(string name, float value)
+        {
+            int location = GL.GetUniformLocation(Handle, name);
+            GL.Uniform1(location, value);
+        }
+
         public void Dispose()
         {
             GL.DeleteProgram(Handle);

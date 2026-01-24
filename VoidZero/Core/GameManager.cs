@@ -163,8 +163,8 @@ namespace VoidZero.Core
                 if (player.IsCriticalHealth)
                 {
                     const float totalRegen = 3f;
-                    const float fadeDuration = 0.5f;
-                    const float holdDuration = totalRegen - fadeDuration; // 2.5s
+                    const float fadeDuration = 1f;
+                    const float holdDuration = totalRegen - fadeDuration; // 2s
 
                     float t = player.HealthRegenTimer;
 
