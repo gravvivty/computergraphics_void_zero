@@ -11,7 +11,7 @@ namespace VoidZero.UI
 {
     public static class MenuUI
     {
-        public enum MenuPage { Main, Options, Credits }
+        public enum MenuPage { Main, StageSelect, Options, Credits }
 
         public static void DrawMenu(GameStateManager gsm, GameWindow window, InputManager input, ref MenuPage currentPage, Background bg, GameManager gm)
         {
@@ -19,6 +19,9 @@ namespace VoidZero.UI
             {
                 case MenuPage.Main:
                     DrawMainMenu(ref currentPage, gsm, window, input, bg, gm);
+                    break;
+                case MenuPage.StageSelect:
+                    DrawStageSelectMenu(ref currentPage, gsm, window, input, bg, gm);
                     break;
                 case MenuPage.Options:
                     DrawOptionsMenu(ref currentPage, gsm, window, input);
@@ -75,8 +78,7 @@ namespace VoidZero.UI
                     switch (label)
                     {
                         case "Play":
-                            gm.StartGame();
-                            gsm.ChangeState(new PlayState(gsm, window, input, bg, gm));
+                            currentPage = MenuPage.StageSelect;
                             break;
                         case "Options":
                             currentPage = MenuPage.Options;
@@ -250,6 +252,68 @@ namespace VoidZero.UI
             {
                 gm.ExitGame();
                 gsm.ChangeState(new MenuState(gsm, window, input, pausedState._background, gm));
+            }
+
+            ImGui.End();
+        }
+
+        public static void DrawStageSelectMenu(
+            ref MenuPage currentPage,
+            GameStateManager gsm,
+            GameWindow window,
+            InputManager input,
+            Background bg,
+            GameManager gm)
+        {
+            var io = ImGui.GetIO();
+            ImGui.SetNextWindowPos(Vector2.Zero);
+            ImGui.SetNextWindowSize(io.DisplaySize);
+
+            ImGui.Begin("Stage Select",
+                ImGuiWindowFlags.NoDecoration |
+                ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoSavedSettings |
+                ImGuiWindowFlags.NoBackground
+            );
+
+            float buttonWidth = 180f;
+            float buttonHeight = 60f;
+            float spacing = 20f;
+
+            int stageCount = 3;
+            float totalWidth =
+                stageCount * buttonWidth +
+                (stageCount - 1) * spacing;
+
+            float startX = (ImGui.GetContentRegionAvail().X - totalWidth) / 2f;
+            float centerY = ImGui.GetWindowHeight() * 0.5f;
+
+            ImGui.SetCursorPosY(centerY - buttonHeight * 0.5f);
+            ImGui.SetCursorPosX(startX);
+
+            for (int stage = 1; stage <= stageCount; stage++)
+            {
+                if (ImGui.Button($"Stage {stage}", new Vector2(buttonWidth, buttonHeight)))
+                {
+                    gm.StartGame();
+                    gsm.ChangeState(
+                        new PlayState(gsm, window, input, bg, gm, stage)
+                    );
+                }
+
+                if (stage < stageCount)
+                {
+                    ImGui.SameLine(0f, spacing);
+                }
+            }
+
+            // Back button
+            ImGui.Dummy(new Vector2(0, 80f));
+            CenterNextItem(200f);
+            if (ImGui.Button("Back", new Vector2(200, 50)))
+            {
+                currentPage = MenuPage.Main;
             }
 
             ImGui.End();

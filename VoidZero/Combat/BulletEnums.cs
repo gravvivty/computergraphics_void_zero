@@ -9,7 +9,7 @@ namespace VoidZero.Game.Combat
     public enum BulletEnergy
     {
         Blue,
-        Yellow,
+        Red,
         Green,
         Neutral
     }

@@ -14,9 +14,9 @@ namespace VoidZero.Utils
         {
             return energy switch
             {
-                BulletEnergy.Green => new Vector4(0f, 1f, 0f, 1f),   // green
-                BulletEnergy.Yellow => new Vector4(1f, 1f, 0f, 1f),   // yellow
-                BulletEnergy.Blue => new Vector4(0.1f, 0.8f, 1f, 1f), // blue
+                BulletEnergy.Green => new Vector4(0.3f, 1f, 0f, 1f),   // green
+                BulletEnergy.Red => new Vector4(1f, 0f, 0f, 1f),   // red
+                BulletEnergy.Blue => new Vector4(0.0f, 0.6f, 1f, 1f), // blue
                 BulletEnergy.Neutral => Vector4.One,                  // no tint
                 _ => Vector4.One
             };

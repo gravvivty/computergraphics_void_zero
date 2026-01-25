@@ -7,6 +7,7 @@ using VoidZero.Game.Combat.Patterns;
 using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
+using VoidZero.Game.Entities.Tools;
 
 namespace VoidZero.Game.Entities
 {
@@ -18,7 +19,7 @@ namespace VoidZero.Game.Entities
         private readonly float _deceleration = 6000f;
         private readonly float _maxSpeed = 550f;
         private ShooterComponent _shooter;
-        public BulletEnergy ActiveShield { get; private set; } = BulletEnergy.Yellow;
+        public BulletEnergy ActiveShield { get; private set; } = BulletEnergy.Red;
         // Grazing
         private bool _isCurrentlyGrazing = false;
         private float _grazeAccumulatedTime = 0f;
@@ -122,10 +123,13 @@ namespace VoidZero.Game.Entities
             if (_input.SwitchPatternPressed)
             {
                 _shooter.SetPattern(
-                    new ThreeWaySpreadPattern(
+                    new SpreadPattern(
                         GameServices.Instance.Content.GetTexture("VanillaBullet"),
                         -Vector2.UnitY,
-                        40f
+                        20,
+                        20f,
+                        1500f,
+                        true
                     )
                 );
             }
@@ -307,9 +311,9 @@ namespace VoidZero.Game.Entities
         {
             ActiveShield = ActiveShield switch
             {
-                BulletEnergy.Blue => BulletEnergy.Yellow,
-                BulletEnergy.Yellow => BulletEnergy.Blue,
-                _ => BulletEnergy.Yellow
+                BulletEnergy.Blue => BulletEnergy.Red,
+                BulletEnergy.Red => BulletEnergy.Blue,
+                _ => BulletEnergy.Red
             };
         }
 

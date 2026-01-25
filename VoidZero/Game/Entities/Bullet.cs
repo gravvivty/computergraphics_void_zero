@@ -9,7 +9,7 @@ namespace VoidZero.Game.Entities
     public class Bullet : Entity
     {
         public Vector2 Direction { get; set; }
-        public float Lifetime { get; set; } = 10f;
+        public float Lifetime { get; set; } = 5f;
         public BulletEnergy Energy { get; set; }
         public BulletOwner Owner { get; set; }
         public float Damage { get; set; }

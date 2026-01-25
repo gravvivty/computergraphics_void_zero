@@ -9,22 +9,16 @@ public class CardinalPattern : IBulletPattern
 {
     private readonly Texture2D _bulletTexture;
     private readonly float _bulletSpeed;
-    private float _rotation;
 
     public CardinalPattern(Texture2D bulletTexture, float bulletSpeed = 1500f)
     {
         _bulletTexture = bulletTexture;
         _bulletSpeed = bulletSpeed;
-        _rotation = 0f;
-    }
-
-    public void SetRotation(float rotation)
-    {
-        _rotation = rotation;
     }
 
     public void Shoot(Entity shooter, BulletManager bullets, BulletOwner owner, float damage, BulletEnergy energy)
     {
+        float rotation = shooter.Rotation;
         Vector2[] directions =
         {
             Vector2.UnitX,
@@ -40,7 +34,7 @@ public class CardinalPattern : IBulletPattern
 
         for (int i = 0; i < directions.Length; i++)
         {
-            directions[i] = Rotate(directions[i], _rotation);
+            directions[i] = Rotate(directions[i], rotation);
         }
 
         foreach (Vector2 direction in directions)

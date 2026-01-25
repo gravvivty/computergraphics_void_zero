@@ -11,15 +11,19 @@ using VoidZero.Game.Combat;
 using System;
 using VoidZero.Game.Entities.Enemies;
 using System.Linq;
+using VoidZero.States.Stages;
+using VoidZero.States.Stages.VoidZero.States.Stages;
+using VoidZero.Game.Entities.Components;
 
 namespace VoidZero.States
 {
     public class PlayState : GameState, IResizableState
     {
         private readonly InputManager _input;
-        private readonly GameWindow _window;
+        public GameWindow Window { get; private set; }
         private readonly GameStateManager _gameStateManager;
         private readonly GameManager _gameManager;
+        private StageComposer _stageComposer;
         private float _criticalBlinkTimer = 0f;
         public BulletManager Bullets { get; } = new();
 
@@ -28,45 +32,50 @@ namespace VoidZero.States
 
         public Player _player { get; }
         private Shield _playerShield;
+        public int StageIndex { get; }
 
 
-        public PlayState(GameStateManager gsm, GameWindow window, InputManager input, Background bg, GameManager gm)
+        public PlayState(GameStateManager gsm, GameWindow window, InputManager input, Background bg, GameManager gm, int stageIndex = 1)
         {
             _gameStateManager = gsm;
-            _window = window;
+            Window = window;
             _input = input;
             _background = bg;
             _gameManager = gm;
+            StageIndex = stageIndex;
+            IStageDefinition stage = StageIndex switch
+            {
+                1 => new Stage1(),
+                2 => new Stage2(),
+                3 => new Stage3(),
+                _ => new Stage1()
+            };
+
+            _stageComposer = stage.Build();
 
             Texture2D playerTexture = GameServices.Instance.Content.GetTexture("player");
             _player = new Player(playerTexture, new Vector2(500, 500), _input, Bullets);
-            _player.SetPositionRelative(_player.Position,window.Size.X, window.Size.Y);
+            _player.SetPositionRelative(_player.Position, Window.Size.X, Window.Size.Y);
 
             Texture2D shieldTexture = GameServices.Instance.Content.GetTexture("shield");
             _playerShield = new Shield(shieldTexture, _player);
 
-            Texture2D stationaryEnemyTexture = GameServices.Instance.Content.GetTexture("witch");
-            StationaryEnemy stationaryEnemy = new StationaryEnemy(stationaryEnemyTexture, new Vector2(750, 0), Bullets);
-            stationaryEnemy.SetPositionRelative(stationaryEnemy.Position, _window.Size.X, _window.Size.Y);
-
-            Texture2D rotatingEnemyTexture = GameServices.Instance.Content.GetTexture("witch");
-            RotatingEnemy rotatingEnemy = new RotatingEnemy(rotatingEnemyTexture, new Vector2(350, 0), Bullets, 1);
-            rotatingEnemy.SetPositionRelative(rotatingEnemy.Position, _window.Size.X, _window.Size.Y);
-            rotatingEnemy.Movement = new MovementComponent(Vector2.UnitX, 200f, 5f);
-
-            Entities.Add(stationaryEnemy);
-            Entities.Add(rotatingEnemy);
             Entities.Add(_player);
             Entities.Add(_playerShield);
-
+            StageIndex = stageIndex;
         }
 
         public override void Update(float dt)
         {
+            _stageComposer.Update(dt, this);
             _background.Update(dt);
             foreach (var entity in Entities.ToList())
             {
                 entity.Update(dt);
+                if (entity.Components.OfType<TimedExitComponent>().Any(c => c.IsExpired))
+                {
+                    Entities.Remove(entity);
+                }
             }
             Bullets.Update(dt);
             HandleBulletHits(dt);
@@ -74,7 +83,7 @@ namespace VoidZero.States
             // Pause logic
             if (_input.ConsumePausePressed())
             {
-                _gameStateManager.ChangeState(new PauseState(_gameStateManager, _window, _input, this, _gameManager));
+                _gameStateManager.ChangeState(new PauseState(_gameStateManager, Window, _input, this, _gameManager));
             }
         }
 
@@ -117,7 +126,7 @@ namespace VoidZero.States
                     foreach (Entity entity in Entities)
                     {
                         // Check if entity is any type of enemy
-                        if (entity is RotatingEnemy || entity is StationaryEnemy)
+                        if (entity is Enemy enemy)
                         {
                             if (bullet.Hitbox.IntersectsWith(entity.Hitbox))
                             {

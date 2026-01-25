@@ -1,20 +1,18 @@
-﻿using VoidZero.Game.Combat.Patterns;
-using VoidZero.Game.Entities;
+﻿using VoidZero.Game.Combat;
+using VoidZero.Game.Combat.Patterns;
 
-namespace VoidZero.Game.Combat
+namespace VoidZero.Game.Entities.Tools
 {
     public class ShooterComponent
     {
-        private IBulletPattern _pattern;
+        public IBulletPattern Pattern { get; private set; }
+        public BulletEnergy BulletEnergy { get; set; }
         private readonly BulletManager _bulletManager;
         private readonly BulletOwner _owner;
 
-        private readonly float _damage;
+        private float _damage;
         private float _cooldown;
         private float _timer;
-
-        public IBulletPattern Pattern => _pattern;
-        public BulletEnergy BulletEnergy { get; set; }
 
         public ShooterComponent(
             IBulletPattern pattern,
@@ -23,7 +21,7 @@ namespace VoidZero.Game.Combat
             float cooldown,
             float damage)
         {
-            _pattern = pattern;
+            Pattern = pattern;
             _bulletManager = manager;
             _owner = owner;
             _cooldown = cooldown;
@@ -32,7 +30,18 @@ namespace VoidZero.Game.Combat
 
         public void SetPattern(IBulletPattern newPattern)
         {
-            _pattern = newPattern;
+            Pattern = newPattern;
+        }
+
+        public void Configure(
+            IBulletPattern pattern,
+            float cooldown,
+            float damage)
+        {
+            Pattern = pattern;
+            _cooldown = cooldown;
+            _damage = damage;
+            _timer = 0f;
         }
 
         public void TryShoot(Entity entity, float dt, bool trigger)
@@ -58,7 +67,7 @@ namespace VoidZero.Game.Combat
                 finalDamage *= player.DamageMultiplier;
             }
 
-            _pattern.Shoot(entity, _bulletManager, _owner, finalDamage, BulletEnergy);
+            Pattern.Shoot(entity, _bulletManager, _owner, finalDamage, BulletEnergy);
         }
     }
 }

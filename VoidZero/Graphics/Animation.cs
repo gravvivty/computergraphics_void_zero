@@ -49,9 +49,9 @@ namespace VoidZero.Graphics
             }
         }
 
-        public void Draw(SpriteBatch batch, Vector2 position, float scale, Vector4 tint)
+        public void Draw(SpriteBatch batch, Vector2 position, float scale, Vector4 tint, float rotation = 0f)
         {
-            batch.DrawFrame(_texture, position, _frames[_currentFrame], tint, scale);
+            batch.DrawFrame(_texture, position, _frames[_currentFrame], tint, scale, rotation);
         }
     }
 }

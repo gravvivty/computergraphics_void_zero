@@ -1,7 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using VoidZero.Game.Entities;
 
-public class MovementComponent
+public class MovementTool
 {
     private Vector2 _direction;
     private float _speed; // units per second
@@ -10,7 +10,7 @@ public class MovementComponent
 
     public bool Finished => _timer >= _duration;
 
-    public MovementComponent(Vector2 direction, float speed, float duration)
+    public MovementTool(Vector2 direction, float speed, float duration)
     {
         _direction = direction.Normalized();
         _speed = speed;

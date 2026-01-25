@@ -4,16 +4,16 @@ using VoidZero.Game.Combat;
 using VoidZero.Game.Combat.Patterns;
 using VoidZero.Game.Entities;
 using System;
+using VoidZero.Game.Entities.Tools;
 
 namespace VoidZero.Game.Entities.Enemies
 {
-    public class RotatingEnemy : Entity
+    public class Spinner : Enemy
     {
         private ShooterComponent _shooter;
-        private float _rotationSpeed; // radians per second
-        private float _currentAngle;  // current rotation angle
+        public ShooterComponent Shooter => _shooter;
 
-        public RotatingEnemy(Texture2D texture, Vector2 position, BulletManager bulletManager, float rotationSpeed = 1f)
+        public Spinner(Texture2D texture, Vector2 position, BulletManager bulletManager)
             : base(texture, position, 24, 24)
         {
             MaxHealth = 60f;
@@ -21,9 +21,6 @@ namespace VoidZero.Game.Entities.Enemies
             Scale = 6f;
             Width = 24 * Scale;
             Height = 24 * Scale;
-
-            _rotationSpeed = rotationSpeed;
-            _currentAngle = 0f;
 
             Animations.Add("Idle", new Animation(texture, 24, 24, 3, 1f, 0));
 
@@ -33,31 +30,35 @@ namespace VoidZero.Game.Entities.Enemies
                 new CardinalPattern(bulletTex, 500f),
                 bulletManager,
                 BulletOwner.Enemy,
-                cooldown: 0.25f,
+                cooldown: 0.1f,
                 damage: 1f
             );
-            _shooter.BulletEnergy = BulletEnergy.Green;
+            _shooter.BulletEnergy = BulletEnergy.Red;
         }
 
         public override void Update(float dt)
         {
             Movement?.Update(this, dt);
-            // Rotate enemy
-            _currentAngle += _rotationSpeed * dt;
-            if (_currentAngle > MathF.PI * 2f)
-            {
-                _currentAngle -= MathF.PI * 2f;
-            }
 
-            // Apply rotation to pattern
-            if (_shooter.Pattern is CardinalPattern cardinal)
-            {
-                cardinal.SetRotation(_currentAngle);
-            }
+            foreach (var component in Components)
+                component.Update(this, dt);
 
             _shooter.TryShoot(this, dt, trigger: true);
 
             UpdateAnimation("Idle", dt);
+        }
+
+        public void SetBulletEnergy(BulletEnergy bulletEnergy)
+        {
+            _shooter.BulletEnergy = bulletEnergy;
+        }
+
+        public void SetShooterPattern(
+            IBulletPattern pattern,
+            float cooldown,
+            float damage)
+        {
+            _shooter.Configure(pattern, cooldown, damage);
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using System.Drawing;
+using VoidZero.Game.Combat;
+using VoidZero.Game.Entities.Components;
 using VoidZero.Graphics;
 using VoidZero.Utils;
 
@@ -8,10 +10,12 @@ namespace VoidZero.Game.Entities
     public abstract class Entity
     {
         public Texture2D Texture { get; protected set; }
+        public List<IEntityComponent> Components { get; } = new();
+        public float Rotation { get; set; }
         public float MaxHealth { get; set; } = 100f;
         public float CurrentHealth { get; set; }
         public float Scale { get; set; } = 6f;
-        public MovementComponent Movement { get; set; }
+        public MovementTool Movement { get; set; }
         public Vector2 RelativePosition { get; protected set; } // Relative to screen
         public Vector2 Velocity;
         public float Speed { get; protected set; }
@@ -72,7 +76,7 @@ namespace VoidZero.Game.Entities
                 tint = BulletColorHelper.GetTint(bullet.Energy);
             }
 
-            Animations.Draw(batch, Position, Scale, tint);
+            Animations.Draw(batch, Position, Scale, tint, Rotation);
             // Debug
             batch.DrawRectangle(Hitbox, Color.Red);
         }
@@ -100,6 +104,12 @@ namespace VoidZero.Game.Entities
         protected void UpdateAnimation(string key, float dt)
         {
             Animations.Update(key, dt);
+        }
+
+        public void AddComponent(IEntityComponent component)
+        {
+            component.Attach(this);
+            Components.Add(component);
         }
     }
 }
