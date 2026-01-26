@@ -234,6 +234,7 @@ namespace VoidZero.UI
             CenterNextItem(buttonWidth);
             if (ImGui.Button("Resume", new Vector2(buttonWidth, buttonHeight)))
             {
+                gm.ExitPause();
                 gsm.ChangeState(pausedState);
             }
 
@@ -250,7 +251,7 @@ namespace VoidZero.UI
             CenterNextItem(buttonWidth);
             if (ImGui.Button("Main Menu", new Vector2(buttonWidth, buttonHeight)))
             {
-                gm.ExitGame();
+                gm.ExitPause();
                 gsm.ChangeState(new MenuState(gsm, window, input, pausedState._background, gm));
             }
 
@@ -296,7 +297,9 @@ namespace VoidZero.UI
             {
                 if (ImGui.Button($"Stage {stage}", new Vector2(buttonWidth, buttonHeight)))
                 {
-                    gm.StartGame();
+                    gm.EnterPlay();
+                    gm.ResetTime();
+                    input.Reset();
                     gsm.ChangeState(
                         new PlayState(gsm, window, input, bg, gm, stage)
                     );

@@ -11,15 +11,27 @@ namespace VoidZero.Core
 {
     public class GameManager
     {
+        public enum GameMode
+        {
+            Menu,
+            Playing,
+            Paused,
+            Dying
+        }
+        public GameMode CurrentMode { get; private set; } = GameMode.Menu;
+
         private readonly GameWindow _window;
         private SpriteBatch _spriteBatch;
         private GameStateManager _stateManager;
         private ImGuiController _imGui;
-        private Background _background;
-        private InputManager _input;
+        public Background _background { get; private set; }
+        public InputManager _input { get; private set; }
         private ScreenShake _screenShake;
         private ImFontPtr _defaultFont;
-        private bool _gameStarted = false;
+
+        private float _deathTimer = 0f;
+        private const float DeathSlowDuration = 1f;
+        private const float DeathTargetScale = 0.3f;
 
         public GameManager(GameWindow window)
         {
@@ -35,7 +47,7 @@ namespace VoidZero.Core
             _background = new Background(
                 _window.Size.X,
                 _window.Size.Y,
-                GameServices.Instance.Content.LoadTexture("space", "Content/Background/background.png"),
+                GameServices.Instance.Content.LoadTexture("space", "Content/Background/background_generated.png"),
                 GameServices.Instance.Content.LoadTexture("stars", "Content/Background/star.png"),
                 GameServices.Instance.Content.LoadTexture("planets", "Content/Background/planet.png")
             );
@@ -77,14 +89,31 @@ namespace VoidZero.Core
         public void Update(float dt)
         {
             _imGui.Update(_window, dt);
-            _screenShake.Update(dt);
-            // Update current state
-            _stateManager.Update(dt);
-            _input.Update(_window);
-            if (!_gameStarted)
+
+            float timeScale = 1f;
+
+            // 1️⃣ PAUSE HAS HIGHEST PRIORITY
+            if (CurrentMode == GameMode.Paused)
             {
-                _background.Update(dt);
+                timeScale = 0f;
             }
+            // 2️⃣ DEATH SLOW-MO
+            else if (CurrentMode == GameMode.Dying)
+            {
+                _deathTimer += dt;
+
+                float t = Math.Clamp(_deathTimer / DeathSlowDuration, 0f, 1f);
+                t = t * t * (3f - 2f * t); // smoothstep
+
+                timeScale = MathHelper.Lerp(1f, 0.3f, t);
+            }
+
+            // 3️⃣ APPLY TIME SCALE
+            _background.Update(dt * timeScale);
+
+            _stateManager.Update(dt * timeScale);
+
+            _input.Update(_window);
         }
 
         public void Draw(float dt)
@@ -117,6 +146,10 @@ namespace VoidZero.Core
             ImGui.PopFont();
             _imGui.Render();
         }
+        public void ResetTime()
+        {
+            _deathTimer = 0f;
+        }
 
         public void OnResize(int width, int height)
         {
@@ -133,14 +166,32 @@ namespace VoidZero.Core
 
         }
 
-        public void StartGame()
+        public void EnterPlay()
         {
-            _gameStarted = true;
+            ResetTime();
+            CurrentMode = GameMode.Playing;
         }
 
-        public void ExitGame()
+        public void EnterPause()
         {
-            _gameStarted = false;
+            CurrentMode = GameMode.Paused;
+        }
+
+        public void ExitPause()
+        {
+            CurrentMode = GameMode.Playing;
+        }
+
+        public void EnterDeath()
+        {
+            _deathTimer = 0f;
+            CurrentMode = GameMode.Dying;
+        }
+
+        public void EnterMenu()
+        {
+            _deathTimer = 0f;
+            CurrentMode = GameMode.Menu;
         }
 
         private void LoadImGuiFont(string fontPath, float fontSize)

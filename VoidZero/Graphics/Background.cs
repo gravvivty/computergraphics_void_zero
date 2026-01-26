@@ -43,8 +43,8 @@ namespace VoidZero.Core
         private readonly List<Star> _stars = new();
         private readonly Random _rng = new();
 
-        private const int StarCount = 80;
-        private const int MaxPlanets = 8;
+        private const int StarCount = 50;
+        private const int MaxPlanets = 3;
 
         public Background(int screenWidth, int screenHeight, Texture2D space, Texture2D stars, Texture2D planets)
         {
@@ -94,8 +94,8 @@ namespace VoidZero.Core
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            DrawLayer(spriteBatch, _spaceTexture, _spaceOffset, FillScale());
             DrawStars(spriteBatch);
+            DrawLayer(spriteBatch, _spaceTexture, _spaceOffset, FillScale());
             DrawPlanets(spriteBatch);
         }
 

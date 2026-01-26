@@ -14,6 +14,7 @@ using System.Linq;
 using VoidZero.States.Stages;
 using VoidZero.States.Stages.VoidZero.States.Stages;
 using VoidZero.Game.Entities.Components;
+using static VoidZero.Core.GameManager;
 
 namespace VoidZero.States
 {
@@ -33,6 +34,11 @@ namespace VoidZero.States
         public Player _player { get; }
         private Shield _playerShield;
         public int StageIndex { get; }
+        private bool _isDying = false;
+        private float _deathTimer = 0f;
+        private const float DeathAnimDuration = 1f;
+        private const float BulletSlowFactor = 0.6f;
+
 
 
         public PlayState(GameStateManager gsm, GameWindow window, InputManager input, Background bg, GameManager gm, int stageIndex = 1)
@@ -63,15 +69,61 @@ namespace VoidZero.States
             Entities.Add(_player);
             Entities.Add(_playerShield);
             StageIndex = stageIndex;
+            _isDying = false;
         }
 
         public override void Update(float dt)
         {
+            // 🔑 ESC works ONLY while alive
+            if (!_isDying && _input.ConsumePausePressed())
+            {
+                _gameManager.EnterPause();
+                _gameStateManager.ChangeState(
+                    new PauseState(_gameStateManager, Window, _input, this, _gameManager)
+                );
+                return;
+            }
+
+            if (_gameManager.CurrentMode == GameMode.Paused)
+                return;
+
+            // --- bullets always update (unless paused) ---
+            float bulletDt = dt;
+            if (_isDying)
+                bulletDt *= 0.6f;
+
+            Bullets.Update(bulletDt);
+
+            // No collisions once dying
+            if (!_isDying)
+                HandleBulletHits(dt);
+
+            // --- death sequence ---
+            if (_isDying)
+            {
+                _deathTimer += dt;
+
+                if (_deathTimer >= DeathAnimDuration)
+                {
+                    _gameStateManager.ChangeState(
+                        new DeathState(_gameStateManager, Window, _gameManager)
+                    );
+                }
+
+                // Update entities for death animation only
+                foreach (var entity in Entities.ToList())
+                    entity.Update(dt);
+
+                return;
+            }
+
+            // --- normal gameplay ---
             _stageComposer.Update(dt, this);
-            _background.Update(dt);
+
             foreach (var entity in Entities.ToList())
             {
                 entity.Update(dt);
+
                 bool remove =
                     entity.IsDead ||
                     entity.Components.OfType<TimedExitComponent>().Any(c => c.IsExpired);
@@ -79,15 +131,9 @@ namespace VoidZero.States
                 if (remove)
                     Entities.Remove(entity);
             }
-            Bullets.Update(dt);
-            HandleBulletHits(dt);
-
-            // Pause logic
-            if (_input.ConsumePausePressed())
-            {
-                _gameStateManager.ChangeState(new PauseState(_gameStateManager, Window, _input, this, _gameManager));
-            }
         }
+
+
 
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -96,7 +142,6 @@ namespace VoidZero.States
                 entity.Draw(spriteBatch);
             }
 
-            Bullets.Draw(spriteBatch);
             Bullets.Draw(spriteBatch);
         }
 
@@ -182,23 +227,35 @@ namespace VoidZero.States
                         }
                         else
                         {
-                            if (_player.CurrentHealth == 0)
+                            _player.CurrentHealth -= bullet.Damage;
+
+                            if (_player.CurrentHealth <= 0)
                             {
                                 _player.CurrentHealth = 0;
+                                _player.Kill();
+                                OnPlayerDied();
                             }
                             else
                             {
-                                _player.CurrentHealth -= bullet.Damage;
+                                _player.OnDamaged();
+                                _gameManager.Shake(0.25f, 20f);
                             }
-                            
-                            _player.OnDamaged();
-                            _gameManager.Shake(0.25f, 20f);
                         }
 
                         Bullets.Bullets.RemoveAt(i);
                     }
                 }
             }
+        }
+
+        private void OnPlayerDied()
+        {
+            if (_isDying)
+                return;
+
+            _isDying = true;
+            _playerShield.Kill();
+            _gameManager.EnterDeath();
         }
 
         private void DrawCriticalBorder(SpriteBatch spriteBatch, float dt)

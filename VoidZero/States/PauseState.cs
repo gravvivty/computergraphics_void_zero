@@ -26,6 +26,7 @@ namespace VoidZero.States
             _input = input;
             _pausedState = pausedState; // store the paused game
             _gameManager = gm;
+            _gameManager.EnterPause();
         }
 
         public override void Update(float dt)
@@ -33,6 +34,7 @@ namespace VoidZero.States
             // Press ESC again to resume
             if (_input.ConsumePausePressed())
             {
+                _gameManager.ExitPause();
                 _gameStateManager.ChangeState(_pausedState);
             }
         }

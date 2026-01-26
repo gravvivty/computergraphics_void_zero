@@ -109,5 +109,12 @@ namespace VoidZero.Game.Input
             }
             return false;
         }
+
+        public void Reset()
+        {
+            _pausePressed = false;
+            _pauseConsumed = false;
+            // Reset any other per-frame flags
+        }
     }
 }

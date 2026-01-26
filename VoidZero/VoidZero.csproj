@@ -16,12 +16,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Content\Background\background.png" />
+    <None Remove="Content\Background\planet.png" />
+    <None Remove="Content\Background\space.png" />
     <None Remove="Content\Effects\death.png" />
     <None Remove="Content\Enemies\Witch.png" />
     <None Remove="Content\player.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Content\Background\planet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Background\space.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Effects\death.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

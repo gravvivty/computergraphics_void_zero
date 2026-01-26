@@ -34,7 +34,7 @@ namespace VoidZero.Core
             base.OnLoad();
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            GL.ClearColor(0.05f, 0.1f, 0.15f, 1f);
+            GL.ClearColor(0f, 0f, 0f, 1f);
 
             _game = new GameManager(this);
             _game.Initialize();

@@ -27,6 +27,7 @@ namespace VoidZero.States
             _input = input;
             _background = background;
             _gameManager = gm;
+            _gameManager.EnterMenu();
         }
 
         public override void Update(float dt) { }
@@ -34,7 +35,7 @@ namespace VoidZero.States
 
         public override void DrawUI(SpriteBatch spriteBatch, float dt)
         {
-            MenuUI.DrawMenu(_gameStateManager, _window, _input, ref _currentPage, _background, _gameManager);
+            MenuUI.DrawMenu(_gameStateManager, _window, _input, ref _currentPage, _gameManager._background, _gameManager);
         }
     }
 }
