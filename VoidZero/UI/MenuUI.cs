@@ -146,6 +146,44 @@ namespace VoidZero.UI
 
             ImGui.Dummy(new Vector2(0, spacing));
 
+            // Audio sliders
+            CenterNextItem(buttonWidth);
+            ImGui.Text("Audio Settings");
+            // Master Volume
+            CenterNextItem(buttonWidth);
+            ImGui.SetNextItemWidth(buttonWidth);
+            float master = settings.MasterVolume * 100f; // convert 0-1 to 0-100
+            if (ImGui.SliderFloat("Master", ref master, 0f, 100f, "%.1f%%"))
+            {
+                settings.MasterVolume = master / 100f; // store back as 0-1
+            }
+            // SFX Volume
+            CenterNextItem(buttonWidth);
+            ImGui.SetNextItemWidth(buttonWidth);
+            float sfx = settings.SfxVolume * 100f;
+            if (ImGui.SliderFloat("SFX", ref sfx, 0f, 100f, "%.1f%%"))
+            {
+                settings.SfxVolume = sfx / 100f;
+            }
+            // Music Volume
+            CenterNextItem(buttonWidth);
+            ImGui.SetNextItemWidth(buttonWidth);
+            float music = settings.MusicVolume * 100f;
+            if (ImGui.SliderFloat("Music", ref music, 0f, 100f, "%.1f%%"))
+            {
+                settings.MusicVolume = music / 100f;
+            }
+            // UI Volume
+            CenterNextItem(buttonWidth);
+            ImGui.SetNextItemWidth(buttonWidth);
+            float ui = settings.UiVolume * 100f;
+            if (ImGui.SliderFloat("UI", ref ui, 0f, 100f, "%.1f%%"))
+            {
+                settings.UiVolume = ui / 100f;
+            }
+
+            ImGui.Dummy(new Vector2(0, spacing));
+
             CenterNextItem(buttonWidth);
             if (ImGui.Button("Back", new Vector2(buttonWidth, buttonHeight)))
             {
