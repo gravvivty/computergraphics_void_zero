@@ -38,6 +38,7 @@ namespace VoidZero.Game.Entities
             Height = 16 * Scale;
 
             Animations.Add("Travel", new Animation(texture, 16, 16, 4, 0.08f));
+            Animations.Play("Travel");
         }
 
         public override void Update(float dt)
@@ -45,7 +46,7 @@ namespace VoidZero.Game.Entities
             Position += Direction * Speed * dt;
             Lifetime -= dt;
 
-            UpdateAnimation("Travel", dt);
+            Animations.Update(dt);
         }
 
         public override void Draw(SpriteBatch batch)

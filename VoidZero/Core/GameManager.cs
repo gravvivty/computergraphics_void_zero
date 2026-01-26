@@ -35,7 +35,7 @@ namespace VoidZero.Core
             _background = new Background(
                 _window.Size.X,
                 _window.Size.Y,
-                GameServices.Instance.Content.LoadTexture("space", "Content/Background/space.png"),
+                GameServices.Instance.Content.LoadTexture("space", "Content/Background/background.png"),
                 GameServices.Instance.Content.LoadTexture("stars", "Content/Background/star.png"),
                 GameServices.Instance.Content.LoadTexture("planets", "Content/Background/planet.png")
             );
@@ -44,6 +44,7 @@ namespace VoidZero.Core
             GameServices.Instance.Content.LoadTexture("VanillaBullet", "Content/Bullets/VanillaBullet.png");
             GameServices.Instance.Content.LoadTexture("witch", "Content/Enemies/Witch.png");
             GameServices.Instance.Content.LoadTexture("shield", "Content/Shield/shield.png");
+            GameServices.Instance.Content.LoadTexture("death", "Content/Effects/death.png");
 
             _input = new InputManager();
             _spriteBatch = new SpriteBatch();

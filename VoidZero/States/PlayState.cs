@@ -72,10 +72,12 @@ namespace VoidZero.States
             foreach (var entity in Entities.ToList())
             {
                 entity.Update(dt);
-                if (entity.Components.OfType<TimedExitComponent>().Any(c => c.IsExpired))
-                {
+                bool remove =
+                    entity.IsDead ||
+                    entity.Components.OfType<TimedExitComponent>().Any(c => c.IsExpired);
+
+                if (remove)
                     Entities.Remove(entity);
-                }
             }
             Bullets.Update(dt);
             HandleBulletHits(dt);
@@ -100,6 +102,8 @@ namespace VoidZero.States
 
         public override void DrawUI(SpriteBatch spriteBatch, float dt)
         {
+            DrawAbilityBar(spriteBatch);
+            DrawGrazingBar(spriteBatch);
             if (_player.IsCriticalHealth)
             {
                 DrawCriticalBorder(spriteBatch, dt);
@@ -128,6 +132,8 @@ namespace VoidZero.States
                         // Check if entity is any type of enemy
                         if (entity is Enemy enemy)
                         {
+                            if (enemy.IsDying)
+                                continue;
                             if (bullet.Hitbox.IntersectsWith(entity.Hitbox))
                             {
                                 entity.CurrentHealth -= bullet.Damage;
@@ -135,7 +141,7 @@ namespace VoidZero.States
 
                                 if (entity.CurrentHealth <= 0)
                                 {
-                                    Entities.Remove(entity);
+                                    entity.Kill();
                                 }  
 
                                 break;
@@ -158,7 +164,7 @@ namespace VoidZero.States
 
                     if (grazeHit)
                     {
-                        _player.RegisterGraze(dt);
+                        _player.RegisterGraze();
                     }
 
                     if (damageHit)
@@ -172,6 +178,7 @@ namespace VoidZero.States
                         if (shieldAbsorbs)
                         {
                             _playerShield.Flash();
+                            _player.FillAbilityBar(_player.AbsorbFillAmount);
                         }
                         else
                         {
@@ -230,6 +237,58 @@ namespace VoidZero.States
                 // Reset blink timer if player is not at critical HP
                 _criticalBlinkTimer = 0f;
             }
+        }
+
+        public void DrawAbilityBar(SpriteBatch spritebatch)
+        {
+            // Example position and size
+            float barX = 20f;
+            float barY = 20f;
+            float barWidth = 200f;
+            float barHeight = 20f;
+
+            // Draw background
+            spritebatch.DrawRectangle(new RectangleF(barX, barY, barWidth, barHeight), Color.Gray, true);
+
+            // Determine fill color based on level
+            Color fillColor = Color.LightBlue;
+            if (_player._abilityBar >= _player.Level3Threshold) fillColor = Color.Red;
+            else if (_player._abilityBar >= _player.Level2Threshold) fillColor = Color.Orange;
+            else if (_player._abilityBar >= _player.Level1Threshold) fillColor = Color.Yellow;
+
+            float fill = _player._abilityBar / _player.MaxAbilityBar;
+            spritebatch.DrawRectangle(new RectangleF(barX, barY, barWidth * fill, barHeight), Color.Cyan, true);
+
+            float[] thresholds = { _player.Level1Threshold, _player.Level2Threshold, _player.Level3Threshold };
+
+            foreach (float threshold in thresholds)
+            {
+                float markerX = barX + (threshold / _player.MaxAbilityBar) * barWidth;
+                // Draw a thin line as marker
+                spritebatch.DrawRectangle(new RectangleF(markerX - 1, barY, 2, barHeight), Color.Yellow, true);
+            }
+        }
+
+        public void DrawGrazingBar(SpriteBatch spritebatch)
+        {
+            float barX = 20f;
+            float barY = 20f;
+            float barWidth = 200f;
+            float barHeight = 20f;
+            float spacing = 10f;
+
+            float grazeBarY = barY + barHeight + spacing;
+            float grazeBonus = _player.DamageMultiplier - 1f;
+            float maxBonus = _player.MaxGrazeMultiplier - 1f;
+
+            float grazeFill = grazeBonus / maxBonus;
+            grazeFill = Math.Clamp(grazeFill, 0f, 1f);
+
+            // Draw background
+            spritebatch.DrawRectangle(new RectangleF(barX, grazeBarY, barWidth, barHeight), Color.DarkGray, true);
+
+            // Draw fill
+            spritebatch.DrawRectangle(new RectangleF(barX, grazeBarY, barWidth * grazeFill, barHeight), Color.LightBlue, true);
         }
     }
 }

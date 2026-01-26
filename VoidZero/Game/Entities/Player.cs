@@ -22,14 +22,15 @@ namespace VoidZero.Game.Entities
         public BulletEnergy ActiveShield { get; private set; } = BulletEnergy.Red;
         // Grazing
         private bool _isCurrentlyGrazing = false;
-        private float _grazeAccumulatedTime = 0f;
-        private float _currentDamageMultiplier = 1f;
-        const float _maxGrazeDamageAfter = 1f;
+        public float _maxGrazeDamageAfter { get; private set; } = 1f;
         const float _grazeDecayTimer = 10f;
-        const float MaxGrazeMultiplier = 3f;
+        public float MaxGrazeMultiplier { get; private set; } = 3f;
         const float GrazeDecayRate = 1.5f;
         public float GrazeTimer { get; private set; } = 0f;
-        public float DamageMultiplier => _currentDamageMultiplier;
+        private float _grazeBonus = 0f;
+        public float DamageMultiplier => 1f + _grazeBonus;
+        private const float GrazeGainPerSecond = 2f; // tuning knob
+        private float MaxGrazeBonus => MaxGrazeMultiplier - 1f;
         // Dashing
         private const float DashDistance = 200f;
         private const float DashCooldown = 0.5f;
@@ -58,6 +59,24 @@ namespace VoidZero.Game.Entities
 
         private bool _isRegeneratingHealth = false;
         public bool IsCriticalHealth => CurrentHealth <= 1f;
+        // Ability bar
+        public float _abilityBar { get; private set; } = 0f; // current progress
+        public float MaxAbilityBar { get; } = 100f; // full bar
+        private const float AbilityFillRate = 4f; // per second when not shooting
+        public float AbsorbFillAmount { get; } = 2f; // per bullet absorbed
+
+        // Ability levels thresholds
+        public float Level1Threshold { get; private set; } = 30f;
+        public float Level2Threshold { get; private set; } = 60f;
+        public float Level3Threshold { get; private set; } = 100f;
+
+        // Active ability state
+        private bool _abilityActive = false;
+        private float _abilityTimer = 0f;
+        private const float AbilityDuration = 10f;
+        private int _currentAbilityLevel = 0; // 0 = none, 1 = level1, etc.
+        private string _currentAnimationKey = "Idle";
+
 
 
         public Player(Texture2D texture, Vector2 startPosition, InputManager input, BulletManager bulletManager)
@@ -88,10 +107,26 @@ namespace VoidZero.Game.Entities
             Animations.Add("Left", new Animation(texture, 16, 16, 3, 0.1f, 6));
 
             Animations.Add("Idle", new Animation(texture, 16, 16, 1, 1f, 0));
+            Animations.Play("Idle");
+            AddDefaultDeathAnimation();
         }
 
         public override void Update(float dt)
         {
+            base.Update(dt);
+            if (IsDying)
+            {
+                Animations.Update(dt);
+
+                // Optional: once animation finishes, mark dead or trigger game over
+                if (Animations.IsFinished)
+                {
+                    IsDead = true;
+                    // trigger game over
+                }
+
+                return; // skip all normal update logic
+            }
             if (_dashCooldownTimer > 0f)
             {
                 _dashCooldownTimer -= dt;
@@ -111,7 +146,16 @@ namespace VoidZero.Game.Entities
             ApplyMovement(inputDirection, dt, movementPriority);
             _shooter.TryShoot(this, dt, _input.ShootHeld);
             string animationKey = GetAnimationKey(hasMovementInput ? inputDirection : Velocity);
-            UpdateAnimation(animationKey, dt);
+
+            // Only switch if animation changed
+            if (animationKey != _currentAnimationKey)
+            {
+                Animations.Play(animationKey);
+                _currentAnimationKey = animationKey;
+            }
+
+            // Always update current animation
+            Animations.Update(dt);
             UpdateGraze(dt);
             UpdateHealthRegen(dt);
 
@@ -120,19 +164,38 @@ namespace VoidZero.Game.Entities
                 CycleShield();
             }
 
-            if (_input.SwitchPatternPressed)
+            if (_input.ActivateAbilityPressed && _abilityBar > 0f)
             {
-                _shooter.SetPattern(
-                    new SpreadPattern(
-                        GameServices.Instance.Content.GetTexture("VanillaBullet"),
-                        -Vector2.UnitY,
-                        20,
-                        20f,
-                        1500f,
-                        true
-                    )
-                );
+                ActivateAbility();
             }
+
+            // Ability bar fill when not shooting
+            if (!_abilityActive && !_input.ShootHeld)
+            {
+                _abilityBar += AbilityFillRate * dt;
+                if (_abilityBar > MaxAbilityBar) _abilityBar = MaxAbilityBar;
+            }
+
+            // Reset ability timer if active
+            if (_abilityActive)
+            {
+                _abilityTimer -= dt;
+                if (_abilityTimer <= 0f)
+                {
+                    _abilityActive = false;
+                    _currentAbilityLevel = 0;
+                    // Restore original bullet pattern
+                    _shooter.SetPattern(new FixedDirectionPattern(
+                        GameServices.Instance.Content.GetTexture("VanillaBullet"),
+                        -Vector2.UnitY
+                    ));
+                }
+            }
+        }
+        public void FillAbilityBar(float amount)
+        {
+            _abilityBar += amount;
+            if (_abilityBar > MaxAbilityBar) _abilityBar = MaxAbilityBar;
         }
 
         public override void Draw(SpriteBatch batch)
@@ -175,38 +238,19 @@ namespace VoidZero.Game.Entities
         {
             if (_isCurrentlyGrazing)
             {
-                // Update multiplier based on accumulated graze time
-                _grazeAccumulatedTime += dt;
-                if (_grazeAccumulatedTime > _maxGrazeDamageAfter)
-                {
-                    _grazeAccumulatedTime = _maxGrazeDamageAfter;
-                } 
-
-                _currentDamageMultiplier = MathHelper.Lerp(1f, MaxGrazeMultiplier, _grazeAccumulatedTime / _maxGrazeDamageAfter);
+                _grazeBonus += GrazeGainPerSecond * dt;
             }
             else
             {
-                // Not grazing -> decay multiplier over _grazeDecayTimer seconds
-                float decayPerSecond = (MaxGrazeMultiplier - 1f) / _grazeDecayTimer;
-                _currentDamageMultiplier -= decayPerSecond * dt;
-                if (_currentDamageMultiplier < 1f)
-                {
-                    _currentDamageMultiplier = 1f;
-                }
-
-                // Decay graze accumulation too
-                _grazeAccumulatedTime -= dt;
-                if (_grazeAccumulatedTime < 0f)
-                {
-                    _grazeAccumulatedTime = 0f;
-                }
+                float decayPerSecond = MaxGrazeBonus / _grazeDecayTimer;
+                _grazeBonus -= decayPerSecond * dt;
             }
 
-            // Reset grazing flag for next frame
+            _grazeBonus = Math.Clamp(_grazeBonus, 0f, MaxGrazeBonus);
             _isCurrentlyGrazing = false;
         }
 
-        public void RegisterGraze(float dt)
+        public void RegisterGraze()
         {
             if (IsInvulnerable)
             {
@@ -214,13 +258,6 @@ namespace VoidZero.Game.Entities
             }
 
             _isCurrentlyGrazing = true;
-
-            // Increase graze accumulation
-            _grazeAccumulatedTime += dt;
-            if (_grazeAccumulatedTime > _maxGrazeDamageAfter)
-            {
-                _grazeAccumulatedTime = _maxGrazeDamageAfter;
-            }
         }
 
         public void OnDamaged()
@@ -231,6 +268,8 @@ namespace VoidZero.Game.Entities
             // Reset health regen
             _healthRegenTimer = 0f;
             _isRegeneratingHealth = false;
+            // Reset dmg mult and graze
+            _grazeBonus = 0f;
         }
 
         public float HealthRegenProgress
@@ -420,6 +459,51 @@ namespace VoidZero.Game.Entities
 
                 // If still not full, keep chaining regen
                 _isRegeneratingHealth = CurrentHealth < MaxHealth;
+            }
+        }
+
+        private void ActivateAbility()
+        {
+            // Determine level
+            if (_abilityBar >= Level3Threshold)
+                _currentAbilityLevel = 3;
+            else if (_abilityBar >= Level2Threshold)
+                _currentAbilityLevel = 2;
+            else if (_abilityBar >= Level1Threshold)
+                _currentAbilityLevel = 1;
+            else
+                return; // not enough to activate
+
+            _abilityActive = true;
+            _abilityTimer = AbilityDuration;
+
+            // Consume bar
+            _abilityBar = 0f;
+
+            // Assign new pattern based on level
+            switch (_currentAbilityLevel)
+            {
+                case 1:
+                    _shooter.SetPattern(new SpreadPattern(
+                        GameServices.Instance.Content.GetTexture("VanillaBullet"),
+                        -Vector2.UnitY,
+                        3, 30f, 1500f
+                    ));
+                    break;
+                case 2:
+                    _shooter.SetPattern(new SpreadPattern(
+                        GameServices.Instance.Content.GetTexture("VanillaBullet"),
+                        -Vector2.UnitY,
+                        6, 25f, 1800f
+                    ));
+                    break;
+                case 3:
+                    _shooter.SetPattern(new SpreadPattern(
+                        GameServices.Instance.Content.GetTexture("VanillaBullet"),
+                        -Vector2.UnitY,
+                        10, 15f, 2000f
+                    ));
+                    break;
             }
         }
     }

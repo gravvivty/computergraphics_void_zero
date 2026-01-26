@@ -22,6 +22,7 @@ namespace VoidZero.Game.Entities
             Height = 32 * Scale;
 
             Animations.Add("Idle", new Animation(texture, 32, 32, 3, 0.1f));
+            Animations.Play("Idle");
         }
 
         public override void Update(float dt)
@@ -37,7 +38,7 @@ namespace VoidZero.Game.Entities
                 _flashTimer -= dt;
             }
 
-            UpdateAnimation("Idle", dt);
+            Animations.Update(dt);
         }
 
         public override void Draw(SpriteBatch batch)

@@ -25,6 +25,7 @@ namespace VoidZero.Game.Entities.Enemies
             Height = 24 * Scale;
 
             Animations.Add("Idle", new Animation(texture, 24, 24, 3, 1f, 0));
+            Animations.Play("Idle");
 
             var bulletTex = GameServices.Instance.Content.GetTexture("VanillaBullet");
             _shooter = new ShooterComponent(
@@ -44,14 +45,12 @@ namespace VoidZero.Game.Entities.Enemies
 
         public override void Update(float dt)
         {
+            base.Update(dt);
             Movement?.Update(this, dt);
-
-            foreach (var component in Components)
-                component.Update(this, dt);
 
             _shooter.TryShoot(this, dt, trigger: true);
 
-            UpdateAnimation("Idle", dt);
+            Animations.Update(dt);
         }
 
         public void SetBulletEnergy(BulletEnergy bulletEnergy)

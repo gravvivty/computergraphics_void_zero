@@ -23,6 +23,14 @@ namespace VoidZero.Game.Entities
         public float Height { get; protected set; }
         protected AnimationManager Animations { get; }
         private Vector2 _position;
+        // Death
+        public bool IsDead { get; protected set; } = false;
+        public bool IsDying { get; private set; } = false;
+        protected virtual string DeathAnimationKey => "Death";
+        // How long before cleanup (fallback if animation length unknown)
+        protected virtual float DeathDuration => 0.4f;
+
+        protected float _deathTimer = 0f;
         public Vector2 Position
         {
             get => _position;
@@ -52,11 +60,15 @@ namespace VoidZero.Game.Entities
             );
 
             Animations = new AnimationManager();
+            AddDefaultDeathAnimation();
         }
         public virtual RectangleF Hitbox
         {
             get
             {
+                if (IsDying)
+                    return RectangleF.Empty;
+
                 float shrinkFactor = 0.25f; // 25%
                 float offsetX = Width * (shrinkFactor);
                 float offsetY = Height * (shrinkFactor);
@@ -66,18 +78,41 @@ namespace VoidZero.Game.Entities
                 return new RectangleF(Position.X + offsetX, Position.Y + offsetY, hitboxWidth, hitboxHeight);
             }
         }
-
-        public abstract void Update(float dt);
-        public virtual void Draw(SpriteBatch batch)
+        public virtual void Update(float dt)
         {
-            Vector4 tint = Vector4.One; // default no tint
-            if (this is Bullet bullet)
+            if (IsDying)
             {
-                tint = BulletColorHelper.GetTint(bullet.Energy);
+                Animations.Update(dt);
+                UpdateDeath(dt);
+                return;
             }
 
-            Animations.Draw(batch, Position, Scale, tint, Rotation);
-            // Debug
+            foreach (var component in Components)
+                component.Update(this, dt);
+        }
+
+        public virtual void Draw(SpriteBatch batch)
+        {
+            // Default tint
+            Vector4 tint = (this is Bullet b) ? BulletColorHelper.GetTint(b.Energy) : Vector4.One;
+
+            // Calculate draw position (center death animation if dying)
+            Vector2 drawPos = Position;
+
+            if (IsDying && Animations.CurrentAnimationKey == DeathAnimationKey)
+            {
+                var anim = Animations.CurrentAnimation;
+                if (anim != null)
+                {
+                    // Center the animation over the entity
+                    drawPos += new Vector2(Width, Height) / 2f - new Vector2(anim.FrameWidth, anim.FrameHeight) * 0.5f * Scale;
+                }
+            }
+
+            // Draw animation at calculated position
+            Animations.Draw(batch, drawPos, Scale, tint, Rotation);
+
+            // Debug hitbox
             batch.DrawRectangle(Hitbox, Color.Red);
         }
 
@@ -101,15 +136,45 @@ namespace VoidZero.Game.Entities
             _position = new Vector2(RelativePosition.X * newWidth, RelativePosition.Y * newHeight);
         }
 
-        protected void UpdateAnimation(string key, float dt)
+        protected void AddDefaultDeathAnimation()
         {
-            Animations.Update(key, dt);
+            Texture2D deathTexture = GameServices.Instance.Content.GetTexture("death");
+
+            Animations.Add(
+                "Death",
+                new Animation(deathTexture, 32, 32, 10, 0.08f, loop: false)
+            );
         }
 
         public void AddComponent(IEntityComponent component)
         {
             component.Attach(this);
             Components.Add(component);
+        }
+
+        public virtual void Kill()
+        {
+            if (IsDying) return;
+
+            IsDying = true;
+            Velocity = Vector2.Zero;
+            Components.Clear(); // optional, prevents logic during death
+            Animations.Play(DeathAnimationKey);
+
+            _deathTimer = DeathDuration;
+        }
+
+        protected void UpdateDeath(float dt)
+        {
+            if (!IsDying)
+                return;
+
+            _deathTimer -= dt;
+
+            if (_deathTimer <= 0f)
+            {
+                IsDead = true;
+            }
         }
     }
 }

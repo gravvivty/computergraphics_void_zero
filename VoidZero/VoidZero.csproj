@@ -16,11 +16,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Content\Effects\death.png" />
     <None Remove="Content\Enemies\Witch.png" />
     <None Remove="Content\player.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Content\Effects\death.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Enemies\Witch.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

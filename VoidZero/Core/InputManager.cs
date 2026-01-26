@@ -22,7 +22,7 @@ namespace VoidZero.Game.Input
         public bool ShootHeld { get; private set; }
         public bool DashPressed { get; private set; }
         public bool SwitchShieldPressed { get; private set; }
-        public bool SwitchPatternPressed { get; private set; }
+        public bool ActivateAbilityPressed { get; private set; }
 
         public unsafe void Update(GameWindow window)
         {
@@ -84,7 +84,7 @@ namespace VoidZero.Game.Input
             _prevShieldButton = shieldHeld;
 
 
-            SwitchPatternPressed =
+            ActivateAbilityPressed =
                 _keyboard.IsKeyPressed(Keys.L) ||
                 (_gamepadConnected && _gamepad.Buttons[3] == 1); // Y, L
 
