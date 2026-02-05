@@ -15,10 +15,10 @@ namespace VoidZero.Game.Entities.Enemies
         private ShooterComponent _shooter;
         public ShooterComponent Shooter => _shooter;
 
-        public CardinalSequencer(Texture2D texture, Vector2 position, BulletManager bulletManager)
+        public CardinalSequencer(Texture2D texture, Vector2 position, BulletManager bulletManager, BulletEnergy energy)
             : base(texture, position, 24, 24)
         {
-            MaxHealth = 60f;
+            MaxHealth = 300f;
             CurrentHealth = MaxHealth;
             Scale = 6f;
             Width = 24 * Scale;
@@ -35,7 +35,7 @@ namespace VoidZero.Game.Entities.Enemies
                 cooldown: 0.25f,
                 damage: 1f
             );
-            _shooter.BulletEnergy = BulletEnergy.Red;
+            _shooter.BulletEnergy = energy;
             RotationSequenceComponent rsc = new RotationSequenceComponent(
                 loop: true,
                 new RotationComponent(MathF.PI / 4f, 0f, 1f)

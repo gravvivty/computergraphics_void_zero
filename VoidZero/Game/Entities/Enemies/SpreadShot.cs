@@ -12,10 +12,10 @@ namespace VoidZero.Game.Entities.Enemies
         private ShooterComponent _shooter;
         public ShooterComponent Shooter => _shooter;
 
-        public SpreadShot(Texture2D texture, Vector2 position, BulletManager bulletManager)
+        public SpreadShot(Texture2D texture, Vector2 position, BulletManager bulletManager, BulletEnergy energy)
             : base(texture, position, 24, 24)
         {
-            MaxHealth = 50f;
+            MaxHealth = 300f;
             CurrentHealth = MaxHealth;
             Scale = 6f;
             Width = 24 * Scale;
@@ -32,7 +32,7 @@ namespace VoidZero.Game.Entities.Enemies
                 cooldown: 1.0f,
                 damage: 1f
             );
-            _shooter.BulletEnergy = BulletEnergy.Red;
+            _shooter.BulletEnergy = energy;
         }
 
         public override void Update(float dt)

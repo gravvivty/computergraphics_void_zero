@@ -15,10 +15,10 @@ namespace VoidZero.Game.Entities.Enemies
         private ShooterComponent _shooter;
         public ShooterComponent Shooter => _shooter;
 
-        public CardinalSeperatorFull(Texture2D texture, Vector2 position, BulletManager bulletManager)
+        public CardinalSeperatorFull(Texture2D texture, Vector2 position, BulletManager bulletManager, BulletEnergy energy)
             : base(texture, position, 24, 24)
         {
-            MaxHealth = 60f;
+            MaxHealth = 1000f;
             CurrentHealth = MaxHealth;
             Scale = 6f;
             Width = 24 * Scale;
@@ -35,7 +35,7 @@ namespace VoidZero.Game.Entities.Enemies
                 cooldown: 0.1f,
                 damage: 1f
             );
-            _shooter.BulletEnergy = BulletEnergy.Red;
+            _shooter.BulletEnergy = energy;
         }
 
         public override void Update(float dt)

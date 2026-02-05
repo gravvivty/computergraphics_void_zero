@@ -25,9 +25,6 @@ namespace VoidZero.Game.Combat.Patterns
             bool omnidirectional = false
         )
         {
-            if (bulletCount < 1)
-                throw new ArgumentException("bulletCount must be at least 1");
-
             _bulletTexture = bulletTexture;
             _baseDirection = baseDirection.Normalized();
             _bulletCount = bulletCount;
@@ -43,9 +40,8 @@ namespace VoidZero.Game.Combat.Patterns
                 shooter.Position.Y + (owner == BulletOwner.Player ? 0 : shooter.Height / 2f)
             );
 
-            // get rotation from entity + components
             float rotation = shooter.Rotation;
-            var rotComp = shooter.Components.OfType<RotationComponent>().FirstOrDefault();
+            RotationComponent rotComp = shooter.Components.OfType<RotationComponent>().FirstOrDefault();
             if (rotComp != null) rotation += rotComp.CurrentRotation;
 
             if (_omnidirectional)

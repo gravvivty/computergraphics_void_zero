@@ -29,7 +29,8 @@ namespace VoidZero.States.Stages
                     var enemy = new CardinalSeperatorWeave(
                         enemyTex,
                         position: Vector2.Zero,
-                        bulletManager: state.Bullets
+                        bulletManager: state.Bullets,
+                        energy: BulletEnergy.Green
                     );
                     enemy.SetPositionRelative(
                         RelativeCenter(0.666f, -0.2f, enemy),
@@ -43,7 +44,6 @@ namespace VoidZero.States.Stages
                         exitSpeed: 1000f,
                         moveDuration: 0.5f
                     ));
-                    enemy.SetBulletEnergy(BulletEnergy.Green);
                     return enemy;
                 }),
                 new SpawnEnemyEvent(0f, state =>
@@ -52,7 +52,8 @@ namespace VoidZero.States.Stages
                     var enemy = new CardinalSeperatorWeave(
                         enemyTex,
                         position: Vector2.Zero,
-                        bulletManager: state.Bullets
+                        bulletManager: state.Bullets,
+                        energy: BulletEnergy.Green
                     );
                     enemy.SetPositionRelative(
                         RelativeCenter(0.333f, 1.2f, enemy),
@@ -66,7 +67,6 @@ namespace VoidZero.States.Stages
                         exitSpeed: 1000f,
                         moveDuration: 0.5f
                     ));
-                    enemy.SetBulletEnergy(BulletEnergy.Green);
                     return enemy;
                 }),
                 new SpawnEnemyEvent(0f, state =>
@@ -75,7 +75,8 @@ namespace VoidZero.States.Stages
                     var enemy = new CardinalSpinner(
                         enemyTex,
                         position: Vector2.Zero,
-                        bulletManager: state.Bullets
+                        bulletManager: state.Bullets,
+                        energy: BulletEnergy.Blue
                     );
                     enemy.SetPositionRelative(
                         RelativeCenter(0.5f, 1.2f, enemy),
@@ -92,6 +93,52 @@ namespace VoidZero.States.Stages
                     enemy.SetBulletEnergy(BulletEnergy.Red);
                     return enemy;
                 }),
+                new SpawnEnemyEvent(0f, state =>
+                {
+                    var enemyTex = GameServices.Instance.Content.GetTexture("witch");
+                    var enemy = new OmniShotRotate(
+                        enemyTex,
+                        position: Vector2.Zero,
+                        bulletManager: state.Bullets,
+                        energy: BulletEnergy.Blue
+                    );
+                    enemy.SetPositionRelative(
+                        RelativeCenter(0.9f, 1.2f, enemy),
+                        GameServices.Instance.Settings.Width,
+                        GameServices.Instance.Settings.Height
+                    );
+                    enemy.Movement = new MovementTool(-Vector2.UnitY, 1500f, 0.45f);
+                    enemy.Components.Add(new TimedExitComponent(
+                        waitTime: 15f,
+                        exitDirection: Vector2.UnitY,
+                        exitSpeed: 1000f,
+                        moveDuration: 0.5f
+                    ));
+                    return enemy;
+                }),
+                new SpawnEnemyEvent(0f, state =>
+                {
+                    var enemyTex = GameServices.Instance.Content.GetTexture("witch");
+                    var enemy = new OmniShotRotate(
+                        enemyTex,
+                        position: Vector2.Zero,
+                        bulletManager: state.Bullets,
+                        energy: BulletEnergy.Blue
+                    );
+                    enemy.SetPositionRelative(
+                        RelativeCenter(0.1f, 1.2f, enemy),
+                        GameServices.Instance.Settings.Width,
+                        GameServices.Instance.Settings.Height
+                    );
+                    enemy.Movement = new MovementTool(-Vector2.UnitY, 1500f, 0.45f);
+                    enemy.Components.Add(new TimedExitComponent(
+                        waitTime: 15f,
+                        exitDirection: Vector2.UnitY,
+                        exitSpeed: 1000f,
+                        moveDuration: 0.5f
+                    ));
+                    return enemy;
+                })
             });
         }
     }

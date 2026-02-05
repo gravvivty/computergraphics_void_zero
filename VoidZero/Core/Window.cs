@@ -25,7 +25,8 @@ namespace VoidZero.Core
                 new NativeWindowSettings
                 {
                     ClientSize = new Vector2i(1600, 900),
-                    APIVersion = new Version(4, 1)
+                    APIVersion = new Version(4, 1),
+                    Title = "Void Zero"
                 })
         { }
 
@@ -35,6 +36,8 @@ namespace VoidZero.Core
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.ClearColor(0f, 0f, 0f, 1f);
+
+            VSync = VSyncMode.On;
 
             _game = new GameManager(this);
             _game.Initialize();

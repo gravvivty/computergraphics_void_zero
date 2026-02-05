@@ -16,7 +16,7 @@ namespace VoidZero.Game.Entities.Enemies
         public Spinner(Texture2D texture, Vector2 position, BulletManager bulletManager)
             : base(texture, position, 24, 24)
         {
-            MaxHealth = 60f;
+            MaxHealth = 300f;
             CurrentHealth = MaxHealth;
             Scale = 6f;
             Width = 24 * Scale;

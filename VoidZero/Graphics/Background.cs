@@ -18,6 +18,16 @@ namespace VoidZero.Core
             public float Scale;
         }
 
+        private struct Galaxy
+        {
+            public float XNorm;
+            public float Y;
+            public float Speed;
+            public float Scale;
+            public Vector4 Color;
+            public AnimationManager Animations;
+        }
+
         private struct Star
         {
             public float XNorm;
@@ -31,22 +41,26 @@ namespace VoidZero.Core
         private const float BaseSpaceSpeed = 80f;
         private const float BaseStarSpeed = 40f;
         private const float BasePlanetSpeed = 120f;
+        private const float BaseGalaxySpeed = 5f;
 
         private readonly Texture2D _spaceTexture;
         private readonly Texture2D _starsTexture;
         private readonly Texture2D _planetsTexture;
+        private readonly Texture2D _galaxyTexture;
 
         private int _screenWidth;
         private int _screenHeight;
 
         private readonly List<Planet> _planets = new();
         private readonly List<Star> _stars = new();
+        private readonly List<Galaxy> _galaxies = new();
         private readonly Random _rng = new();
 
-        private const int StarCount = 50;
+        private const int StarCount = 80;
         private const int MaxPlanets = 3;
+        private const int GalaxyCount = 4;
 
-        public Background(int screenWidth, int screenHeight, Texture2D space, Texture2D stars, Texture2D planets)
+        public Background(int screenWidth, int screenHeight, Texture2D space, Texture2D stars, Texture2D planets, Texture2D galaxies)
         {
             _screenWidth = screenWidth;
             _screenHeight = screenHeight;
@@ -54,6 +68,7 @@ namespace VoidZero.Core
             _spaceTexture = space;
             _starsTexture = stars;
             _planetsTexture = planets;
+            _galaxyTexture = galaxies;
 
             // Spawn initial planets and stars
             for (int i = 0; i < MaxPlanets; i++)
@@ -64,6 +79,11 @@ namespace VoidZero.Core
             for (int i = 0; i < StarCount; i++)
             {
                 SpawnStar(false);
+            }
+
+            for (int i = 0; i < GalaxyCount; i++)
+            {
+                SpawnGalaxy(false);
             }
         }
 
@@ -88,6 +108,7 @@ namespace VoidZero.Core
             float scaledHeight = _spaceTexture.Height * scale;
             WrapOffset(ref _spaceOffset, scaledHeight);
 
+            UpdateGalaxies(dt, multiplier);
             UpdatePlanets(dt, multiplier);
             UpdateStars(dt, multiplier);
         }
@@ -95,6 +116,7 @@ namespace VoidZero.Core
         public void Draw(SpriteBatch spriteBatch)
         {
             DrawStars(spriteBatch);
+            DrawGalaxies(spriteBatch);
             DrawLayer(spriteBatch, _spaceTexture, _spaceOffset, FillScale());
             DrawPlanets(spriteBatch);
         }
@@ -113,7 +135,7 @@ namespace VoidZero.Core
 
         private void SpawnPlanet(bool spawnAbove)
         {
-            float scale = _rng.NextSingle() * 1.5f + 1.5f;
+            float scale = _rng.NextSingle() * 1.5f + 0.5f;
             float y = spawnAbove ? -_planetsTexture.Height * scale : _rng.Next(0, _screenHeight);
             float xNorm = _rng.NextSingle(); // normalized horizontal position
 
@@ -139,6 +161,69 @@ namespace VoidZero.Core
                 Speed = BaseStarSpeed + _rng.NextSingle() * 15f, // some variation
                 Scale = scale
             });
+        }
+
+        private void SpawnGalaxy(bool spawnAbove)
+        {
+            float scale = _rng.NextSingle() * 1.2f + 1.0f;
+            float y = spawnAbove
+                ? -64f * scale
+                : _rng.Next(0, _screenHeight);
+
+            float xNorm = _rng.NextSingle();
+
+            Vector4 color = RandomGalaxyColor();
+
+            float noise = (_rng.NextSingle() - 0.5f) * 0.03f;
+            color.X += noise;
+            color.Y -= noise * 0.5f;
+            color.Z += noise * 0.3f;
+
+            // Animation setup
+            var animManager = new AnimationManager();
+            animManager.Add(
+                "Idle",
+                new Animation(
+                    _galaxyTexture,
+                    100, 100,       // frame size
+                    10,            // frame count
+                    0.12f,        // frame time
+                    column: 0,
+                    loop: true
+                )
+            );
+            animManager.Play("Idle");
+
+            _galaxies.Add(new Galaxy
+            {
+                XNorm = xNorm,
+                Y = y,
+                Speed = BaseGalaxySpeed + _rng.NextSingle() * 8f,
+                Scale = scale,
+                Color = color,
+                Animations = animManager
+            });
+        }
+
+        private void UpdateGalaxies(float dt, float multiplier)
+        {
+            for (int i = _galaxies.Count - 1; i >= 0; i--)
+            {
+                Galaxy g = _galaxies[i];
+
+                g.Y += g.Speed * dt * multiplier;
+                g.Animations.Update(dt);
+
+                if (g.Y > _screenHeight + 64f * g.Scale)
+                {
+                    _galaxies.RemoveAt(i);
+                    SpawnGalaxy(true);
+                }
+                else
+                {
+                    _galaxies[i] = g;
+                }
+            }
         }
 
         private void UpdatePlanets(float dt, float multiplier)
@@ -199,6 +284,22 @@ namespace VoidZero.Core
             }
         }
 
+        private void DrawGalaxies(SpriteBatch spriteBatch)
+        {
+            foreach (Galaxy g in _galaxies)
+            {
+                Vector2 pos = new(
+                    g.XNorm * _screenWidth,
+                    g.Y
+                );
+
+                spriteBatch.GlobalTint = Vector4.One;
+                g.Animations.Draw(spriteBatch, pos, g.Scale, g.Color);
+            }
+
+            spriteBatch.GlobalTint = Vector4.One;
+        }
+
         private float FillScale()
         {
             return MathF.Max((float)_screenWidth / _spaceTexture.Width, (float)_screenHeight / _spaceTexture.Height);
@@ -210,6 +311,27 @@ namespace VoidZero.Core
             {
                 offset -= height;
             }
+        }
+
+        private Vector4 RandomGalaxyColor()
+        {
+            // Base near-black
+            float baseDark = 0.05f + _rng.NextSingle() * 0.08f; // 0.05–0.13
+
+            // Dusty pink bias
+            float pinkBias = 0.08f + _rng.NextSingle() * 0.12f;
+
+            float r = baseDark + pinkBias * 0.9f;
+            float g = baseDark + pinkBias * 0.6f;
+            float b = baseDark + pinkBias * 0.8f;
+
+            // Push toward gray / black
+            float gray = (r + g + b) / 3f;
+            r = MathHelper.Lerp(r, gray, 0.55f);
+            g = MathHelper.Lerp(g, gray, 0.55f);
+            b = MathHelper.Lerp(b, gray, 0.55f);
+
+            return new Vector4(r, g, b, 0.45f);
         }
     }
 }

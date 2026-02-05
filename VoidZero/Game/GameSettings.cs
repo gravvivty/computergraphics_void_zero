@@ -12,7 +12,7 @@ namespace VoidZero.Game
         public bool Borderless { get; set; } = false;
         public int Width { get; set; } = 1600;
         public int Height { get; set; } = 900;
-        public float BackgroundSpeedMultiplier { get; set; } = 4f;
+        public float BackgroundSpeedMultiplier { get; set; } = 6f;
         public float MasterVolume = 0.5f;
         public float SfxVolume = 0.5f;
         public float MusicVolume = 0.5f;

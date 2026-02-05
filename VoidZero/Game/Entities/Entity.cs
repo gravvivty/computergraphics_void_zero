@@ -176,5 +176,13 @@ namespace VoidZero.Game.Entities
                 IsDead = true;
             }
         }
+
+        public Vector2 VisualCenter
+        {
+            get
+            {
+                return Position + new Vector2(Width, Height) * 0.5f;
+            }
+        }
     }
 }

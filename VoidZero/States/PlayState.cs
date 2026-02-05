@@ -74,7 +74,6 @@ namespace VoidZero.States
 
         public override void Update(float dt)
         {
-            // 🔑 ESC works ONLY while alive
             if (!_isDying && _input.ConsumePausePressed())
             {
                 _gameManager.EnterPause();
@@ -131,6 +130,8 @@ namespace VoidZero.States
                 if (remove)
                     Entities.Remove(entity);
             }
+
+            GameServices.Instance.ParticleSystem.Update(dt);
         }
 
 
@@ -182,6 +183,13 @@ namespace VoidZero.States
                             if (bullet.Hitbox.IntersectsWith(entity.Hitbox))
                             {
                                 entity.CurrentHealth -= bullet.Damage;
+
+                                Vector2 impactDir = bullet.Velocity.Normalized();
+                                Vector2 hitboxHalf = new Vector2(entity.Hitbox.Size.Width / 2f, entity.Hitbox.Size.Height / 2f);
+                                Vector2 spawnPos = entity.Position + hitboxHalf;
+
+                                GameServices.Instance.ParticleSystem.SpawnSparks(enemy.VisualCenter, impactDir, 25);
+
                                 Bullets.Bullets.RemoveAt(i);
 
                                 if (entity.CurrentHealth <= 0)

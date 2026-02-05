@@ -23,8 +23,7 @@ namespace VoidZero.States.Stages
         {
             _time += dt;
 
-            while (_currentIndex < _events.Count &&
-                   _events[_currentIndex].TriggerTime <= _time)
+            while (_currentIndex < _events.Count && _events[_currentIndex].TriggerTime <= _time)
             {
                 _events[_currentIndex].Execute(state);
                 _currentIndex++;

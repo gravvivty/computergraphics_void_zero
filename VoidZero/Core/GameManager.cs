@@ -33,6 +33,10 @@ namespace VoidZero.Core
         private const float DeathSlowDuration = 1f;
         private const float DeathTargetScale = 0.3f;
 
+        private float _fpsTimer = 0f;
+        private int _frameCount = 0;
+        private float _currentFPS = 0f;
+
         public GameManager(GameWindow window)
         {
             _window = window;
@@ -47,9 +51,10 @@ namespace VoidZero.Core
             _background = new Background(
                 _window.Size.X,
                 _window.Size.Y,
-                GameServices.Instance.Content.LoadTexture("space", "Content/Background/background_generated.png"),
+                GameServices.Instance.Content.LoadTexture("space", "Content/Background/background_generated_dark.png"),
                 GameServices.Instance.Content.LoadTexture("stars", "Content/Background/star.png"),
-                GameServices.Instance.Content.LoadTexture("planets", "Content/Background/planet.png")
+                GameServices.Instance.Content.LoadTexture("planets", "Content/Background/planet.png"),
+                GameServices.Instance.Content.LoadTexture("galaxies", "Content/Background/galaxy.png")
             );
 
             GameServices.Instance.Content.LoadTexture("player", "Content/player.png");
@@ -114,6 +119,16 @@ namespace VoidZero.Core
             _stateManager.Update(dt * timeScale);
 
             _input.Update(_window);
+
+            _fpsTimer += dt;
+            _frameCount++;
+
+            if (_fpsTimer >= 1f)
+            {
+                _currentFPS = _frameCount / _fpsTimer;
+                _frameCount = 0;
+                _fpsTimer = 0f;
+            }
         }
 
         public void Draw(float dt)
@@ -141,7 +156,10 @@ namespace VoidZero.Core
             _spriteBatch.Begin(projection, targetGray);
             _background.Draw(_spriteBatch);
             _stateManager.Draw(_spriteBatch); // only draws state-specific sprites
+            GameServices.Instance.ParticleSystem.Draw(_spriteBatch);
             _stateManager.DrawUI(_spriteBatch, dt);
+            DrawFPS();
+
             _spriteBatch.End();
             ImGui.PopFont();
             _imGui.Render();
@@ -236,6 +254,40 @@ namespace VoidZero.Core
             }
 
             return targetGray;
+        }
+
+        private void DrawFPS()
+        {
+            // --- FPS Display ---
+            float padding = 10f;
+            float windowWidth = 80f;
+            float windowHeight = 20f;
+
+            // Position slightly above the bottom-right corner
+            Vector2 fpsPos = new Vector2(
+                GameServices.Instance.Settings.Width - windowWidth - padding,
+                GameServices.Instance.Settings.Height - windowHeight - padding
+            );
+
+            // Convert to System.Numerics.Vector2 for ImGui
+            ImGui.SetNextWindowPos(ToNumVec(fpsPos), ImGuiCond.Always);
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(windowWidth, windowHeight));
+
+            ImGui.Begin("FPS",
+                ImGuiWindowFlags.NoDecoration |
+                ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoSavedSettings |
+                ImGuiWindowFlags.NoBackground
+            );
+
+            ImGui.Text($"FPS: {MathF.Round(_currentFPS)}");
+            ImGui.End();
+        }
+
+        private static System.Numerics.Vector2 ToNumVec(OpenTK.Mathematics.Vector2 v)
+        {
+            return new System.Numerics.Vector2(v.X, v.Y);
         }
     }
 }

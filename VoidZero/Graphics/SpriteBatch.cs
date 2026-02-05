@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using VoidZero.Graphics.Particles;
 
 namespace VoidZero.Graphics
 {
@@ -59,6 +60,7 @@ namespace VoidZero.Graphics
             _shader.Use();
             _shader.SetMatrix4("projection", projection);
             _shader.SetFloat("grayscale", Grayscale);
+            _shader.SetFloat("glowPower", 3f);
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.Uniform1(GL.GetUniformLocation(_shader.Handle, "texture0"), 0);

@@ -17,7 +17,7 @@ namespace VoidZero.Game.Entities
 
         private readonly float _acceleration = 10000f; // low -> on ice
         private readonly float _deceleration = 6000f;
-        private readonly float _maxSpeed = 550f;
+        private readonly float _maxSpeed = 450f;
         private ShooterComponent _shooter;
         public BulletEnergy ActiveShield { get; private set; } = BulletEnergy.Red;
         // Grazing
@@ -53,7 +53,7 @@ namespace VoidZero.Game.Entities
         private float _flickerTimer = 0f;
         private bool _visibleThisFrame = true;
         // Health
-        private const float HealthRegenDelay = 3f;
+        private const float HealthRegenDelay = 2f;
         private float _healthRegenTimer = 0f;
         public float HealthRegenTimer => _healthRegenTimer;
 
@@ -335,7 +335,7 @@ namespace VoidZero.Game.Entities
             }
             else
             {
-                Velocity *= 0.929f; // high value -> drifting on ice
+                Velocity *= 0.659f; // high value -> drifting on ice
             }
 
             if (Velocity.Length > _maxSpeed)
@@ -487,21 +487,21 @@ namespace VoidZero.Game.Entities
                     _shooter.SetPattern(new SpreadPattern(
                         GameServices.Instance.Content.GetTexture("VanillaBullet"),
                         -Vector2.UnitY,
-                        3, 30f, 1500f
+                        3, 25f, 1500f
                     ));
                     break;
                 case 2:
                     _shooter.SetPattern(new SpreadPattern(
                         GameServices.Instance.Content.GetTexture("VanillaBullet"),
                         -Vector2.UnitY,
-                        6, 25f, 1800f
+                        5, 15f, 1800f
                     ));
                     break;
                 case 3:
                     _shooter.SetPattern(new SpreadPattern(
                         GameServices.Instance.Content.GetTexture("VanillaBullet"),
                         -Vector2.UnitY,
-                        10, 15f, 2000f
+                        10, 2f, 2000f
                     ));
                     break;
             }

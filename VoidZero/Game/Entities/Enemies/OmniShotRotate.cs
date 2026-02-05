@@ -12,10 +12,10 @@ namespace VoidZero.Game.Entities.Enemies
         private ShooterComponent _shooter;
         public ShooterComponent Shooter => _shooter;
 
-        public OmniShotRotate(Texture2D texture, Vector2 position, BulletManager bulletManager)
+        public OmniShotRotate(Texture2D texture, Vector2 position, BulletManager bulletManager, BulletEnergy energy)
             : base(texture, position, 24, 24)
         {
-            MaxHealth = 50f;
+            MaxHealth = 300f;
             CurrentHealth = MaxHealth;
             Scale = 6f;
             Width = 24 * Scale;
@@ -32,7 +32,7 @@ namespace VoidZero.Game.Entities.Enemies
                 cooldown: 0.3f,
                 damage: 1f
             );
-            _shooter.BulletEnergy = BulletEnergy.Red;
+            _shooter.BulletEnergy = energy;
             RotationComponent rotationComponent = new RotationComponent(MathF.Tau, 2f, 0f, loop: true);
             AddComponent(rotationComponent);
             rotationComponent.Update(this, 0f);
