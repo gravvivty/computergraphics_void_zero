@@ -31,7 +31,7 @@ namespace VoidZero.Graphics
             _timer -= dt;
 
             float t = _timer / _duration; // 1 -> 0
-            float currentStrength = _strength * t * t; // smooth falloff, squared
+            float currentStrength = _strength * t * t; // smooth falloff
 
             Offset = new Vector2(
                 ((float)_rng.NextDouble() * 2f - 1f) * currentStrength,

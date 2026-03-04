@@ -9,6 +9,8 @@ namespace VoidZero.Game.Input
         private KeyboardState _keyboard;
         private GamepadState _gamepad;
         private bool _gamepadConnected;
+        public bool GamepadConnected => _gamepadConnected;
+        public GamepadState GamepadState => _gamepad;
 
         private const int GamepadId = 0; // GLFW joystick 0
         private const float StickDeadZone = 0.2f;
@@ -45,20 +47,6 @@ namespace VoidZero.Game.Input
             if (_keyboard.IsKeyDown(Keys.A)) axis.X -= 1;
             if (_keyboard.IsKeyDown(Keys.D)) axis.X += 1;
 
-            // Gamepad left stick
-            if (_gamepadConnected)
-            {
-                float lx = _gamepad.Axes[0];
-                float ly = _gamepad.Axes[1];
-
-                Vector2 stick = new Vector2(lx, ly);
-
-                if (stick.Length >= StickDeadZone)
-                {
-                    axis = stick;
-                }
-            }
-
             if (axis.LengthSquared > 1f)
             {
                 axis = axis.Normalized();
@@ -67,31 +55,19 @@ namespace VoidZero.Game.Input
             MoveAxis = axis;
 
             // Actions
-            ShootHeld =
-                _keyboard.IsKeyDown(Keys.J) ||
-                (_gamepadConnected && _gamepad.Axes[5] > 0.5f); // RT, J
+            ShootHeld = _keyboard.IsKeyDown(Keys.J) || (_gamepadConnected && _gamepad.Axes[5] > 0.5f); // RT, J
+            DashPressed = _keyboard.IsKeyPressed(Keys.Space) || (_gamepadConnected && _gamepad.Buttons[0] == 1); // A, Space
 
-
-            DashPressed =
-                _keyboard.IsKeyPressed(Keys.Space) ||
-                (_gamepadConnected && _gamepad.Buttons[0] == 1); // A, Space
-
-
-            bool shieldHeld = _gamepadConnected && _gamepad.Buttons[2] == 1; // X, K
-            SwitchShieldPressed =
-                _keyboard.IsKeyPressed(Keys.K) ||
-                (shieldHeld && !_prevShieldButton);
+            bool shieldHeld = _gamepadConnected && _gamepad.Buttons[2] == 1;
+            SwitchShieldPressed = _keyboard.IsKeyPressed(Keys.K) || (shieldHeld && !_prevShieldButton);  // X, K
             _prevShieldButton = shieldHeld;
 
 
-            ActivateAbilityPressed =
-                _keyboard.IsKeyPressed(Keys.L) ||
-                (_gamepadConnected && _gamepad.Buttons[3] == 1); // Y, L
+            ActivateAbilityPressed = _keyboard.IsKeyPressed(Keys.L) || (_gamepadConnected && _gamepad.Buttons[3] == 1); // Y, L
 
 
             bool startHeld = _gamepadConnected && _gamepad.Buttons[7] == 1; // Start, ESC
-            if (_keyboard.IsKeyPressed(Keys.Escape) ||
-                (startHeld && !_prevStartButton))
+            if (_keyboard.IsKeyPressed(Keys.Escape) || (startHeld && !_prevStartButton))
             {
                 _pausePressed = true;
                 _pauseConsumed = false;

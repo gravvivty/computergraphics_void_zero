@@ -18,7 +18,7 @@ namespace VoidZero.States.Stages
                 new SpawnEnemyEvent(0f, state =>
                 {
                     var threeForkTexture = GameServices.Instance.Content.GetTexture("witch");
-                    var threeFork = new ThreeFork(
+                    var threeFork = new CardinalSpinner(
                         threeForkTexture,
                         position: new Vector2(600, -10),
                         bulletManager: state.Bullets,

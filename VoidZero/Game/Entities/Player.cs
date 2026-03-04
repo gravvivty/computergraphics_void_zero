@@ -80,7 +80,7 @@ namespace VoidZero.Game.Entities
 
 
         public Player(Texture2D texture, Vector2 startPosition, InputManager input, BulletManager bulletManager)
-            : base(texture, startPosition, 16, 16)
+            : base(texture, startPosition, 32, 32)
         {
             MaxHealth = 3f;
             CurrentHealth = MaxHealth;
@@ -95,18 +95,30 @@ namespace VoidZero.Game.Entities
                 10f
             );
             _shooter.BulletEnergy = BulletEnergy.Neutral;
+            int spriteWidth = 32;
+            int spriteHeight = spriteWidth;
 
             // Do this for every entity
-            this.Scale = 4f;
-            Width = 16 * Scale;
-            Height = 16 * Scale;
+            this.Scale = 3f;
+            Width = spriteWidth * Scale;
+            Height = spriteHeight * Scale;
 
-            Animations.Add("Up", new Animation(texture, 16, 16, 3, 0.1f, 0));
-            Animations.Add("Right", new Animation(texture, 16, 16, 3, 0.1f, 2));
-            Animations.Add("Down", new Animation(texture, 16, 16, 3, 0.1f, 4));
-            Animations.Add("Left", new Animation(texture, 16, 16, 3, 0.1f, 6));
+            Animations.Add("Idle", new Animation(texture, spriteWidth, spriteWidth, 3, 0.1f, 0));
+            Animations.Add("IdleShoot", new Animation(texture, spriteWidth, spriteWidth, 3, 0.1f, 1));
 
-            Animations.Add("Idle", new Animation(texture, 16, 16, 1, 1f, 0));
+            Animations.Add("Left", new Animation(texture, spriteWidth, spriteWidth, 3, 0.1f, 2));
+            Animations.Add("LeftShoot", new Animation(texture, spriteWidth, spriteWidth, 3, 0.1f, 3));
+
+            Animations.Add("Up", new Animation(texture, spriteWidth, spriteWidth, 3, 0.1f, 4));
+            Animations.Add("UpShoot", new Animation(texture, spriteWidth, spriteWidth, 3, 0.1f, 5));
+
+            Animations.Add("Right", new Animation(texture, spriteWidth, spriteWidth, 3, 0.1f, 6));
+            Animations.Add("RightShoot", new Animation(texture, spriteWidth, spriteWidth, 3, 0.1f, 7));
+
+            Animations.Add("Down", new Animation(texture, spriteWidth, spriteWidth, 3, 0.1f, 8));
+            Animations.Add("DownShoot", new Animation(texture, spriteWidth, spriteWidth, 3, 0.1f, 9));
+            
+
             Animations.Play("Idle");
             AddDefaultDeathAnimation();
         }
@@ -285,20 +297,29 @@ namespace VoidZero.Game.Entities
             }
         }
 
-        private string GetAnimationKey(Vector2 dir)
+        private string GetAnimationKey(Vector2 movementDir)
         {
-            if (dir.LengthSquared == 0)
-            {
-                return "Idle";
-            } 
+            bool isMoving = movementDir.LengthSquared > 0;
+            bool shooting = _input.ShootHeld;
 
-            if (Math.Abs(dir.X) > Math.Abs(dir.Y))
+            if (!isMoving)
             {
-                return dir.X > 0 ? "Right" : "Left";
+                return shooting ? "IdleShoot" : "Idle";
+            }
+
+            if (Math.Abs(movementDir.X) > Math.Abs(movementDir.Y))
+            {
+                if (movementDir.X > 0)
+                    return shooting ? "RightShoot" : "Right";
+                else
+                    return shooting ? "LeftShoot" : "Left";
             }
             else
             {
-                return dir.Y > 0 ? "Down" : "Up";
+                if (movementDir.Y > 0)
+                    return shooting ? "DownShoot" : "Down";
+                else
+                    return shooting ? "UpShoot" : "Up";
             }
         }
 

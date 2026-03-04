@@ -21,7 +21,7 @@ namespace VoidZero.Game.Entities
             Width = 32 * Scale;
             Height = 32 * Scale;
 
-            Animations.Add("Idle", new Animation(texture, 32, 32, 3, 0.1f));
+            Animations.Add("Idle", new Animation(texture, 32, 32, 10, 0.1f));
             Animations.Play("Idle");
         }
 
@@ -52,7 +52,7 @@ namespace VoidZero.Game.Entities
 
             Animations.Draw(batch, Position, Scale, baseTint);
 
-            // Flash ring (bigger, centered)
+            // Flash ring
             if (shieldFlash > 0f)
             {
                 float flashScale = Scale * 1.25f;

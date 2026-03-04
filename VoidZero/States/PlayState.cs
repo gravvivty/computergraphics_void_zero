@@ -162,6 +162,7 @@ namespace VoidZero.States
             {
                 entity.OnResize(newWidth, newHeight);
             }
+            Bullets.OnResize(newWidth, newHeight);
         }
 
         private void HandleBulletHits(float dt)
@@ -210,10 +211,7 @@ namespace VoidZero.States
                         bullet.Energy != BulletEnergy.Green;
 
                     bool damageHit = _player.Hitbox.IntersectsWith(bullet.Hitbox);
-                    bool grazeHit =
-                        bullet.GrazeHitbox.IntersectsWith(_player.Hitbox) &&
-                        !damageHit &&
-                        !shieldAbsorbs;
+                    bool grazeHit = bullet.GrazeHitbox.IntersectsWith(_player.Hitbox) && !damageHit && !shieldAbsorbs;
 
                     if (grazeHit)
                     {
@@ -259,7 +257,9 @@ namespace VoidZero.States
         private void OnPlayerDied()
         {
             if (_isDying)
+            {
                 return;
+            }
 
             _isDying = true;
             _playerShield.Kill();
@@ -306,7 +306,7 @@ namespace VoidZero.States
 
         public void DrawAbilityBar(SpriteBatch spritebatch)
         {
-            // Example position and size
+            // Position and size
             float barX = 20f;
             float barY = 20f;
             float barWidth = 200f;
@@ -317,9 +317,18 @@ namespace VoidZero.States
 
             // Determine fill color based on level
             Color fillColor = Color.LightBlue;
-            if (_player._abilityBar >= _player.Level3Threshold) fillColor = Color.Red;
-            else if (_player._abilityBar >= _player.Level2Threshold) fillColor = Color.Orange;
-            else if (_player._abilityBar >= _player.Level1Threshold) fillColor = Color.Yellow;
+            if (_player._abilityBar >= _player.Level3Threshold)
+            {
+                fillColor = Color.Red;
+            }
+            else if (_player._abilityBar >= _player.Level2Threshold)
+            {
+                fillColor = Color.Orange;
+            }
+            else if (_player._abilityBar >= _player.Level1Threshold)
+            {
+                fillColor = Color.Yellow;
+            }
 
             float fill = _player._abilityBar / _player.MaxAbilityBar;
             spritebatch.DrawRectangle(new RectangleF(barX, barY, barWidth * fill, barHeight), Color.Cyan, true);

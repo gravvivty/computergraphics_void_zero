@@ -12,6 +12,7 @@ namespace VoidZero.UI
     public static class MenuUI
     {
         public enum MenuPage { Main, StageSelect, Options, Credits }
+        private static bool _focusNextFrame = true;
 
         public static void DrawMenu(GameStateManager gsm, GameWindow window, InputManager input, ref MenuPage currentPage, Background bg, GameManager gm)
         {
@@ -49,6 +50,12 @@ namespace VoidZero.UI
                 ImGuiWindowFlags.NoBackground
             );
 
+            if (_focusNextFrame)
+            {
+                ImGui.SetItemDefaultFocus();
+                _focusNextFrame = false;
+            }
+
             float buttonWidth = 200f;
             float buttonHeight = 50f;
             float spacing = 15f;
@@ -79,12 +86,15 @@ namespace VoidZero.UI
                     {
                         case "Play":
                             currentPage = MenuPage.StageSelect;
+                            _focusNextFrame = true;
                             break;
                         case "Options":
                             currentPage = MenuPage.Options;
+                            _focusNextFrame = true;
                             break;
                         case "Credits":
                             currentPage = MenuPage.Credits;
+                            _focusNextFrame = true;
                             break;
                         case "Exit":
                             Environment.Exit(0);
@@ -110,6 +120,12 @@ namespace VoidZero.UI
                 ImGuiWindowFlags.NoSavedSettings |
                 ImGuiWindowFlags.NoBackground
             );
+
+            if (_focusNextFrame)
+            {
+                ImGui.SetItemDefaultFocus();
+                _focusNextFrame = false;
+            }
 
             float buttonWidth = 250f;
             float buttonHeight = 50f;
@@ -188,6 +204,7 @@ namespace VoidZero.UI
             if (ImGui.Button("Back", new Vector2(buttonWidth, buttonHeight)))
             {
                 currentPage = MenuPage.Main;
+                _focusNextFrame = true;
             }
 
             ImGui.End();
@@ -206,6 +223,12 @@ namespace VoidZero.UI
                 ImGuiWindowFlags.NoSavedSettings |
                 ImGuiWindowFlags.NoBackground
             );
+
+            if (_focusNextFrame)
+            {
+                ImGui.SetItemDefaultFocus();
+                _focusNextFrame = false;
+            }
 
             string[] lines =
             {
@@ -231,6 +254,7 @@ namespace VoidZero.UI
             if (ImGui.Button("Back", new Vector2(200, 50)))
             {
                 currentPage = MenuPage.Main;
+                _focusNextFrame = true;
             } 
 
             ImGui.End();
@@ -261,6 +285,12 @@ namespace VoidZero.UI
                 ImGuiWindowFlags.NoSavedSettings |
                 ImGuiWindowFlags.NoBackground
             );
+
+            if (_focusNextFrame)
+            {
+                ImGui.SetItemDefaultFocus();
+                _focusNextFrame = false;
+            }
 
             float buttonWidth = 200f;
             float buttonHeight = 50f;
@@ -316,6 +346,12 @@ namespace VoidZero.UI
                 ImGuiWindowFlags.NoBackground
             );
 
+            if (_focusNextFrame)
+            {
+                ImGui.SetItemDefaultFocus();
+                _focusNextFrame = false;
+            }
+
             float buttonWidth = 180f;
             float buttonHeight = 60f;
             float spacing = 20f;
@@ -355,6 +391,7 @@ namespace VoidZero.UI
             if (ImGui.Button("Back", new Vector2(200, 50)))
             {
                 currentPage = MenuPage.Main;
+                _focusNextFrame = true;
             }
 
             ImGui.End();

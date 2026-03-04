@@ -154,11 +154,14 @@ namespace VoidZero.Game.Entities
 
         public virtual void Kill()
         {
-            if (IsDying) return;
+            if (IsDying)
+            {
+                return;
+            }
 
             IsDying = true;
             Velocity = Vector2.Zero;
-            Components.Clear(); // optional, prevents logic during death
+            Components.Clear(); // prevents logic during death
             Animations.Play(DeathAnimationKey);
 
             _deathTimer = DeathDuration;

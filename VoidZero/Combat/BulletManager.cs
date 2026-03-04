@@ -37,5 +37,13 @@ namespace VoidZero.Game.Combat
                 bullet.Draw(batch);
             }
         }
+
+        public void OnResize(int newWidth, int newHeight)
+        {
+            foreach (Bullet bullet in Bullets)
+            {
+                bullet.OnResize(newWidth, newHeight);
+            }
+        }
     }
 }

@@ -23,8 +23,6 @@ namespace VoidZero.Core
         private int _indexBuffer;
         private int _indexBufferSize;
 
-        //private Texture _fontTexture;
-
         private int _fontTexture;
 
         private int _shader;
@@ -64,8 +62,10 @@ namespace VoidZero.Core
             io.Fonts.AddFontDefault();
 
             io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;
-            // Enable Docking
-            // io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
+            io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard;
+            // Gamepad Support
+            io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad;
+            io.BackendFlags |= ImGuiBackendFlags.HasGamepad;
 
             CreateDeviceResources();
 
@@ -216,7 +216,7 @@ namespace VoidZero.Core
         /// <summary>
         /// Updates ImGui input and IO configuration state.
         /// </summary>
-        public void Update(GameWindow wnd, float deltaSeconds)
+        public void Update(GameWindow wnd, float deltaSeconds, bool gamepadConnected, GamepadState gamepad)
         {
             if (_frameBegun)
             {
@@ -224,7 +224,7 @@ namespace VoidZero.Core
             }
 
             SetPerFrameImGuiData(deltaSeconds);
-            UpdateImGuiInput(wnd);
+            UpdateImGuiInput(wnd, gamepadConnected, gamepad);
 
             _frameBegun = true;
             ImGui.NewFrame();
@@ -246,7 +246,7 @@ namespace VoidZero.Core
 
         readonly List<char> PressedChars = new List<char>();
 
-        private void UpdateImGuiInput(GameWindow wnd)
+        private unsafe void UpdateImGuiInput(GameWindow wnd, bool gamepadConnected, GamepadState gamepad)
         {
             ImGuiIOPtr io = ImGui.GetIO();
 
@@ -259,10 +259,9 @@ namespace VoidZero.Core
             io.MouseDown[3] = MouseState[MouseButton.Button4];
             io.MouseDown[4] = MouseState[MouseButton.Button5];
 
-            var screenPoint = new Vector2i((int)MouseState.X, (int)MouseState.Y);
-            var point = screenPoint;//wnd.PointToClient(screenPoint);
+            Vector2i screenPoint = new Vector2i((int)MouseState.X, (int)MouseState.Y);
             float offsetY = GameServices.Instance.Settings.Fullscreen ? 0 : 40f;
-            io.MousePos = new System.Numerics.Vector2(point.X, point.Y + offsetY); // account for window size top bar
+            io.MousePos = new System.Numerics.Vector2(screenPoint.X, screenPoint.Y + offsetY); // account for window size top bar
 
             foreach (Keys key in Enum.GetValues(typeof(Keys)))
             {
@@ -283,6 +282,19 @@ namespace VoidZero.Core
             io.KeyAlt = KeyboardState.IsKeyDown(Keys.LeftAlt) || KeyboardState.IsKeyDown(Keys.RightAlt);
             io.KeyShift = KeyboardState.IsKeyDown(Keys.LeftShift) || KeyboardState.IsKeyDown(Keys.RightShift);
             io.KeySuper = KeyboardState.IsKeyDown(Keys.LeftSuper) || KeyboardState.IsKeyDown(Keys.RightSuper);
+
+            if (gamepadConnected)
+            {
+                // AB
+                io.AddKeyEvent(ImGuiKey.GamepadFaceDown, gamepad.Buttons[0] == 1); // A
+                io.AddKeyEvent(ImGuiKey.GamepadFaceRight, gamepad.Buttons[1] == 1); // B
+
+                // DPad
+                io.AddKeyEvent(ImGuiKey.GamepadDpadUp, gamepad.Buttons[11] == 1);
+                io.AddKeyEvent(ImGuiKey.GamepadDpadRight, gamepad.Buttons[12] == 1);
+                io.AddKeyEvent(ImGuiKey.GamepadDpadDown, gamepad.Buttons[13] == 1);
+                io.AddKeyEvent(ImGuiKey.GamepadDpadLeft, gamepad.Buttons[14] == 1);
+            }
         }
 
         internal void PressChar(char keyChar)

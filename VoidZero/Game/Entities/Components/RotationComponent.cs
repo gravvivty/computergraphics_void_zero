@@ -27,10 +27,12 @@ namespace VoidZero.Game.Entities.Components
             get
             {
                 if (_finished && !_loop)
+                {
                     return _startRotation + _targetDelta;
+                }
 
-                float t = _duration > 0f ? MathF.Min(_elapsed / _duration, 1f) : 1f;
-                return _startRotation + _targetDelta * t;
+                float time = _duration > 0f ? MathF.Min(_elapsed / _duration, 1f) : 1f;
+                return _startRotation + _targetDelta * time;
             }
         }
 

@@ -57,7 +57,7 @@ namespace VoidZero.Core
                 GameServices.Instance.Content.LoadTexture("galaxies", "Content/Background/galaxy.png")
             );
 
-            GameServices.Instance.Content.LoadTexture("player", "Content/player.png");
+            GameServices.Instance.Content.LoadTexture("player", "Content/Player/player.png");
             GameServices.Instance.Content.LoadTexture("VanillaBullet", "Content/Bullets/VanillaBullet.png");
             GameServices.Instance.Content.LoadTexture("witch", "Content/Enemies/Witch.png");
             GameServices.Instance.Content.LoadTexture("shield", "Content/Shield/shield.png");
@@ -93,7 +93,8 @@ namespace VoidZero.Core
 
         public void Update(float dt)
         {
-            _imGui.Update(_window, dt);
+            _input.Update(_window);
+            _imGui.Update(_window, dt, _input.GamepadConnected, _input.GamepadState);
 
             float timeScale = 1f;
 
@@ -113,12 +114,12 @@ namespace VoidZero.Core
                 timeScale = MathHelper.Lerp(1f, 0.3f, t);
             }
 
+            _screenShake.Update(dt);
+
             // 3️⃣ APPLY TIME SCALE
             _background.Update(dt * timeScale);
 
             _stateManager.Update(dt * timeScale);
-
-            _input.Update(_window);
 
             _fpsTimer += dt;
             _frameCount++;
@@ -258,12 +259,10 @@ namespace VoidZero.Core
 
         private void DrawFPS()
         {
-            // --- FPS Display ---
             float padding = 10f;
             float windowWidth = 80f;
             float windowHeight = 20f;
 
-            // Position slightly above the bottom-right corner
             Vector2 fpsPos = new Vector2(
                 GameServices.Instance.Settings.Width - windowWidth - padding,
                 GameServices.Instance.Settings.Height - windowHeight - padding
@@ -285,9 +284,9 @@ namespace VoidZero.Core
             ImGui.End();
         }
 
-        private static System.Numerics.Vector2 ToNumVec(OpenTK.Mathematics.Vector2 v)
+        private static System.Numerics.Vector2 ToNumVec(Vector2 vector)
         {
-            return new System.Numerics.Vector2(v.X, v.Y);
+            return new System.Numerics.Vector2(vector.X, vector.Y);
         }
     }
 }

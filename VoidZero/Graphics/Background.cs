@@ -286,15 +286,15 @@ namespace VoidZero.Core
 
         private void DrawGalaxies(SpriteBatch spriteBatch)
         {
-            foreach (Galaxy g in _galaxies)
+            foreach (Galaxy galaxy in _galaxies)
             {
                 Vector2 pos = new(
-                    g.XNorm * _screenWidth,
-                    g.Y
+                    galaxy.XNorm * _screenWidth,
+                    galaxy.Y
                 );
 
                 spriteBatch.GlobalTint = Vector4.One;
-                g.Animations.Draw(spriteBatch, pos, g.Scale, g.Color);
+                galaxy.Animations.Draw(spriteBatch, pos, galaxy.Scale, galaxy.Color);
             }
 
             spriteBatch.GlobalTint = Vector4.One;
@@ -315,7 +315,7 @@ namespace VoidZero.Core
 
         private Vector4 RandomGalaxyColor()
         {
-            // Base near-black
+            // Base near black
             float baseDark = 0.05f + _rng.NextSingle() * 0.08f; // 0.05–0.13
 
             // Dusty pink bias
@@ -325,7 +325,7 @@ namespace VoidZero.Core
             float g = baseDark + pinkBias * 0.6f;
             float b = baseDark + pinkBias * 0.8f;
 
-            // Push toward gray / black
+            // Push toward gray
             float gray = (r + g + b) / 3f;
             r = MathHelper.Lerp(r, gray, 0.55f);
             g = MathHelper.Lerp(g, gray, 0.55f);

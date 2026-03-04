@@ -35,10 +35,13 @@ namespace VoidZero.Game.Entities.Components
                 if (_steps.Count == 0)
                 {
                     if (_loop)
+                    {
                         ResetQueue(entity);
+                    }
                     else
+                    {
                         _current = null;
-
+                    }
                     return;
                 }
 
@@ -51,9 +54,9 @@ namespace VoidZero.Game.Entities.Components
         {
             _steps.Clear();
 
-            foreach (var step in _originalSteps)
+            foreach (RotationComponent step in _originalSteps)
             {
-                var copy = new RotationComponent(step.Delta, step.Duration, step.PauseAfter);
+                RotationComponent copy = new RotationComponent(step.Delta, step.Duration, step.PauseAfter);
                 copy.Attach(entity);
                 _steps.Enqueue(copy);
             }

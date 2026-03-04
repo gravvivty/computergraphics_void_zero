@@ -10,7 +10,7 @@ namespace VoidZero.Game
     public class ContentManager
     {
         public Texture2D GetTexture(string name) => _textures[name];
-        private readonly Dictionary<string, Texture2D> _textures = new();
+        private Dictionary<string, Texture2D> _textures = new();
 
         public Texture2D LoadTexture(string name, string path)
         {
