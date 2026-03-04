@@ -47,6 +47,20 @@ namespace VoidZero.Game.Input
             if (_keyboard.IsKeyDown(Keys.A)) axis.X -= 1;
             if (_keyboard.IsKeyDown(Keys.D)) axis.X += 1;
 
+            // Gamepad left stick
+            if (_gamepadConnected)
+            {
+                float lx = _gamepad.Axes[0];
+                float ly = _gamepad.Axes[1];
+
+                Vector2 stick = new Vector2(lx, ly);
+
+                if (stick.Length >= StickDeadZone)
+                {
+                    axis = stick;
+                }
+            }
+
             if (axis.LengthSquared > 1f)
             {
                 axis = axis.Normalized();
