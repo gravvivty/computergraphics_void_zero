@@ -129,8 +129,8 @@ namespace VoidZero.Core
             Vector2 pos1 = new Vector2(0, offset);
             Vector2 pos2 = new Vector2(0, offset - size.Y);
 
-            spriteBatch.Draw(texture, pos1, size);
-            spriteBatch.Draw(texture, pos2, size);
+            spriteBatch.Draw(texture, pos1, size, Vector4.One);
+            spriteBatch.Draw(texture, pos2, size, Vector4.One);
         }
 
         private void SpawnPlanet(bool spawnAbove)
@@ -270,7 +270,7 @@ namespace VoidZero.Core
             {
                 Vector2 size = new Vector2(_planetsTexture.Width * planet.Scale, _planetsTexture.Height * planet.Scale);
                 Vector2 position = new Vector2(planet.XNorm * _screenWidth, planet.Y);
-                spriteBatch.Draw(_planetsTexture, position, size);
+                spriteBatch.Draw(_planetsTexture, position, size, Vector4.One);
             }
         }
 
@@ -280,7 +280,7 @@ namespace VoidZero.Core
             {
                 Vector2 size = new Vector2(_starsTexture.Width * star.Scale, _starsTexture.Height * star.Scale);
                 Vector2 position = new Vector2(star.XNorm * _screenWidth, star.Y);
-                spriteBatch.Draw(_starsTexture, position, size);
+                spriteBatch.Draw(_starsTexture, position, size, Vector4.One);
             }
         }
 

@@ -75,78 +75,9 @@ namespace VoidZero.Graphics
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         }
 
-        public void Draw(Texture2D texture, Vector2 position, Vector2 size)
+        public void Draw(Texture2D texture, Vector2 position, Vector2 size, Vector4 color)
         {
-            DrawInternal(texture, position, size, new Vector4(0, 0, 1, 1), Vector4.One);
-        }
-
-        public void DrawDebug(Texture2D texture, Vector2 position, Vector2 size, Vector4 color)
-        {
-            DrawInternal(texture, position, size, new Vector4(0, 0, 1, 1), color);
-        }
-
-
-        public void DrawFrame(
-            Texture2D texture,
-            Vector2 position,
-            Rectangle source,
-            Vector4 color,
-            float scale = 1f,
-            float rotation = 0f)
-        {
-            float u0 = source.X / (float)texture.Width;
-            float v0 = source.Y / (float)texture.Height;
-            float u1 = (source.X + source.Width) / (float)texture.Width;
-            float v1 = (source.Y + source.Height) / (float)texture.Height;
-
-            float w = source.Width * scale;
-            float h = source.Height * scale;
-
-            // Center of the sprite
-            Vector2 origin = new Vector2(w / 2f, h / 2f);
-
-            // Quad corners (local space, centered)
-            Vector2[] corners =
-            {
-                new(-origin.X, -origin.Y),
-                new( origin.X, -origin.Y),
-                new(-origin.X,  origin.Y),
-                new( origin.X,  origin.Y),
-            };
-
-            // Rotate corners
-            for (int i = 0; i < corners.Length; i++)
-                corners[i] = Rotate(corners[i], rotation) + position + origin;
-
-            Vector4 finalColor = color * GlobalTint;
-
-            float[] vertices =
-            {
-                    // pos                         uv           color
-                    corners[2].X, corners[2].Y, u0, v1, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
-                    corners[1].X, corners[1].Y, u1, v0, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
-                    corners[0].X, corners[0].Y, u0, v0, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
-
-                    corners[2].X, corners[2].Y, u0, v1, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
-                    corners[3].X, corners[3].Y, u1, v1, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
-                    corners[1].X, corners[1].Y, u1, v0, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
-                };
-
-            GL.BindVertexArray(_vao);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-            GL.BindTexture(TextureTarget.Texture2D, texture.Handle);
-
-            GL.BufferSubData(
-                BufferTarget.ArrayBuffer,
-                IntPtr.Zero,
-                vertices.Length * sizeof(float),
-                vertices);
-
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
-        }
-
-        private void DrawInternal(Texture2D texture, Vector2 position, Vector2 size, Vector4 uv, Vector4 color)
-        {
+            Vector4 uv = new Vector4(0, 0, 1, 1);
             Vector4 finalColor = color * GlobalTint;
 
             float x = position.X;
@@ -191,11 +122,74 @@ namespace VoidZero.Graphics
             GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
         }
 
+
+        public void DrawFrame(
+            Texture2D texture,
+            Vector2 position,
+            Rectangle source,
+            Vector4 color,
+            float scale = 1f,
+            float rotation = 0f)
+        {
+            // Texture origins (0-1)
+            float u0 = source.X / (float)texture.Width;
+            float v0 = source.Y / (float)texture.Height;
+            float u1 = (source.X + source.Width) / (float)texture.Width;
+            float v1 = (source.Y + source.Height) / (float)texture.Height;
+
+            // Dimensions of the scaled sprite
+            float w = source.Width * scale;
+            float h = source.Height * scale;
+
+            // Center of the sprite
+            Vector2 origin = new Vector2(w / 2f, h / 2f);
+
+            // Quad corners (local space, centered)
+            Vector2[] corners =
+            {
+                new(-origin.X, -origin.Y),
+                new( origin.X, -origin.Y),
+                new(-origin.X,  origin.Y),
+                new( origin.X,  origin.Y),
+            };
+
+            // Rotate corners
+            for (int i = 0; i < corners.Length; i++)
+                corners[i] = Rotate(corners[i], rotation) + position + origin;
+
+            Vector4 finalColor = color * GlobalTint;
+
+            // We are drawing 2 triangles therefore 6 vertices
+            float[] vertices =
+            {
+                    // pos                  uv/texture origins           color
+                    corners[2].X, corners[2].Y, u0, v1, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
+                    corners[1].X, corners[1].Y, u1, v0, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
+                    corners[0].X, corners[0].Y, u0, v0, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
+
+                    corners[2].X, corners[2].Y, u0, v1, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
+                    corners[3].X, corners[3].Y, u1, v1, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
+                    corners[1].X, corners[1].Y, u1, v0, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
+                };
+
+            GL.BindVertexArray(_vao);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
+            GL.BindTexture(TextureTarget.Texture2D, texture.Handle);
+
+            GL.BufferSubData(
+                BufferTarget.ArrayBuffer,
+                IntPtr.Zero,
+                vertices.Length * sizeof(float),
+                vertices);
+
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+        }
+
         public void DrawRectangle(RectangleF rectangle, Color color, bool filled = false, float thickness = 2f)
         {
             if (filled)
             {
-                DrawDebug(
+                Draw(
                     _whiteTexture,
                     new Vector2(rectangle.X, rectangle.Y),
                     new Vector2(rectangle.Width, rectangle.Height),
@@ -210,25 +204,25 @@ namespace VoidZero.Graphics
             }
 
             // Top
-            DrawDebug(_whiteTexture,
+            Draw(_whiteTexture,
                 new Vector2(rectangle.X, rectangle.Y),
                 new Vector2(rectangle.Width, thickness),
                 ColorToVec4(color));
 
             // Bottom
-            DrawDebug(_whiteTexture,
+            Draw(_whiteTexture,
                 new Vector2(rectangle.X, rectangle.Y + rectangle.Height - thickness),
                 new Vector2(rectangle.Width, thickness),
                 ColorToVec4(color));
 
             // Left
-            DrawDebug(_whiteTexture,
+            Draw(_whiteTexture,
                 new Vector2(rectangle.X, rectangle.Y),
                 new Vector2(thickness, rectangle.Height),
                 ColorToVec4(color));
 
             // Right
-            DrawDebug(_whiteTexture,
+            Draw(_whiteTexture,
                 new Vector2(rectangle.X + rectangle.Width - thickness, rectangle.Y),
                 new Vector2(thickness, rectangle.Height),
                 ColorToVec4(color));
