@@ -54,8 +54,14 @@ namespace VoidZero.Core
             base.OnRenderFrame(e);
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
+
+            // Draw Game
             _game.ApplyViewport(Size.X, Size.Y);
             _game.Draw((float)e.Time);
+            
+            // Render ImGui Menu
+            GL.Viewport(0, 0, Size.X, Size.Y);
+            _game.DrawMenu();
             SwapBuffers();
         }
 

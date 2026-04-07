@@ -40,6 +40,9 @@ namespace VoidZero.Core
         private int _frameCount = 0;
         private float _currentFPS = 0f;
 
+        public Vector2 ViewportOffset { get; private set; }
+        public Vector2 ViewportSize { get; private set; }
+
         public GameManager(GameWindow window)
         {
             _window = window;
@@ -102,12 +105,10 @@ namespace VoidZero.Core
 
             float timeScale = 1f;
 
-            // 1️⃣ PAUSE HAS HIGHEST PRIORITY
             if (CurrentMode == GameMode.Paused)
             {
                 timeScale = 0f;
             }
-            // 2️⃣ DEATH SLOW-MO
             else if (CurrentMode == GameMode.Dying)
             {
                 _deathTimer += dt;
@@ -119,8 +120,6 @@ namespace VoidZero.Core
             }
 
             _screenShake.Update(dt);
-
-            // 3️⃣ APPLY TIME SCALE
             _background.Update(dt * timeScale);
 
             _stateManager.Update(dt * timeScale);
@@ -138,8 +137,8 @@ namespace VoidZero.Core
 
         public void Draw(float dt)
         {
-            ImGui.PushFont(_defaultFont);
 
+            ImGui.PushFont(_defaultFont);
             float targetGray = calculateGrayScale();
 
             // Smooth transition
@@ -161,6 +160,9 @@ namespace VoidZero.Core
             DrawFPS();
 
             _spriteBatch.End();
+        }
+        public void DrawMenu()
+        {
             ImGui.PopFont();
             _imGui.Render();
         }
@@ -285,10 +287,8 @@ namespace VoidZero.Core
         {
             float worldWidth = GameServices.Instance.Settings.WorldWidth;
             float worldHeight = GameServices.Instance.Settings.WorldHeight;
-            float scale = MathF.Min(
-                width / worldWidth,
-                height / worldHeight
-            );
+
+            float scale = MathF.Min(width / worldWidth, height / worldHeight);
 
             float renderWidth = worldWidth * scale;
             float renderHeight = worldHeight * scale;
@@ -297,6 +297,9 @@ namespace VoidZero.Core
                 (width - renderWidth) * 0.5f,
                 (height - renderHeight) * 0.5f
             );
+
+            ViewportOffset = offset;
+            ViewportSize = new Vector2(renderWidth, renderHeight);
 
             GL.Viewport(
                 (int)offset.X,
