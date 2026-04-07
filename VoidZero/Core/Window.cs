@@ -54,6 +54,7 @@ namespace VoidZero.Core
             base.OnRenderFrame(e);
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
+            _game.ApplyViewport(Size.X, Size.Y);
             _game.Draw((float)e.Time);
             SwapBuffers();
         }
@@ -61,7 +62,6 @@ namespace VoidZero.Core
         protected override void OnResize(ResizeEventArgs e)
         {
             base.OnResize(e);
-            GL.Viewport(0, 0, Size.X, Size.Y);
             _game.OnResize(Size.X, Size.Y);
         }
     }

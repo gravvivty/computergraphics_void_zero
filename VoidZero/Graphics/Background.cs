@@ -87,17 +87,6 @@ namespace VoidZero.Core
             }
         }
 
-        public void Resize(int width, int height)
-        {
-            if (width < 1 || height < 1)
-            {
-                return;
-            }
-
-            _screenWidth = width;
-            _screenHeight = height;
-        }
-
         public void Update(float dt)
         {
             float multiplier = GameServices.Instance.Settings.BackgroundSpeedMultiplier;

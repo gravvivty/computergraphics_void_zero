@@ -1,7 +1,9 @@
 ﻿using ImGuiNET;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 using System;
+using System.Drawing;
 using VoidZero.Game;
 using VoidZero.Game.Input;
 using VoidZero.Graphics;
@@ -27,6 +29,7 @@ namespace VoidZero.Core
         public Background _background { get; private set; }
         public InputManager _input { get; private set; }
         private ScreenShake _screenShake;
+        private Camera _camera;
         private ImFontPtr _defaultFont;
 
         private float _deathTimer = 0f;
@@ -49,8 +52,8 @@ namespace VoidZero.Core
 
             // Load background layers
             _background = new Background(
-                _window.Size.X,
-                _window.Size.Y,
+                GameServices.Instance.Settings.WorldWidth,
+                GameServices.Instance.Settings.WorldHeight,
                 GameServices.Instance.Content.LoadTexture("space", "Content/Background/background_generated_dark.png"),
                 GameServices.Instance.Content.LoadTexture("stars", "Content/Background/star.png"),
                 GameServices.Instance.Content.LoadTexture("planets", "Content/Background/planet.png"),
@@ -67,6 +70,7 @@ namespace VoidZero.Core
             _spriteBatch = new SpriteBatch();
             _stateManager = new GameStateManager();
             _screenShake = new ScreenShake();
+            _camera = new Camera();
             _imGui = new ImGuiController(_window.Size.X, _window.Size.Y);
             LoadImGuiFont("Content/Fonts/lowrespixel.otf", 20f); // adjust path & size
 
@@ -146,13 +150,8 @@ namespace VoidZero.Core
             );
 
             // Draw game objects
-            Matrix4 projection = Matrix4.CreateOrthographicOffCenter(
-                0 + _screenShake.Offset.X,
-                _window.Size.X + _screenShake.Offset.X,
-                _window.Size.Y + _screenShake.Offset.Y,
-                0 + _screenShake.Offset.Y,
-                -1, 1
-            );
+            _camera.ShakeOffset = _screenShake.Offset;
+            Matrix4 projection = _camera.GetProjection();
 
             _spriteBatch.Begin(projection, targetGray);
             _background.Draw(_spriteBatch);
@@ -176,14 +175,6 @@ namespace VoidZero.Core
             GameServices.Instance.Settings.Width = width;
             GameServices.Instance.Settings.Height = height;
             _imGui.WindowResized(width, height);
-            _background?.Resize(width, height);
-
-            // Resize all entities in current state
-            if (_stateManager._current is IResizableState resizable)
-            {
-                resizable.OnResize(width, height);
-            }
-
         }
 
         public void EnterPlay()
@@ -288,6 +279,31 @@ namespace VoidZero.Core
         private static System.Numerics.Vector2 ToNumVec(Vector2 vector)
         {
             return new System.Numerics.Vector2(vector.X, vector.Y);
+        }
+
+        public void ApplyViewport(int width, int height)
+        {
+            float worldWidth = GameServices.Instance.Settings.WorldWidth;
+            float worldHeight = GameServices.Instance.Settings.WorldHeight;
+            float scale = MathF.Min(
+                width / worldWidth,
+                height / worldHeight
+            );
+
+            float renderWidth = worldWidth * scale;
+            float renderHeight = worldHeight * scale;
+
+            Vector2 offset = new Vector2(
+                (width - renderWidth) * 0.5f,
+                (height - renderHeight) * 0.5f
+            );
+
+            GL.Viewport(
+                (int)offset.X,
+                (int)offset.Y,
+                (int)renderWidth,
+                (int)renderHeight
+            );
         }
     }
 }

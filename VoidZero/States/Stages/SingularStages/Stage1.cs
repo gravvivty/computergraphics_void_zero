@@ -14,8 +14,8 @@ namespace VoidZero.States.Stages
         private Vector2 RelativeCenter(float xPercent, float yPercent, Entity entity)
         {
             return new Vector2(
-                xPercent * GameServices.Instance.Settings.Width - entity.Width / 2f,
-                yPercent * GameServices.Instance.Settings.Height - entity.Height / 2f
+                xPercent * GameServices.Instance.Settings.WorldWidth - entity.Width / 2f,
+                yPercent * GameServices.Instance.Settings.WorldHeight - entity.Height / 2f
             );
         }
 
@@ -32,10 +32,8 @@ namespace VoidZero.States.Stages
                         bulletManager: state.Bullets,
                         energy: BulletEnergy.Green
                     );
-                    enemy.SetPositionRelative(
-                        RelativeCenter(0.666f, -0.2f, enemy),
-                        GameServices.Instance.Settings.Width,
-                        GameServices.Instance.Settings.Height
+                    enemy.SetPosition(
+                        RelativeCenter(0.666f, -0.2f, enemy)
                     );
                     enemy.Movement = new MovementTool(Vector2.UnitY, 1500f, 0.3f);
                     enemy.Components.Add(new TimedExitComponent(
@@ -55,10 +53,8 @@ namespace VoidZero.States.Stages
                         bulletManager: state.Bullets,
                         energy: BulletEnergy.Green
                     );
-                    enemy.SetPositionRelative(
-                        RelativeCenter(0.333f, 1.2f, enemy),
-                        GameServices.Instance.Settings.Width,
-                        GameServices.Instance.Settings.Height
+                    enemy.SetPosition(
+                        RelativeCenter(0.333f, 1.2f, enemy)
                     );
                     enemy.Movement = new MovementTool(-Vector2.UnitY, 1500f, 0.3f);
                     enemy.Components.Add(new TimedExitComponent(
@@ -78,10 +74,8 @@ namespace VoidZero.States.Stages
                         bulletManager: state.Bullets,
                         energy: BulletEnergy.Blue
                     );
-                    enemy.SetPositionRelative(
-                        RelativeCenter(0.5f, 1.2f, enemy),
-                        GameServices.Instance.Settings.Width,
-                        GameServices.Instance.Settings.Height
+                    enemy.SetPosition(
+                        RelativeCenter(0.5f, 1.2f, enemy)
                     );
                     enemy.Movement = new MovementTool(-Vector2.UnitY, 1500f, 0.45f);
                     enemy.Components.Add(new TimedExitComponent(
@@ -102,10 +96,8 @@ namespace VoidZero.States.Stages
                         bulletManager: state.Bullets,
                         energy: BulletEnergy.Blue
                     );
-                    enemy.SetPositionRelative(
-                        RelativeCenter(0.9f, 1.2f, enemy),
-                        GameServices.Instance.Settings.Width,
-                        GameServices.Instance.Settings.Height
+                    enemy.SetPosition(
+                        RelativeCenter(0.9f, 1.2f, enemy)
                     );
                     enemy.Movement = new MovementTool(-Vector2.UnitY, 1500f, 0.45f);
                     enemy.Components.Add(new TimedExitComponent(
@@ -125,10 +117,8 @@ namespace VoidZero.States.Stages
                         bulletManager: state.Bullets,
                         energy: BulletEnergy.Blue
                     );
-                    enemy.SetPositionRelative(
-                        RelativeCenter(0.1f, 1.2f, enemy),
-                        GameServices.Instance.Settings.Width,
-                        GameServices.Instance.Settings.Height
+                    enemy.SetPosition(
+                        RelativeCenter(0.1f, 1.2f, enemy)
                     );
                     enemy.Movement = new MovementTool(-Vector2.UnitY, 1500f, 0.45f);
                     enemy.Components.Add(new TimedExitComponent(

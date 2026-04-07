@@ -12,8 +12,8 @@ namespace VoidZero.Game
         public bool Borderless { get; set; } = false;
         public int Width { get; set; } = 1600;
         public int Height { get; set; } = 900;
-        public const float VirtualWidth = 1920f;
-        public const float VirtualHeight = 1080f;
+        public int WorldWidth { get; } = 1920;
+        public int WorldHeight { get; } = 1080;
         public float BackgroundSpeedMultiplier { get; set; } = 6f;
         public float MasterVolume = 0.5f;
         public float SfxVolume = 0.5f;

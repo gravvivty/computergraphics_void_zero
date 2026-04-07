@@ -18,7 +18,7 @@ using static VoidZero.Core.GameManager;
 
 namespace VoidZero.States
 {
-    public class PlayState : GameState, IResizableState
+    public class PlayState : GameState
     {
         private readonly InputManager _input;
         public GameWindow Window { get; private set; }
@@ -61,7 +61,7 @@ namespace VoidZero.States
 
             Texture2D playerTexture = GameServices.Instance.Content.GetTexture("player");
             _player = new Player(playerTexture, new Vector2(500, 500), _input, Bullets);
-            _player.SetPositionRelative(_player.Position, Window.Size.X, Window.Size.Y);
+            _player.SetPosition(_player.Position);
 
             Texture2D shieldTexture = GameServices.Instance.Content.GetTexture("shield");
             _playerShield = new Shield(shieldTexture, _player);
@@ -154,15 +154,6 @@ namespace VoidZero.States
             {
                 DrawCriticalBorder(spriteBatch, dt);
             }
-        }
-
-        public void OnResize(int newWidth, int newHeight)
-        {
-            foreach (Entity entity in Entities)
-            {
-                entity.OnResize(newWidth, newHeight);
-            }
-            Bullets.OnResize(newWidth, newHeight);
         }
 
         private void HandleBulletHits(float dt)

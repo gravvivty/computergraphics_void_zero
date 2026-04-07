@@ -16,7 +16,6 @@ namespace VoidZero.Game.Entities
         public float CurrentHealth { get; set; }
         public float Scale { get; set; } = 6f;
         public MovementTool Movement { get; set; }
-        public Vector2 RelativePosition { get; protected set; } // Relative to screen
         public Vector2 Velocity;
         public float Speed { get; protected set; }
         public float Width { get; protected set; }
@@ -37,11 +36,6 @@ namespace VoidZero.Game.Entities
             set
             {
                 _position = value;
-                // Always keep relative position up to date
-                RelativePosition = new Vector2(
-                    _position.X / GameServices.Instance.Settings.Width,
-                    _position.Y / GameServices.Instance.Settings.Height
-                );
             }
         }
 
@@ -53,11 +47,6 @@ namespace VoidZero.Game.Entities
             Height = height;
 
             CurrentHealth = MaxHealth;
-
-            RelativePosition = new Vector2(
-                position.X / GameServices.Instance.Settings.Width,
-                position.Y / GameServices.Instance.Settings.Height
-            );
 
             Animations = new AnimationManager();
             AddDefaultDeathAnimation();
@@ -116,24 +105,9 @@ namespace VoidZero.Game.Entities
             batch.DrawRectangle(Hitbox, Color.Red);
         }
 
-        public void SetPositionRelative(Vector2 absolutePos, int screenWidth, int screenHeight)
+        public void SetPosition(Vector2 absolutePos)
         {
             _position = absolutePos;
-            RelativePosition = new Vector2(
-                absolutePos.X / screenWidth,
-                absolutePos.Y / screenHeight
-            );
-        }
-
-        public void UpdateAbsolutePosition(int screenWidth, int screenHeight)
-        {
-            Position = new Vector2(RelativePosition.X * screenWidth, RelativePosition.Y * screenHeight);
-        }
-
-        public void OnResize(int newWidth, int newHeight)
-        {
-            // Only recalc absolute position from relative
-            _position = new Vector2(RelativePosition.X * newWidth, RelativePosition.Y * newHeight);
         }
 
         protected void AddDefaultDeathAnimation()
