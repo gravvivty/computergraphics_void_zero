@@ -12,9 +12,14 @@ namespace VoidZero.Graphics
 {
     public class SpriteBatch
     {
-        private int _vao, _vbo;
+        private int _vao;
+        private int _vbo;
         private Shader _shader;
         private Texture2D _whiteTexture;
+        private float[] _vertexData;
+        private int _index = 0;
+        private Texture2D _currentTexture;
+        private int _textureLocation;
         public Vector4 GlobalTint { get; set; } = Vector4.One;
         public float Grayscale { get; set; } = 0f;
 
@@ -23,35 +28,35 @@ namespace VoidZero.Graphics
         {
             _shader = new Shader("Content/sprite.vert", "Content/sprite.frag");
 
-            _vao = GL.GenVertexArray();
-            _vbo = GL.GenBuffer();
+            _vao = GL.GenVertexArray(); // Vertex Array Object -> how to read buffer data
+            _vbo = GL.GenBuffer(); // Vertex Buffer Object -> data
+            _vertexData = new float[10000 * 6 * 8]; // 10k sprites max
+
+            _textureLocation = GL.GetUniformLocation(_shader.Handle, "texture");
 
             GL.BindVertexArray(_vao);
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
 
             GL.BufferData(
                 BufferTarget.ArrayBuffer,
-                6 * 8 * sizeof(float), // 6 vertices, 8 floats each
+                _vertexData.Length * sizeof(float),
                 IntPtr.Zero,
                 BufferUsageHint.DynamicDraw);
 
             int stride = 8 * sizeof(float);
 
-            // position
+            // Position
             GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, stride, 0);
             GL.EnableVertexAttribArray(0);
-
-            // texcoords
+            // Texture Coordinates / uv
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, stride, 2 * sizeof(float));
             GL.EnableVertexAttribArray(1);
-
-            // color
+            // Color
             GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, stride, 4 * sizeof(float));
             GL.EnableVertexAttribArray(2);
 
-            // Create a 1x1 white texture
+            // Create a 1x1 white texture -> for debugging hitboxes etc.
             _whiteTexture = new Texture2D(1, 1, [255, 255, 255, 255]);
-
         }
 
         public void Begin(Matrix4 projection, float grayscale = 0f)
@@ -63,7 +68,7 @@ namespace VoidZero.Graphics
             _shader.SetFloat("glowPower", 3f);
 
             GL.ActiveTexture(TextureUnit.Texture0);
-            GL.Uniform1(GL.GetUniformLocation(_shader.Handle, "texture0"), 0);
+            GL.Uniform1(_textureLocation, 0);
 
             GL.BindVertexArray(_vao);
 
@@ -77,49 +82,35 @@ namespace VoidZero.Graphics
 
         public void Draw(Texture2D texture, Vector2 position, Vector2 size, Vector4 color)
         {
-            Vector4 uv = new Vector4(0, 0, 1, 1);
-            Vector4 finalColor = color * GlobalTint;
+            if (_currentTexture != null && texture != _currentTexture)
+                Flush();
+
+            _currentTexture ??= texture;
 
             float x = position.X;
             float y = position.Y;
-            float w = size.X;
-            float h = size.Y;
+            float width = size.X;
+            float height = size.Y;
 
-            float u = uv.X;
-            float v = uv.Y;
-            float uw = uv.Z;
-            float vh = uv.W;
+            float u0 = 0f;
+            float v0 = 0f;
+            float u1 = 1f;
+            float v1 = 1f;
 
-            float r = finalColor.X;
-            float g = finalColor.Y;
-            float b = finalColor.Z;
-            float a = finalColor.W;
+            Vector4 tintedColor = color * GlobalTint;
 
-            float[] vertices =
-            {
-                // pos              // uv            // color
-                x,     y + h, u,     v + vh, r,g,b,a,
-                x + w, y,     u + uw,v,      r,g,b,a,
-                x,     y,     u,     v,      r,g,b,a,
+            // Auto flush if full
+            if (_index + 6 * 8 >= _vertexData.Length)
+                Flush();
 
-                x,     y + h, u,     v + vh, r,g,b,a,
-                x + w, y + h, u + uw,v + vh, r,g,b,a,
-                x + w, y,     u + uw,v,      r,g,b,a
-            };
-
-            GL.BindVertexArray(_vao);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, texture.Handle);
-
-            GL.BufferSubData(
-                BufferTarget.ArrayBuffer,
-                IntPtr.Zero,
-                vertices.Length * sizeof(float),
-                vertices);
-
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+            // Triangle 1
+            PushVertex(x, y + height, u0, v1, tintedColor);
+            PushVertex(x + width, y, u1, v0, tintedColor);
+            PushVertex(x, y, u0, v0, tintedColor);
+            // Triangle 2
+            PushVertex(x, y + height, u0, v1, tintedColor);
+            PushVertex(x + width, y + height, u1, v1, tintedColor);
+            PushVertex(x + width, y, u1, v0, tintedColor);
         }
 
 
@@ -131,20 +122,23 @@ namespace VoidZero.Graphics
             float scale = 1f,
             float rotation = 0f)
         {
-            // Texture origins (0-1)
+            if (_currentTexture != null && texture != _currentTexture)
+                Flush();
+
+            _currentTexture ??= texture;
+
+            // UV coordinates
             float u0 = source.X / (float)texture.Width;
             float v0 = source.Y / (float)texture.Height;
             float u1 = (source.X + source.Width) / (float)texture.Width;
             float v1 = (source.Y + source.Height) / (float)texture.Height;
 
-            // Dimensions of the scaled sprite
-            float w = source.Width * scale;
-            float h = source.Height * scale;
+            // Size
+            float width = source.Width * scale;
+            float height = source.Height * scale;
 
-            // Center of the sprite
-            Vector2 origin = new Vector2(w / 2f, h / 2f);
+            Vector2 origin = new Vector2(width / 2f, height / 2f);
 
-            // Quad corners (local space, centered)
             Vector2[] corners =
             {
                 new(-origin.X, -origin.Y),
@@ -153,36 +147,27 @@ namespace VoidZero.Graphics
                 new( origin.X,  origin.Y),
             };
 
-            // Rotate corners
-            for (int i = 0; i < corners.Length; i++)
-                corners[i] = Rotate(corners[i], rotation) + position + origin;
-
-            Vector4 finalColor = color * GlobalTint;
-
-            // We are drawing 2 triangles therefore 6 vertices
-            float[] vertices =
+            for (int i = 0; i < 4; i++)
             {
-                    // pos                  uv/texture origins           color
-                    corners[2].X, corners[2].Y, u0, v1, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
-                    corners[1].X, corners[1].Y, u1, v0, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
-                    corners[0].X, corners[0].Y, u0, v0, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
+                corners[i] = Rotate(corners[i], rotation) + position + origin;
+            }
 
-                    corners[2].X, corners[2].Y, u0, v1, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
-                    corners[3].X, corners[3].Y, u1, v1, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
-                    corners[1].X, corners[1].Y, u1, v0, finalColor.X, finalColor.Y, finalColor.Z, finalColor.W,
-                };
+            Vector4 tintedColor = color * GlobalTint;
 
-            GL.BindVertexArray(_vao);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-            GL.BindTexture(TextureTarget.Texture2D, texture.Handle);
+            // Auto flush safety
+            if (_index + 6 * 8 >= _vertexData.Length)
+            {
+                Flush();
+            } 
 
-            GL.BufferSubData(
-                BufferTarget.ArrayBuffer,
-                IntPtr.Zero,
-                vertices.Length * sizeof(float),
-                vertices);
-
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+            // Triangle 1
+            PushVertex(corners[2].X, corners[2].Y, u0, v1, tintedColor);
+            PushVertex(corners[1].X, corners[1].Y, u1, v0, tintedColor);
+            PushVertex(corners[0].X, corners[0].Y, u0, v0, tintedColor);
+            // Triangle 2
+            PushVertex(corners[2].X, corners[2].Y, u0, v1, tintedColor);
+            PushVertex(corners[3].X, corners[3].Y, u1, v1, tintedColor);
+            PushVertex(corners[1].X, corners[1].Y, u1, v0, tintedColor);
         }
 
         public void DrawRectangle(RectangleF rectangle, Color color, bool filled = false, float thickness = 2f)
@@ -203,24 +188,22 @@ namespace VoidZero.Graphics
                 return;
             }
 
+            // Rectangle circumference
             // Top
             Draw(_whiteTexture,
                 new Vector2(rectangle.X, rectangle.Y),
                 new Vector2(rectangle.Width, thickness),
                 ColorToVec4(color));
-
             // Bottom
             Draw(_whiteTexture,
                 new Vector2(rectangle.X, rectangle.Y + rectangle.Height - thickness),
                 new Vector2(rectangle.Width, thickness),
                 ColorToVec4(color));
-
             // Left
             Draw(_whiteTexture,
                 new Vector2(rectangle.X, rectangle.Y),
                 new Vector2(thickness, rectangle.Height),
                 ColorToVec4(color));
-
             // Right
             Draw(_whiteTexture,
                 new Vector2(rectangle.X + rectangle.Width - thickness, rectangle.Y),
@@ -228,7 +211,46 @@ namespace VoidZero.Graphics
                 ColorToVec4(color));
         }
 
-        public void End() { }
+        public void End()
+        {
+            Flush();
+        }
+
+        private void Flush()
+        {
+            if (_index == 0)
+                return;
+
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, _currentTexture.Handle);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
+
+            GL.BufferSubData(
+                BufferTarget.ArrayBuffer,
+                IntPtr.Zero,
+                _index * sizeof(float),
+                _vertexData);
+
+            int vertexCount = _index / 8;
+
+            GL.DrawArrays(PrimitiveType.Triangles, 0, vertexCount);
+
+            _index = 0;
+            _currentTexture = null;
+        }
+
+        private void PushVertex(float x, float y, float u, float v, Vector4 c)
+        {
+            _vertexData[_index++] = x;
+            _vertexData[_index++] = y;
+            _vertexData[_index++] = u;
+            _vertexData[_index++] = v;
+            _vertexData[_index++] = c.X;
+            _vertexData[_index++] = c.Y;
+            _vertexData[_index++] = c.Z;
+            _vertexData[_index++] = c.W;
+        }
 
         private Vector4 ColorToVec4(Color c)
         {

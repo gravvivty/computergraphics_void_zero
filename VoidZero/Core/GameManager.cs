@@ -165,6 +165,7 @@ namespace VoidZero.Core
             ImGui.PopFont();
             _imGui.Render();
         }
+
         public void ResetTime()
         {
             _deathTimer = 0f;
