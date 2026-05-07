@@ -9,6 +9,8 @@ using VoidZero.States.Stages.VoidZero.States.Stages;
 
 namespace VoidZero.States.Stages
 {
+    // Each Stage has a build which defines which enemies, spawn where and when , what their bullet color is
+    // and when they would leave the screen if they are not killed
     public class Stage1 : IStageDefinition
     {
         private Vector2 RelativeCenter(float xPercent, float yPercent, Entity entity)

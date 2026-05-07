@@ -8,6 +8,7 @@ using Vector2 = OpenTK.Mathematics.Vector2;
 
 namespace VoidZero.Core
 {
+    // Ngl this whole background thing is scuffed as fuck
     public class Background
     {
         private struct Planet

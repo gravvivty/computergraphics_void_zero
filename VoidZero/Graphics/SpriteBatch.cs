@@ -10,12 +10,15 @@ using VoidZero.Graphics.Particles;
 
 namespace VoidZero.Graphics
 {
+    // Serves as a wrapper for the GL commands
     public class SpriteBatch
     {
         private int _vao;
         private int _vbo;
         private Shader _shader;
         private Texture2D _whiteTexture;
+        //iirc we store all vertices as an array so each frame only this array gets pushed to the GPU
+        // instead of doing a GPU call PER TEXTURE on screen - improves performance
         private float[] _vertexData;
         private int _index = 0;
         private Texture2D _currentTexture;
@@ -103,6 +106,7 @@ namespace VoidZero.Graphics
             if (_index + 6 * 8 >= _vertexData.Length)
                 Flush();
 
+            // Why do we push this as two triangles and not just a quad? Good question, no clue but I'm sure it serve a purpose
             // Triangle 1
             PushVertex(x, y + height, u0, v1, tintedColor);
             PushVertex(x + width, y, u1, v0, tintedColor);

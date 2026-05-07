@@ -12,6 +12,7 @@ namespace VoidZero.Graphics
     {
         public Vector2 ShakeOffset;
 
+        // Probably a bad implementaiton of the camera however we only use it for camera shake so might get away with this
         public Matrix4 GetProjection()
         {
             return Matrix4.CreateOrthographicOffCenter(

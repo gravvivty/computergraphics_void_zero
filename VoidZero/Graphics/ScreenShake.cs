@@ -3,6 +3,7 @@ using System;
 
 namespace VoidZero.Graphics
 {
+    // ScreenShake logic when getting hit
     public class ScreenShake
     {
         private float _timer;

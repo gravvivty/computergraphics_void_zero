@@ -61,6 +61,7 @@ namespace VoidZero.Graphics
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
         }
 
+        // Never called - why would we delete textures from the GPU space? We do not have a lot anyway
         public void Dispose()
         {
             GL.DeleteTexture(Handle);

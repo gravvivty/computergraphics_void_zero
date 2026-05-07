@@ -27,12 +27,11 @@ namespace VoidZero.Graphics
             FrameHeight = frameHeight;
             FrameWidth = frameWidth;
 
-            int columns = _texture.Width / frameWidth;
+            int x = column * frameWidth; // from the whole sprite - select 1 column i.e. one Animation loop e.g. Idle
 
             for (int i = 0; i < frameCount; i++)
             {
-                int x = column * frameWidth;
-                int y = i * frameHeight;
+                int y = i * frameHeight; // basically all each frame of a column
                 _frames.Add(new Rectangle(x, y, frameWidth, frameHeight));
             }
         }
@@ -47,6 +46,7 @@ namespace VoidZero.Graphics
             IsFinished = false;
         }
 
+        // this update works for looping through a single column i.e. Animation - "Idle", "Left", etc.
         public void Update(float dt)
         {
             if (!_playing || IsFinished) return;
