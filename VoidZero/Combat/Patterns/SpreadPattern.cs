@@ -7,6 +7,8 @@ using VoidZero.Game.Entities.Components;
 
 namespace VoidZero.Game.Combat.Patterns
 {
+    // Different shooting patterns, all have a Shoot() method that calculate the bullet trajectories depending on pattern
+    // and add a new Bullet
     public class SpreadPattern : IBulletPattern
     {
         private readonly Texture2D _bulletTexture;

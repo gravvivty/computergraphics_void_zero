@@ -8,6 +8,8 @@ using VoidZero.Graphics;
 
 namespace VoidZero.Game.Combat
 {
+    // Should be a singleton really
+    // Singular object BulletManager that contains ALL bullets currently active (both enemies and player)
     public class BulletManager
     {
         public List<Bullet> Bullets { get; } = new();

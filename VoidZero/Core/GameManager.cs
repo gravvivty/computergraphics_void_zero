@@ -11,6 +11,7 @@ using VoidZero.States;
 
 namespace VoidZero.Core
 {
+    // Core Manager when starting the game
     public class GameManager
     {
         public enum GameMode

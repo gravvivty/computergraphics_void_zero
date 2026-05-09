@@ -3,6 +3,9 @@ using VoidZero.Game.Entities;
 
 namespace VoidZero.Game.Entities.Components
 {
+    // Gives an entity the ability to leave the viewport after some time
+    // Uses the MovementTool
+    // Should probably update this so we can define entry information AND exit info
     public class TimedExitComponent : IEntityComponent
     {
         private enum ExitState

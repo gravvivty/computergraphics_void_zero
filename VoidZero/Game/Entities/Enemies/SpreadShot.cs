@@ -3,7 +3,6 @@ using VoidZero.Graphics;
 using VoidZero.Game.Combat;
 using VoidZero.Game.Combat.Patterns;
 using VoidZero.Game.Entities.Components;
-using VoidZero.Game.Entities.Tools;
 
 namespace VoidZero.Game.Entities.Enemies
 {

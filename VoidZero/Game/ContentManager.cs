@@ -7,6 +7,9 @@ using VoidZero.Graphics;
 
 namespace VoidZero.Game
 {
+
+    // How we load our ressources (images, music, fonts, etc.)
+    // Currently only supports images
     public class ContentManager
     {
         public Texture2D GetTexture(string name) => _textures[name];

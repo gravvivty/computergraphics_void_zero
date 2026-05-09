@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace VoidZero.Game.Combat
 {
+    // Simple enums needed for collision checking
     public enum BulletEnergy
     {
         Blue,

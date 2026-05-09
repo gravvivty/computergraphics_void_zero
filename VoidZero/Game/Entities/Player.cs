@@ -7,10 +7,11 @@ using VoidZero.Game.Combat.Patterns;
 using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
-using VoidZero.Game.Entities.Tools;
+using VoidZero.Game.Entities.Components;
 
 namespace VoidZero.Game.Entities
 {
+    // Bloated Player class with literally everything
     public class Player : Entity
     {
         private readonly InputManager _input;

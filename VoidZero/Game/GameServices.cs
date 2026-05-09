@@ -7,6 +7,8 @@ using VoidZero.Graphics.Particles;
 
 namespace VoidZero.Game
 {
+    // Global instances
+    // Particlesystem is in here cuz i was lazy
     public class GameServices
     {
         public static GameServices Instance { get; } = new();

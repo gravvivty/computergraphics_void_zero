@@ -7,6 +7,8 @@ using VoidZero.Utils;
 
 namespace VoidZero.Game.Entities
 {
+    // All the entity logic
+    // Enemies, Player and Bullets inherit from this
     public abstract class Entity
     {
         public Texture2D Texture { get; protected set; }

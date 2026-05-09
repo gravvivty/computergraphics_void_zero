@@ -4,7 +4,6 @@ using VoidZero.Game.Combat;
 using VoidZero.Game.Combat.Patterns;
 using VoidZero.Game.Entities;
 using System;
-using VoidZero.Game.Entities.Tools;
 using System.Runtime.CompilerServices;
 using VoidZero.Game.Entities.Components;
 
