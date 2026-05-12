@@ -229,7 +229,7 @@ namespace VoidZero.States
                             else
                             {
                                 _player.OnDamaged();
-                                _gameManager.Shake(0.25f, 20f);
+                                _gameManager.Shake(0.25f,0.1f);
                             }
                         }
 

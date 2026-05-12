@@ -151,7 +151,7 @@ namespace VoidZero.Core
 
             // Draw game objects
             _camera.ShakeOffset = _screenShake.Offset;
-            Matrix4 projection = _camera.GetProjection();
+            Matrix4 projection = _camera.GetViewProjectionMatrix();
 
             _spriteBatch.Begin(projection, targetGray);
             _background.Draw(_spriteBatch);
