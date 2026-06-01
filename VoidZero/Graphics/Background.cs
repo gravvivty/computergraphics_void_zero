@@ -1,25 +1,33 @@
-﻿using OpenTK.Mathematics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using OpenTK.Mathematics;
 using VoidZero.Game;
 using VoidZero.Graphics;
+using VoidZero.Graphics.Particles;
 using Vector2 = OpenTK.Mathematics.Vector2;
 
 namespace VoidZero.Core
 {
-    // Ngl this whole background thing is scuffed as fuck
     public class Background
     {
-        private struct Planet
+
+        private class Planet
         {
-            public float XNorm;   // normalized horizontal position [0..1]
-            public float Y;       // vertical position in pixels
+            public float XNorm; // horizontal position as 0..1, multiplied by screen width when drawing
+            public float Y;
             public float Speed;
             public float Scale;
         }
 
-        private struct Galaxy
+        private class Star
+        {
+            public float XNorm;
+            public float Y;
+            public float Speed;
+            public float Scale;
+        }
+
+        private class Galaxy
         {
             public float XNorm;
             public float Y;
@@ -29,299 +37,233 @@ namespace VoidZero.Core
             public AnimationManager Animations;
         }
 
-        private struct Star
-        {
-            public float XNorm;
-            public float Y;
-            public float Speed;
-            public float Scale;
-        }
-
-        private float _spaceOffset = 500f;
-
         private const float BaseSpaceSpeed = 80f;
         private const float BaseStarSpeed = 40f;
         private const float BasePlanetSpeed = 120f;
         private const float BaseGalaxySpeed = 5f;
+
+        private const int StarCount = 80;
+        private const int MaxPlanets = 3;
+        private const int GalaxyCount = 4;
 
         private readonly Texture2D _spaceTexture;
         private readonly Texture2D _starsTexture;
         private readonly Texture2D _planetsTexture;
         private readonly Texture2D _galaxyTexture;
 
-        private int _screenWidth;
-        private int _screenHeight;
+        private readonly int _screenWidth;
+        private readonly int _screenHeight;
 
         private readonly List<Planet> _planets = new();
         private readonly List<Star> _stars = new();
         private readonly List<Galaxy> _galaxies = new();
+
+        private float _spaceOffset = 500f;
+
         private readonly Random _rng = new();
 
-        private const int StarCount = 80;
-        private const int MaxPlanets = 3;
-        private const int GalaxyCount = 4;
 
-        public Background(int screenWidth, int screenHeight, Texture2D space, Texture2D stars, Texture2D planets, Texture2D galaxies)
+        public Background(
+            int screenWidth, int screenHeight,
+            Texture2D space, Texture2D stars, Texture2D planets, Texture2D galaxies)
         {
             _screenWidth = screenWidth;
             _screenHeight = screenHeight;
-
             _spaceTexture = space;
             _starsTexture = stars;
             _planetsTexture = planets;
             _galaxyTexture = galaxies;
 
-            // Spawn initial planets and stars
-            for (int i = 0; i < MaxPlanets; i++)
-            {
-                SpawnPlanet(false);
-            }
-
-            for (int i = 0; i < StarCount; i++)
-            {
-                SpawnStar(false);
-            }
-
-            for (int i = 0; i < GalaxyCount; i++)
-            {
-                SpawnGalaxy(false);
-            }
+            for (int i = 0; i < MaxPlanets; i++) _planets.Add(SpawnPlanet(spawnAbove: false));
+            for (int i = 0; i < StarCount; i++) _stars.Add(SpawnStar(spawnAbove: false));
+            for (int i = 0; i < GalaxyCount; i++) _galaxies.Add(SpawnGalaxy(spawnAbove: false));
         }
 
         public void Update(float dt)
         {
-            float multiplier = GameServices.Instance.Settings.BackgroundSpeedMultiplier;
+            float mult = GameServices.Instance.Settings.BackgroundSpeedMultiplier;
 
-            // Scroll background downward
-            _spaceOffset += BaseSpaceSpeed * dt * multiplier;
-            float scale = FillScale();
-            float scaledHeight = _spaceTexture.Height * scale;
-            WrapOffset(ref _spaceOffset, scaledHeight);
+            // Scroll the tiled space backdrop and wrap it when it's moved a full tile height
+            _spaceOffset += BaseSpaceSpeed * dt * mult;
+            float tileHeight = _spaceTexture.Height * SpaceFillScale();
+            if (_spaceOffset >= tileHeight)
+                _spaceOffset -= tileHeight;
 
-            UpdateGalaxies(dt, multiplier);
-            UpdatePlanets(dt, multiplier);
-            UpdateStars(dt, multiplier);
+            UpdateStars(dt, mult);
+            UpdatePlanets(dt, mult);
+            UpdateGalaxies(dt, mult);
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        private void UpdateStars(float dt, float mult)
         {
-            DrawStars(spriteBatch);
-            DrawGalaxies(spriteBatch);
-            DrawLayer(spriteBatch, _spaceTexture, _spaceOffset, FillScale());
-            DrawPlanets(spriteBatch);
-        }
-
-        private void DrawLayer(SpriteBatch spriteBatch, Texture2D texture, float offset, float scale)
-        {
-            Vector2 size = new Vector2(texture.Width * scale, texture.Height * scale);
-
-            // Downward scrolling
-            Vector2 pos1 = new Vector2(0, offset);
-            Vector2 pos2 = new Vector2(0, offset - size.Y);
-
-            spriteBatch.Draw(texture, pos1, size, Vector4.One);
-            spriteBatch.Draw(texture, pos2, size, Vector4.One);
-        }
-
-        private void SpawnPlanet(bool spawnAbove)
-        {
-            float scale = _rng.NextSingle() * 1.5f + 0.5f;
-            float y = spawnAbove ? -_planetsTexture.Height * scale : _rng.Next(0, _screenHeight);
-            float xNorm = _rng.NextSingle(); // normalized horizontal position
-
-            _planets.Add(new Planet
+            for (int i = _stars.Count - 1; i >= 0; i--)
             {
-                XNorm = xNorm,
-                Y = y,
-                Speed = BasePlanetSpeed + _rng.NextSingle() * 20f, // some variation
-                Scale = scale
-            });
+                Star s = _stars[i];
+                s.Y += s.Speed * dt * mult;
+
+                if (s.Y > _screenHeight + _starsTexture.Height * s.Scale)
+                {
+                    _stars[i] = SpawnStar(spawnAbove: true);
+                }
+            }
         }
 
-        private void SpawnStar(bool spawnAbove)
+        private void UpdatePlanets(float dt, float mult)
         {
-            float scale = _rng.NextSingle() * 2.0f + 0.2f;
-            float y = spawnAbove ? -_starsTexture.Height * scale : _rng.Next(0, _screenHeight);
-            float xNorm = _rng.NextSingle(); // normalized horizontal position
-
-            _stars.Add(new Star
+            for (int i = _planets.Count - 1; i >= 0; i--)
             {
-                XNorm = xNorm,
-                Y = y,
-                Speed = BaseStarSpeed + _rng.NextSingle() * 15f, // some variation
-                Scale = scale
-            });
+                Planet p = _planets[i];
+                p.Y += p.Speed * dt * mult;
+
+                if (p.Y > _screenHeight + _planetsTexture.Height * p.Scale)
+                {
+                    _planets[i] = SpawnPlanet(spawnAbove: true);
+                }
+            }
         }
 
-        private void SpawnGalaxy(bool spawnAbove)
-        {
-            float scale = _rng.NextSingle() * 1.2f + 1.0f;
-            float y = spawnAbove
-                ? -64f * scale
-                : _rng.Next(0, _screenHeight);
-
-            float xNorm = _rng.NextSingle();
-
-            Vector4 color = RandomGalaxyColor();
-
-            float noise = (_rng.NextSingle() - 0.5f) * 0.03f;
-            color.X += noise;
-            color.Y -= noise * 0.5f;
-            color.Z += noise * 0.3f;
-
-            // Animation setup
-            var animManager = new AnimationManager();
-            animManager.Add(
-                "Idle",
-                new Animation(
-                    _galaxyTexture,
-                    100, 100,       // frame size
-                    10,            // frame count
-                    0.12f,        // frame time
-                    column: 0,
-                    loop: true
-                )
-            );
-            animManager.Play("Idle");
-
-            _galaxies.Add(new Galaxy
-            {
-                XNorm = xNorm,
-                Y = y,
-                Speed = BaseGalaxySpeed + _rng.NextSingle() * 8f,
-                Scale = scale,
-                Color = color,
-                Animations = animManager
-            });
-        }
-
-        private void UpdateGalaxies(float dt, float multiplier)
+        private void UpdateGalaxies(float dt, float mult)
         {
             for (int i = _galaxies.Count - 1; i >= 0; i--)
             {
                 Galaxy g = _galaxies[i];
-
-                g.Y += g.Speed * dt * multiplier;
+                g.Y += g.Speed * dt * mult;
                 g.Animations.Update(dt);
 
                 if (g.Y > _screenHeight + 64f * g.Scale)
                 {
-                    _galaxies.RemoveAt(i);
-                    SpawnGalaxy(true);
-                }
-                else
-                {
-                    _galaxies[i] = g;
+                    _galaxies[i] = SpawnGalaxy(spawnAbove: true);
                 }
             }
         }
 
-        private void UpdatePlanets(float dt, float multiplier)
+        public void Draw(SpriteBatch batch)
         {
-            for (int i = _planets.Count - 1; i >= 0; i--)
-            {
-                Planet planet = _planets[i];
-                planet.Y += planet.Speed * dt * multiplier;
+            DrawStars(batch);
+            DrawGalaxies(batch);
+            DrawSpaceTile(batch);
+            DrawPlanets(batch);
+        }
 
-                if (planet.Y > _screenHeight + _planetsTexture.Height * planet.Scale)
-                {
-                    _planets.RemoveAt(i);
-                    SpawnPlanet(true); // spawn at top only
-                }
-                else
-                {
-                    _planets[i] = planet;
-                }
+        private void DrawSpaceTile(SpriteBatch batch)
+        {
+            float scale = SpaceFillScale();
+            Vector2 size = new(_spaceTexture.Width * scale, _spaceTexture.Height * scale);
+
+            // Draw two tiles stacked vertically so there's never a gap while scrolling
+            batch.Draw(_spaceTexture, new Vector2(0, _spaceOffset), size, Vector4.One);
+            batch.Draw(_spaceTexture, new Vector2(0, _spaceOffset - size.Y), size, Vector4.One);
+        }
+
+        private void DrawStars(SpriteBatch batch)
+        {
+            foreach (Star s in _stars)
+            {
+                Vector2 pos = new(s.XNorm * _screenWidth, s.Y);
+                Vector2 size = new(_starsTexture.Width * s.Scale, _starsTexture.Height * s.Scale);
+                batch.Draw(_starsTexture, pos, size, Vector4.One);
             }
         }
 
-        private void UpdateStars(float dt, float multiplier)
+        private void DrawPlanets(SpriteBatch batch)
         {
-            for (int i = _stars.Count - 1; i >= 0; i--)
+            foreach (Planet p in _planets)
             {
-                Star star = _stars[i];
-                star.Y += star.Speed * dt * multiplier;
-
-                if (star.Y > _screenHeight + _starsTexture.Height * star.Scale)
-                {
-                    _stars.RemoveAt(i);
-                    SpawnStar(true);
-                }
-                else
-                {
-                    _stars[i] = star;
-                }
+                Vector2 pos = new(p.XNorm * _screenWidth, p.Y);
+                Vector2 size = new(_planetsTexture.Width * p.Scale, _planetsTexture.Height * p.Scale);
+                batch.Draw(_planetsTexture, pos, size, Vector4.One);
             }
         }
 
-        private void DrawPlanets(SpriteBatch spriteBatch)
+        private void DrawGalaxies(SpriteBatch batch)
         {
-            foreach (Planet planet in _planets)
+            foreach (Galaxy g in _galaxies)
             {
-                Vector2 size = new Vector2(_planetsTexture.Width * planet.Scale, _planetsTexture.Height * planet.Scale);
-                Vector2 position = new Vector2(planet.XNorm * _screenWidth, planet.Y);
-                spriteBatch.Draw(_planetsTexture, position, size, Vector4.One);
-            }
-        }
-
-        private void DrawStars(SpriteBatch spriteBatch)
-        {
-            foreach (Star star in _stars)
-            {
-                Vector2 size = new Vector2(_starsTexture.Width * star.Scale, _starsTexture.Height * star.Scale);
-                Vector2 position = new Vector2(star.XNorm * _screenWidth, star.Y);
-                spriteBatch.Draw(_starsTexture, position, size, Vector4.One);
-            }
-        }
-
-        private void DrawGalaxies(SpriteBatch spriteBatch)
-        {
-            foreach (Galaxy galaxy in _galaxies)
-            {
-                Vector2 pos = new(
-                    galaxy.XNorm * _screenWidth,
-                    galaxy.Y
-                );
-
-                spriteBatch.GlobalTint = Vector4.One;
-                galaxy.Animations.Draw(spriteBatch, pos, galaxy.Scale, galaxy.Color);
+                batch.GlobalTint = Vector4.One;
+                g.Animations.Draw(batch, new Vector2(g.XNorm * _screenWidth, g.Y), g.Scale, g.Color);
             }
 
-            spriteBatch.GlobalTint = Vector4.One;
+            batch.GlobalTint = Vector4.One;
         }
 
-        private float FillScale()
+        private Planet SpawnPlanet(bool spawnAbove)
         {
-            return MathF.Max((float)_screenWidth / _spaceTexture.Width, (float)_screenHeight / _spaceTexture.Height);
-        }
+            float scale = _rng.NextSingle() * 1.5f + 0.5f;
 
-        private void WrapOffset(ref float offset, float height)
-        {
-            if (offset >= height)
+            return new Planet
             {
-                offset -= height;
-            }
+                XNorm = _rng.NextSingle(),
+                Y = spawnAbove ? -_planetsTexture.Height * scale : _rng.Next(0, _screenHeight),
+                Speed = BasePlanetSpeed + _rng.NextSingle() * 20f,
+                Scale = scale,
+            };
+        }
+
+        private Star SpawnStar(bool spawnAbove)
+        {
+            float scale = _rng.NextSingle() * 2.0f + 0.2f;
+
+            return new Star
+            {
+                XNorm = _rng.NextSingle(),
+                Y = spawnAbove ? -_starsTexture.Height * scale : _rng.Next(0, _screenHeight),
+                Speed = BaseStarSpeed + _rng.NextSingle() * 15f,
+                Scale = scale,
+            };
+        }
+
+        private Galaxy SpawnGalaxy(bool spawnAbove)
+        {
+            float scale = _rng.NextSingle() * 1.2f + 1.0f;
+
+            var anim = new AnimationManager();
+            anim.Add("Idle", new Animation(
+                _galaxyTexture,
+                frameWidth: 100,
+                frameHeight: 100,
+                frameCount: 10,
+                frameTime: 0.12f,
+                column: 0,
+                loop: true));
+            anim.Play("Idle");
+
+            return new Galaxy
+            {
+                XNorm = _rng.NextSingle(),
+                Y = spawnAbove ? -64f * scale : _rng.Next(0, _screenHeight),
+                Speed = BaseGalaxySpeed + _rng.NextSingle() * 8f,
+                Scale = scale,
+                Color = RandomGalaxyColor(),
+                Animations = anim,
+            };
+        }
+
+        // Returns the scale needed to make the space texture fill the screen
+        // without any gaps (same logic as CSS background-size: cover)
+        private float SpaceFillScale()
+        {
+            return MathF.Max(
+                (float)_screenWidth / _spaceTexture.Width,
+                (float)_screenHeight / _spaceTexture.Height);
         }
 
         private Vector4 RandomGalaxyColor()
         {
-            // Base near black
-            float baseDark = 0.05f + _rng.NextSingle() * 0.08f; // 0.05–0.13
-
-            // Dusty pink bias
+            float dark = 0.05f + _rng.NextSingle() * 0.08f;
             float pinkBias = 0.08f + _rng.NextSingle() * 0.12f;
+            float noise = (_rng.NextSingle() - 0.5f) * 0.03f;
 
-            float r = baseDark + pinkBias * 0.9f;
-            float g = baseDark + pinkBias * 0.6f;
-            float b = baseDark + pinkBias * 0.8f;
+            float r = dark + pinkBias * 0.9f + noise;
+            float g = dark + pinkBias * 0.6f - noise * 0.5f;
+            float b = dark + pinkBias * 0.8f + noise * 0.3f;
 
-            // Push toward gray
+            // Pull the color slightly toward gray to desaturate it
             float gray = (r + g + b) / 3f;
-            r = MathHelper.Lerp(r, gray, 0.55f);
-            g = MathHelper.Lerp(g, gray, 0.55f);
-            b = MathHelper.Lerp(b, gray, 0.55f);
-
-            return new Vector4(r, g, b, 0.45f);
+            return new Vector4(
+                MathHelper.Lerp(r, gray, 0.55f),
+                MathHelper.Lerp(g, gray, 0.55f),
+                MathHelper.Lerp(b, gray, 0.55f),
+                0.45f);
         }
     }
 }
