@@ -70,5 +70,10 @@ namespace VoidZero.Game.Entities.Components
 
             Pattern.Shoot(entity, _bulletManager, _owner, finalDamage, BulletEnergy);
         }
+
+        public void ResetTimer()
+        {
+            _timer = 0f;
+        }
     }
 }

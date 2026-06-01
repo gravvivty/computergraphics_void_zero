@@ -20,25 +20,34 @@ namespace VoidZero.States.Stages
                     var threeForkTexture = GameServices.Instance.Content.GetTexture("witch");
                     var threeFork = new CardinalSpinner(
                         threeForkTexture,
-                        position: new Vector2(600, -10),
+                        position: new Vector2(600, -50),
                         bulletManager: state.Bullets,
                         energy: BulletEnergy.Red
                     );
-                    threeFork.Movement = new MovementTool(Vector2.UnitY, 100f, 2f);
-                    threeFork.AddComponent(new TimedExitComponent(waitTime : 8f, exitDirection : -Vector2.UnitY, exitSpeed : 250f, moveDuration : 3f));
+                    threeFork.AddComponent(new MovementLifecycleComponent(
+                        entryMovement: new MovementTool(Vector2.UnitY, 1000f, 0.5f),
+                        waitTime : 8f,
+                        exitDirection : -Vector2.UnitY,
+                        exitSpeed : 250f,
+                        exitDuration : 3f));
                     return threeFork;
                 }),
 
                 new SpawnEnemyEvent(4f, state =>
                 {
                     var spinnerTexture = GameServices.Instance.Content.GetTexture("witch");
-                    var spinner = new Spinner(
+                    var spinner = new CardinalSpinner(
                         spinnerTexture,
                         position: new Vector2(200, -10),
-                        bulletManager: state.Bullets
+                        bulletManager: state.Bullets,
+                        energy: BulletEnergy.Green
                     );
-                    spinner.Movement = new MovementTool(Vector2.UnitY, 100f, 2f);
-                    spinner.Components.Add(new TimedExitComponent(waitTime : 8f, exitDirection : -Vector2.UnitY, exitSpeed : 250f, moveDuration : 3f));
+                    spinner.Components.Add(new MovementLifecycleComponent(
+                        entryMovement : new MovementTool(Vector2.UnitY, 100f, 2f),
+                        waitTime : 8f,
+                        exitDirection : -Vector2.UnitY,
+                        exitSpeed : 250f,
+                        exitDuration : 3f));
                     spinner.AddComponent(new RotationComponent(MathF.Tau, 2f, 0f, loop: true));
                     spinner.SetBulletEnergy(BulletEnergy.Blue);
                     return spinner;
@@ -53,8 +62,12 @@ namespace VoidZero.States.Stages
                         bulletManager: state.Bullets,
                         energy: BulletEnergy.Blue
                     );
-                    spinner.Movement = new MovementTool(Vector2.UnitY, 100f, 2f);
-                    spinner.AddComponent(new TimedExitComponent(waitTime : 8f, exitDirection : -Vector2.UnitY, exitSpeed : 250f, moveDuration : 3f));
+                    spinner.AddComponent(new MovementLifecycleComponent(
+                        entryMovement: new MovementTool(Vector2.UnitY, 100f, 2f),
+                        waitTime : 8f,
+                        exitDirection : -Vector2.UnitY,
+                        exitSpeed : 250f,
+                        exitDuration : 3f));
                     spinner.AddComponent(new RotationSequenceComponent(
                         loop: true,
                         new RotationComponent(MathF.PI / 2f, 0f, 1f)
@@ -70,8 +83,12 @@ namespace VoidZero.States.Stages
                         bulletManager: state.Bullets,
                         energy: BulletEnergy.Blue
                     );
-                    spinner.Movement = new MovementTool(Vector2.UnitY, 100f, 2f);
-                    spinner.AddComponent(new TimedExitComponent(waitTime : 8f, exitDirection : -Vector2.UnitY, exitSpeed : 250f, moveDuration : 3f));
+                    spinner.AddComponent(new MovementLifecycleComponent(
+                        entryMovement: new MovementTool(Vector2.UnitY, 100f, 2f),
+                        waitTime : 8f,
+                        exitDirection : -Vector2.UnitY,
+                        exitSpeed : 250f,
+                        exitDuration : 3f));
                     spinner.AddComponent(new RotationSequenceComponent(
                         loop: true,
                         new RotationComponent(MathF.PI / 2f, 0f, 1f)

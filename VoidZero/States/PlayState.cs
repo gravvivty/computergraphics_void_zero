@@ -123,7 +123,7 @@ namespace VoidZero.States
 
                 bool remove =
                     entity.IsDead ||
-                    entity.Components.OfType<TimedExitComponent>().Any(c => c.IsExpired);
+                    entity.Components.OfType<MovementLifecycleComponent>().Any(c => c.IsExpired);
 
                 if (remove)
                     Entities.Remove(entity);
@@ -166,13 +166,19 @@ namespace VoidZero.States
                         {
                             if (enemy.IsDying)
                                 continue;
+                            if (bullet.HitEntities.Contains(enemy))  // already hit this enemy
+                                continue;
                             if (bullet.Hitbox.IntersectsWith(entity.Hitbox))
                             {
+                                float healthBefore = entity.CurrentHealth;
                                 entity.CurrentHealth -= bullet.Damage;
+                                float healthAfter = entity.CurrentHealth;
+
+                                Console.WriteLine($"[HIT] {enemy.GetType().Name} | Damage: {bullet.Damage} | HP: {healthBefore} -> {healthAfter}");
+
+                                bullet.HitEntities.Add(enemy);
 
                                 Vector2 impactDir = bullet.Velocity.Normalized();
-                                Vector2 hitboxHalf = new Vector2(entity.Hitbox.Size.Width / 2f, entity.Hitbox.Size.Height / 2f);
-                                Vector2 spawnPos = entity.Position + hitboxHalf;
 
                                 GameServices.Instance.ParticleSystem.SpawnSparks(enemy.VisualCenter, impactDir, 25);
 

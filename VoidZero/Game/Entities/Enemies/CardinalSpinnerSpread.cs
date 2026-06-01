@@ -43,9 +43,8 @@ namespace VoidZero.Game.Entities.Enemies
         public override void Update(float dt)
         {
             base.Update(dt);
-            Movement?.Update(this, dt);
 
-            _shooter.TryShoot(this, dt, trigger: true);
+            _shooter.TryShoot(this, dt, trigger: CanShoot);
                 
             Animations.Update(dt);
         }
