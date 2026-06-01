@@ -27,7 +27,8 @@ namespace VoidZero.Core
                 {
                     ClientSize = new Vector2i(1600, 900),
                     APIVersion = new Version(4, 1),
-                    Title = "Void Zero"
+                    Title = "Void Zero",
+                    WindowBorder = WindowBorder.Fixed
                 })
         { }
 
