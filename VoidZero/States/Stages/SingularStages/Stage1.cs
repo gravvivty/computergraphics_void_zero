@@ -68,28 +68,6 @@ namespace VoidZero.States.Stages
                 new SpawnEnemyEvent(0f, state =>
                 {
                     var enemyTex = GameServices.Instance.Content.GetTexture("witch");
-                    var enemy = new CardinalSpinner(
-                        enemyTex,
-                        position: Vector2.Zero,
-                        bulletManager: state.Bullets,
-                        energy: BulletEnergy.Blue
-                    );
-                    enemy.SetPosition(
-                        RelativeCenter(0.5f, 1.2f, enemy)
-                    );
-                    enemy.Movement = new MovementTool(-Vector2.UnitY, 1500f, 0.45f);
-                    enemy.Components.Add(new TimedExitComponent(
-                        waitTime: 15f,
-                        exitDirection: Vector2.UnitY,
-                        exitSpeed: 1000f,
-                        moveDuration: 0.5f
-                    ));
-                    enemy.SetBulletEnergy(BulletEnergy.Red);
-                    return enemy;
-                }),
-                new SpawnEnemyEvent(0f, state =>
-                {
-                    var enemyTex = GameServices.Instance.Content.GetTexture("witch");
                     var enemy = new OmniShotRotate(
                         enemyTex,
                         position: Vector2.Zero,

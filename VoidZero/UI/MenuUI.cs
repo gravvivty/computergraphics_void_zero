@@ -38,8 +38,8 @@ namespace VoidZero.UI
             var io = ImGui.GetIO();
             var windowSize = io.DisplaySize;
 
-            ImGui.SetNextWindowPos((Vector2)gm.ViewportOffset);
-            ImGui.SetNextWindowSize((Vector2)gm.ViewportSize);
+            ImGui.SetNextWindowPos(new Vector2(0, 0));
+            ImGui.SetNextWindowSize(io.DisplaySize);
 
             ImGui.Begin("Main Menu",
                 ImGuiWindowFlags.NoDecoration |   // no title bar, resize, move
@@ -66,18 +66,18 @@ namespace VoidZero.UI
             float windowHeight = ImGui.GetWindowHeight();
             ImGui.SetCursorPosY((windowHeight - totalHeight) / 2f);
 
-            Vector2 available = ImGui.GetContentRegionAvail();
+            float available = ImGui.GetWindowWidth();
 
             // Draw title
             string title = "void_zero";
             float textWidth = ImGui.CalcTextSize(title).X;
-            ImGui.SetCursorPosX((available.X - textWidth) / 2f);
+            ImGui.SetCursorPosX((available - textWidth) / 2f);
             ImGui.Text(title);
             ImGui.Dummy(new Vector2(0, spacing * 2));
 
             foreach (string label in labels)
             {
-                float centerX = (available.X - buttonWidth) / 2f;
+                float centerX = (available - buttonWidth) / 2f;
                 ImGui.SetCursorPosX(centerX);
 
                 if (ImGui.Button(label, new Vector2(buttonWidth, buttonHeight)))
@@ -110,8 +110,8 @@ namespace VoidZero.UI
         public static void DrawOptionsMenu(ref MenuPage currentPage, GameStateManager gsm, GameWindow window, InputManager input, GameManager gm)
         {
             var io = ImGui.GetIO();
-            ImGui.SetNextWindowPos((Vector2)gm.ViewportOffset);
-            ImGui.SetNextWindowSize((Vector2)gm.ViewportSize);
+            ImGui.SetNextWindowPos(new Vector2(0, 0));
+            ImGui.SetNextWindowSize(io.DisplaySize);
 
             ImGui.Begin("Options",
                 ImGuiWindowFlags.NoDecoration |
@@ -213,8 +213,8 @@ namespace VoidZero.UI
         public static void DrawCreditsMenu(ref MenuPage currentPage, GameStateManager gsm, GameWindow window, InputManager input, GameManager gm)
         {
             var io = ImGui.GetIO();
-            ImGui.SetNextWindowPos((Vector2)gm.ViewportOffset);
-            ImGui.SetNextWindowSize((Vector2)gm.ViewportSize);
+            ImGui.SetNextWindowPos(new Vector2(0, 0));
+            ImGui.SetNextWindowSize(io.DisplaySize);
 
             ImGui.Begin("Credits",
                 ImGuiWindowFlags.NoDecoration |
@@ -232,10 +232,10 @@ namespace VoidZero.UI
 
             string[] lines =
             {
-                "Game Design by Steven",
-                "Programming by Steven",
-                "Art by Steven",
-                "Music by Steven"
+                "Game Design by Steven & Finley",
+                "Programming by Steven & Finley",
+                "Art by Steven & Finley",
+                "Music will be by Steven"
             };
 
             float spacing = 10f;
@@ -275,8 +275,8 @@ namespace VoidZero.UI
             }
 
             var io = ImGui.GetIO();
-            ImGui.SetNextWindowPos((Vector2)gm.ViewportOffset);
-            ImGui.SetNextWindowSize((Vector2)gm.ViewportSize);
+            ImGui.SetNextWindowPos(new Vector2(0, 0));
+            ImGui.SetNextWindowSize(io.DisplaySize);
 
             ImGui.Begin("Pause Menu",
                 ImGuiWindowFlags.NoDecoration |
@@ -335,8 +335,8 @@ namespace VoidZero.UI
             GameManager gm)
         {
             var io = ImGui.GetIO();
-            ImGui.SetNextWindowPos((Vector2)gm.ViewportOffset);
-            ImGui.SetNextWindowSize((Vector2)gm.ViewportSize);
+            ImGui.SetNextWindowPos(new Vector2(0, 0));
+            ImGui.SetNextWindowSize(io.DisplaySize);
 
             ImGui.Begin("Stage Select",
                 ImGuiWindowFlags.NoDecoration |
@@ -361,7 +361,7 @@ namespace VoidZero.UI
                 stageCount * buttonWidth +
                 (stageCount - 1) * spacing;
 
-            float startX = (ImGui.GetContentRegionAvail().X - totalWidth) / 2f;
+            float startX = (ImGui.GetWindowWidth() - totalWidth) / 2f;
             float centerY = ImGui.GetWindowHeight() * 0.5f;
 
             ImGui.SetCursorPosY(centerY - buttonHeight * 0.5f);
@@ -418,7 +418,7 @@ namespace VoidZero.UI
         }
         private static void CenterNextItem(float itemWidth)
         {
-            float available = ImGui.GetContentRegionAvail().X;
+            float available = ImGui.GetWindowWidth();
             ImGui.SetCursorPosX((available - itemWidth) / 2f);
         }
     }
