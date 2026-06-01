@@ -179,11 +179,11 @@ namespace VoidZero.Core
             _deathTimer = 0f;
         }
 
-        public void OnResize(int width, int height)
+        public void OnResize(int width, int height, int fbWidth, int fbHeight)
         {
             GameServices.Instance.Settings.Width = width;
             GameServices.Instance.Settings.Height = height;
-            _imGui.WindowResized(width, height);
+            _imGui.WindowResized(fbWidth, fbHeight);
         }
 
         public void EnterPlay()
@@ -260,17 +260,16 @@ namespace VoidZero.Core
 
         private void DrawFPS()
         {
+            var io = ImGui.GetIO();
             float padding = 10f;
             float windowWidth = 80f;
             float windowHeight = 20f;
 
-            Vector2 fpsPos = new Vector2(
-                GameServices.Instance.Settings.Width - windowWidth - padding,
-                GameServices.Instance.Settings.Height - windowHeight - padding
-            );
-
-            // Convert to System.Numerics.Vector2 for ImGui
-            ImGui.SetNextWindowPos(ToNumVec(fpsPos), ImGuiCond.Always);
+            ImGui.SetNextWindowPos(
+                new System.Numerics.Vector2(
+                    io.DisplaySize.X - windowWidth - padding,
+                    io.DisplaySize.Y - windowHeight - padding),
+                ImGuiCond.Always);
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(windowWidth, windowHeight));
 
             ImGui.Begin("FPS",
@@ -316,5 +315,9 @@ namespace VoidZero.Core
                 (int)renderHeight
             );
         }
+
+        public (float x, float y, float w, float h) GetViewportRect() =>
+            ((float)ViewportOffset.X, (float)ViewportOffset.Y,
+             (float)ViewportSize.X, (float)ViewportSize.Y);
     }
 }

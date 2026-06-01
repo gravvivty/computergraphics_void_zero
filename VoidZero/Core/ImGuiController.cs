@@ -243,7 +243,7 @@ namespace VoidZero.Core
                 _frameBufferWidth,
                 _frameBufferHeight);
             io.DisplayFramebufferScale = _scaleFactor;
-            io.DeltaTime = deltaSeconds; // DeltaTime is in seconds.
+            io.DeltaTime = deltaSeconds;
         }
 
         readonly List<char> PressedChars = new List<char>();
@@ -261,9 +261,8 @@ namespace VoidZero.Core
             io.MouseDown[3] = MouseState[MouseButton.Button4];
             io.MouseDown[4] = MouseState[MouseButton.Button5];
 
-            Vector2i screenPoint = new Vector2i((int)MouseState.X, (int)MouseState.Y);
-            float offsetY = GameServices.Instance.Settings.Fullscreen ? 0 : 20f;
-            io.MousePos = new System.Numerics.Vector2(screenPoint.X, screenPoint.Y + offsetY); // account for window size top bar
+            io.MousePos = new System.Numerics.Vector2(MouseState.X, MouseState.Y);
+
 
             foreach (Keys key in Enum.GetValues(typeof(Keys)))
             {
@@ -446,7 +445,12 @@ namespace VoidZero.Core
 
                         // We do _windowHeight - (int)clip.W instead of (int)clip.Y because gl has flipped Y when it comes to these coordinates
                         var clip = pcmd.ClipRect;
-                        GL.Scissor((int)clip.X, _frameBufferHeight - (int)clip.W, (int)(clip.Z - clip.X), (int)(clip.W - clip.Y));
+                        // clip coords are in ImGui/viewport space; convert to framebuffer space
+                        GL.Scissor(
+                            (int)clip.X,
+                            _frameBufferHeight - (int)clip.W,
+                            (int)(clip.Z - clip.X),
+                            (int)(clip.W - clip.Y));
                         CheckGLError("Scissor");
 
                         if ((io.BackendFlags & ImGuiBackendFlags.RendererHasVtxOffset) != 0)

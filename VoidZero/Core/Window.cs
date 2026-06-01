@@ -53,14 +53,11 @@ namespace VoidZero.Core
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
-
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            // Draw Game
             _game.ApplyViewport(FramebufferSize.X, FramebufferSize.Y);
             _game.Draw((float)e.Time);
-            
-            // Render ImGui Menu
+
             GL.Viewport(0, 0, FramebufferSize.X, FramebufferSize.Y);
             _game.DrawMenu();
             SwapBuffers();
@@ -69,7 +66,7 @@ namespace VoidZero.Core
         protected override void OnResize(ResizeEventArgs e)
         {
             base.OnResize(e);
-            _game.OnResize(Size.X, Size.Y);
+            _game.OnResize(Size.X, Size.Y, FramebufferSize.X, FramebufferSize.Y);
         }
     }
 }

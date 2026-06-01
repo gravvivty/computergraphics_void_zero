@@ -37,10 +37,10 @@ namespace VoidZero.UI
         public static void DrawMainMenu(ref MenuPage currentPage, GameStateManager gsm, GameWindow window, InputManager input, Background bg, GameManager gm)
         {
             var io = ImGui.GetIO();
-            var windowSize = io.DisplaySize;
+            var (vpX, vpY, vpW, vpH) = gm.GetViewportRect();
 
-            ImGui.SetNextWindowPos(new Vector2(0, 0));
-            ImGui.SetNextWindowSize(io.DisplaySize);
+            ImGui.SetNextWindowPos(new Vector2(vpX, vpY));
+            ImGui.SetNextWindowSize(new Vector2(vpW, vpH));
 
             ImGui.Begin("Main Menu",
                 ImGuiWindowFlags.NoDecoration |   // no title bar, resize, move
@@ -111,8 +111,10 @@ namespace VoidZero.UI
         public static void DrawOptionsMenu(ref MenuPage currentPage, GameStateManager gsm, GameWindow window, InputManager input, GameManager gm)
         {
             var io = ImGui.GetIO();
-            ImGui.SetNextWindowPos(new Vector2(0, 0));
-            ImGui.SetNextWindowSize(io.DisplaySize);
+            var (vpX, vpY, vpW, vpH) = gm.GetViewportRect();
+
+            ImGui.SetNextWindowPos(new Vector2(vpX, vpY));
+            ImGui.SetNextWindowSize(new Vector2(vpW, vpH));
 
             ImGui.Begin("Options",
                 ImGuiWindowFlags.NoDecoration |
@@ -214,8 +216,10 @@ namespace VoidZero.UI
         public static void DrawCreditsMenu(ref MenuPage currentPage, GameStateManager gsm, GameWindow window, InputManager input, GameManager gm)
         {
             var io = ImGui.GetIO();
-            ImGui.SetNextWindowPos(new Vector2(0, 0));
-            ImGui.SetNextWindowSize(io.DisplaySize);
+            var (vpX, vpY, vpW, vpH) = gm.GetViewportRect();
+
+            ImGui.SetNextWindowPos(new Vector2(vpX, vpY));
+            ImGui.SetNextWindowSize(new Vector2(vpW, vpH));
 
             ImGui.Begin("Credits",
                 ImGuiWindowFlags.NoDecoration |
@@ -276,8 +280,10 @@ namespace VoidZero.UI
             }
 
             var io = ImGui.GetIO();
-            ImGui.SetNextWindowPos(new Vector2(0, 0));
-            ImGui.SetNextWindowSize(io.DisplaySize);
+            var (vpX, vpY, vpW, vpH) = gm.GetViewportRect();
+
+            ImGui.SetNextWindowPos(new Vector2(vpX, vpY));
+            ImGui.SetNextWindowSize(new Vector2(vpW, vpH));
 
             ImGui.Begin("Pause Menu",
                 ImGuiWindowFlags.NoDecoration |
@@ -336,8 +342,10 @@ namespace VoidZero.UI
             GameManager gm)
         {
             var io = ImGui.GetIO();
-            ImGui.SetNextWindowPos(new Vector2(0, 0));
-            ImGui.SetNextWindowSize(io.DisplaySize);
+            var (vpX, vpY, vpW, vpH) = gm.GetViewportRect();
+
+            ImGui.SetNextWindowPos(new Vector2(vpX, vpY));
+            ImGui.SetNextWindowSize(new Vector2(vpW, vpH));
 
             ImGui.Begin("Stage Select",
                 ImGuiWindowFlags.NoDecoration |
