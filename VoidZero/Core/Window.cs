@@ -16,6 +16,7 @@ using VoidZero.States;
 
 namespace VoidZero.Core
 {
+    // Startup Window and top level class
     public class Window : GameWindow
     {
         private GameManager _game;

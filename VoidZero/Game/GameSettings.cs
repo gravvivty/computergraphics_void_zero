@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace VoidZero.Game
 {
+    // General game settings
     public class GameSettings
     {
         public bool Fullscreen { get; set; } = false;
@@ -14,6 +15,7 @@ namespace VoidZero.Game
         public int Height { get; set; } = 900;
         public int WorldWidth { get; } = 1920;
         public int WorldHeight { get; } = 1080;
+        // Change this value to adjust the scrolling speed of the main BG
         public float BackgroundSpeedMultiplier { get; set; } = 6f;
         public float MasterVolume = 0.5f;
         public float SfxVolume = 0.5f;

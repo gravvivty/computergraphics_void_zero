@@ -1,8 +1,9 @@
 ﻿using VoidZero.Game.Combat;
 using VoidZero.Game.Combat.Patterns;
 
-namespace VoidZero.Game.Entities.Tools
+namespace VoidZero.Game.Entities.Components
 {
+    // Gives entities the ability to Shoot
     public class ShooterComponent
     {
         public IBulletPattern Pattern { get; private set; }

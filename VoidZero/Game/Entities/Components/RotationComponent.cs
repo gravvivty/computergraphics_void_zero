@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace VoidZero.Game.Entities.Components
 {
+    // Gives an entity the ability to rotate
+    // Acts as a helper for the more complex RotationSequenceComponent
     public class RotationComponent : IEntityComponent
     {
         public float Delta => _targetDelta;

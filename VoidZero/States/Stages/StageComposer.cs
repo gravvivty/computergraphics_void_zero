@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace VoidZero.States.Stages
 {
+    // With this we can design levels 
     public class StageComposer
     {
         private readonly List<StageEvent> _events;

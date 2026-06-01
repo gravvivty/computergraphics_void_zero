@@ -6,6 +6,7 @@ using System.Drawing;
 
 namespace VoidZero.Game.Entities
 {
+    // Definition of a bullet
     public class Bullet : Entity
     {
         public Vector2 Direction { get; set; }
@@ -15,6 +16,8 @@ namespace VoidZero.Game.Entities
         public float Damage { get; set; }
         public bool IsExpired => Lifetime <= 0f;
         // For later collision logic -> bullets should only hit once per hit
+        // Not implemented so as of now so for now a bullet can do a collision multiple times per enemy
+        // Should fix so collision only happens once per bullet per enemy
         public HashSet<Entity> HitEntities { get; } = new();
 
         public Bullet(

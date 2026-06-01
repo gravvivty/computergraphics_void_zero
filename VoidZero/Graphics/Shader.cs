@@ -5,6 +5,7 @@ using System.IO;
 
 namespace VoidZero.Graphics
 {
+    // Need this class to even see something - iirc Scherzer never taught this so go do research lil bro
     public class Shader : IDisposable
     {
         public int Handle { get; }

@@ -6,6 +6,7 @@ using System;
 
 namespace VoidZero.Game.Entities
 {
+    // Shield entity that has a hitbox
     public class Shield : Entity
     {
         private readonly Player _player;

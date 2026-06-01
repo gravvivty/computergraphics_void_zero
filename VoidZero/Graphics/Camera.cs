@@ -35,8 +35,7 @@ namespace VoidZero.Graphics
 
             _shakeOffset = new Vector2(
                 ((float)_rng.NextDouble() * 2f - 1f) * strength,
-                ((float)_rng.NextDouble() * 2f - 1f) * strength
-            );
+                ((float)_rng.NextDouble() * 2f - 1f) * strength);
         }
 
         public void Shake(float duration, float strength)

@@ -4,6 +4,7 @@ using OpenTK.Mathematics;
 
 namespace VoidZero.Game.Input
 {
+    // Handles all player input both keyboard and controller
     public class InputManager
     {
         private KeyboardState _keyboard;

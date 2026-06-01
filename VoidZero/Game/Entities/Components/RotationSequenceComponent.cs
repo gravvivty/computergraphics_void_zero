@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace VoidZero.Game.Entities.Components
 {
+    // Gives an entity the ability to rotate with a list of predetermined sequences
     public class RotationSequenceComponent : IEntityComponent
     {
         private Queue<RotationComponent> _steps = new();

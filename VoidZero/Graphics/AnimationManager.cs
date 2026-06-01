@@ -3,9 +3,10 @@ using System.Collections.Generic;
 
 namespace VoidZero.Graphics
 {
+    // This class handles the individual animations - serving as a Manager for switching animations e.g. Idle -> Left via an animation key
     public class AnimationManager
     {
-        private readonly Dictionary<string, Animation> _animations = new();
+        private readonly Dictionary<string, Animation> _animations = new(); // manage keys in a dictionary
         private string _currentKey;
         private bool _currentPlaying = false;
         public string CurrentAnimationKey { get { return _currentKey; } }

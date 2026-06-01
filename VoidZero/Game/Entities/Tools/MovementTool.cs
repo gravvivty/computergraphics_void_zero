@@ -1,6 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using VoidZero.Game.Entities;
 
+// Tool for making entities move
 public class MovementTool
 {
     private Vector2 _direction;
