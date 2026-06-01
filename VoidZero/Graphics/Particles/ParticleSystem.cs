@@ -53,7 +53,7 @@ namespace VoidZero.Graphics.Particles
             );
 
             // Randomly choose left or right 15°
-            float sideAngle = _rng.Next(0, 2) == 0 ? -15f : 15f;
+            float sideAngle = (float)(_rng.NextDouble() * 30.0 - 15.0);
             baseDir = Rotate(baseDir, MathHelper.DegreesToRadians(sideAngle));
             float coneHalfAngle = MathHelper.DegreesToRadians(20f);
 

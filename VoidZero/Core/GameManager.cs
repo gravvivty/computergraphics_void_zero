@@ -28,7 +28,6 @@ namespace VoidZero.Core
         private ImGuiController _imGui;
         public Background _background { get; private set; }
         public InputManager _input { get; private set; }
-        private ScreenShake _screenShake;
         private Camera _camera;
         private ImFontPtr _defaultFont;
 
@@ -42,6 +41,7 @@ namespace VoidZero.Core
 
         public Vector2 ViewportOffset { get; private set; }
         public Vector2 ViewportSize { get; private set; }
+        public RectangleF LetterboxRect { get; private set; }
 
         public GameManager(GameWindow window)
         {
@@ -72,9 +72,8 @@ namespace VoidZero.Core
             _input = new InputManager();
             _spriteBatch = new SpriteBatch();
             _stateManager = new GameStateManager();
-            _screenShake = new ScreenShake();
             _camera = new Camera();
-            _imGui = new ImGuiController(_window.Size.X, _window.Size.Y);
+            _imGui = new ImGuiController(_window.FramebufferSize.X, _window.FramebufferSize.Y);
             LoadImGuiFont("Content/Fonts/lowrespixel.otf", 20f); // adjust path & size
 
             // Start with MenuState
@@ -119,7 +118,7 @@ namespace VoidZero.Core
                 timeScale = MathHelper.Lerp(1f, 0.3f, t);
             }
 
-            _screenShake.Update(dt);
+            _camera.Update(dt);
             _background.Update(dt * timeScale);
 
             _stateManager.Update(dt * timeScale);
@@ -148,18 +147,25 @@ namespace VoidZero.Core
                 dt * 6f
             );
 
-            // Draw game objects
-            _camera.ShakeOffset = _screenShake.Offset;
-            Matrix4 projection = _camera.GetProjection();
-
-            _spriteBatch.Begin(projection, targetGray);
+            // Draw world objects
+            _spriteBatch.Begin(_camera.GetTransform(), targetGray);
             _background.Draw(_spriteBatch);
             _stateManager.Draw(_spriteBatch); // only draws state-specific sprites
             GameServices.Instance.ParticleSystem.Draw(_spriteBatch);
-            _stateManager.DrawUI(_spriteBatch, dt);
-            DrawFPS();
-
             _spriteBatch.End();
+
+            // Draw UI
+            _spriteBatch.Begin(Matrix4.CreateOrthographicOffCenter(
+                0,
+                GameServices.Instance.Settings.WorldWidth,
+                GameServices.Instance.Settings.WorldHeight,
+                0,
+                -1,
+                1));
+            _stateManager.DrawUI(_spriteBatch, dt);
+            _spriteBatch.End();
+
+            DrawFPS();
         }
         public void DrawMenu()
         {
@@ -214,7 +220,7 @@ namespace VoidZero.Core
 
         public void Shake(float duration, float strength)
         {
-            _screenShake.Start(duration, strength);
+            _camera.Shake(duration, strength);
         }
 
         private float calculateGrayScale()
@@ -300,6 +306,7 @@ namespace VoidZero.Core
 
             ViewportOffset = offset;
             ViewportSize = new Vector2(renderWidth, renderHeight);
+
 
             GL.Viewport(
                 (int)offset.X,

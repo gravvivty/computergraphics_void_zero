@@ -29,8 +29,8 @@ namespace VoidZero.Core
         private int _shaderFontTextureLocation;
         private int _shaderProjectionMatrixLocation;
 
-        private int _windowWidth;
-        private int _windowHeight;
+        private int _frameBufferWidth;
+        private int _frameBufferHeight;
 
         private System.Numerics.Vector2 _scaleFactor = System.Numerics.Vector2.One;
 
@@ -44,8 +44,8 @@ namespace VoidZero.Core
         /// </summary>
         public ImGuiController(int width, int height)
         {
-            _windowWidth = width;
-            _windowHeight = height;
+            _frameBufferWidth = width;
+            _frameBufferHeight = height;
 
             int major = GL.GetInteger(GetPName.MajorVersion);
             int minor = GL.GetInteger(GetPName.MinorVersion);
@@ -77,8 +77,8 @@ namespace VoidZero.Core
 
         public void WindowResized(int width, int height)
         {
-            _windowWidth = width;
-            _windowHeight = height;
+            _frameBufferWidth = width;
+            _frameBufferHeight = height;
         }
 
         public void DestroyDeviceObjects()
@@ -238,8 +238,8 @@ namespace VoidZero.Core
         {
             ImGuiIOPtr io = ImGui.GetIO();
             io.DisplaySize = new System.Numerics.Vector2(
-                _windowWidth / _scaleFactor.X,
-                _windowHeight / _scaleFactor.Y);
+                _frameBufferWidth,
+                _frameBufferHeight);
             io.DisplayFramebufferScale = _scaleFactor;
             io.DeltaTime = deltaSeconds; // DeltaTime is in seconds.
         }
@@ -260,7 +260,7 @@ namespace VoidZero.Core
             io.MouseDown[4] = MouseState[MouseButton.Button5];
 
             Vector2i screenPoint = new Vector2i((int)MouseState.X, (int)MouseState.Y);
-            float offsetY = GameServices.Instance.Settings.Fullscreen ? 0 : 40f;
+            float offsetY = GameServices.Instance.Settings.Fullscreen ? 0 : 20f;
             io.MousePos = new System.Numerics.Vector2(screenPoint.X, screenPoint.Y + offsetY); // account for window size top bar
 
             foreach (Keys key in Enum.GetValues(typeof(Keys)))
@@ -444,7 +444,7 @@ namespace VoidZero.Core
 
                         // We do _windowHeight - (int)clip.W instead of (int)clip.Y because gl has flipped Y when it comes to these coordinates
                         var clip = pcmd.ClipRect;
-                        GL.Scissor((int)clip.X, _windowHeight - (int)clip.W, (int)(clip.Z - clip.X), (int)(clip.W - clip.Y));
+                        GL.Scissor((int)clip.X, _frameBufferHeight - (int)clip.W, (int)(clip.Z - clip.X), (int)(clip.W - clip.Y));
                         CheckGLError("Scissor");
 
                         if ((io.BackendFlags & ImGuiBackendFlags.RendererHasVtxOffset) != 0)
