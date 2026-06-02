@@ -70,6 +70,11 @@ namespace VoidZero.Core
             GameServices.Instance.Content.LoadTexture("shield", "Content/Shield/shield.png");
             GameServices.Instance.Content.LoadTexture("death", "Content/Effects/death.png");
 
+            GameServices.Instance.Content.LoadTexture("healthbar", "Content/UI/health/healthbar.png");
+            GameServices.Instance.Content.LoadTexture("life1", "Content/UI/health/life1.png");
+            GameServices.Instance.Content.LoadTexture("life2", "Content/UI/health/life2.png");
+            GameServices.Instance.Content.LoadTexture("life3", "Content/UI/health/life3.png");
+
             _input = new InputManager();
             _spriteBatch = new SpriteBatch();
             _stateManager = new GameStateManager();
@@ -282,11 +287,6 @@ namespace VoidZero.Core
 
             ImGui.Text($"FPS: {MathF.Round(_currentFPS)}");
             ImGui.End();
-        }
-
-        private static System.Numerics.Vector2 ToNumVec(Vector2 vector)
-        {
-            return new System.Numerics.Vector2(vector.X, vector.Y);
         }
 
         public void ApplyViewport(int width, int height)
