@@ -36,7 +36,7 @@ namespace VoidZero.Game.Entities
             Owner = owner;
             Damage = damage;
 
-            Scale = 4f;
+            Scale = owner == BulletOwner.Player ? 6f : 4f;
             Width = 16 * Scale;
             Height = 16 * Scale;
 

@@ -28,14 +28,14 @@ namespace VoidZero.States.Stages
                 new SpawnEnemyEvent(0f, state =>
                 {
                     var enemyTex = GameServices.Instance.Content.GetTexture("witch");
-                    var enemy = new CardinalSeperatorWeave(
+                    var enemy = new TripleShot(
                         enemyTex,
                         position: Vector2.Zero,
                         bulletManager: state.Bullets,
-                        energy: BulletEnergy.Green
+                        energy: BulletEnergy.Blue
                     );
                     enemy.SetPosition(
-                        RelativeCenter(0.666f, -0.2f, enemy)
+                        RelativeCenter(0.33f, -0.2f, enemy)
                     );
                     enemy.AddComponent(new MovementLifecycleComponent(
                         entryMovement: new MovementTool(Vector2.UnitY, 1500f, 0.3f),
@@ -46,28 +46,28 @@ namespace VoidZero.States.Stages
                     ));
                     return enemy;
                 }),
-                new SpawnEnemyEvent(0f, state =>
+                new SpawnEnemyEvent(5f, state =>
                 {
                     var enemyTex = GameServices.Instance.Content.GetTexture("witch");
-                    var enemy = new CardinalSeperatorWeave(
+                    var enemy = new TripleShot(
                         enemyTex,
                         position: Vector2.Zero,
                         bulletManager: state.Bullets,
-                        energy: BulletEnergy.Green
+                        energy: BulletEnergy.Red
                     );
                     enemy.SetPosition(
-                        RelativeCenter(0.333f, 1.2f, enemy)
+                        RelativeCenter(0.66f, -0.2f, enemy)
                     );
                     enemy.AddComponent(new MovementLifecycleComponent(
-                        entryMovement: new MovementTool(-Vector2.UnitY, 1500f, 0.3f),
+                        entryMovement: new MovementTool(Vector2.UnitY, 1500f, 0.3f),
                         waitTime: 15f,
-                        exitDirection: Vector2.UnitY,
+                        exitDirection: -Vector2.UnitY,
                         exitSpeed: 1500f,
                         exitDuration: 0.5f
                     ));
                     return enemy;
                 }),
-                new SpawnEnemyEvent(0f, state =>
+                new SpawnEnemyEvent(7f, state =>
                 {
                     var enemyTex = GameServices.Instance.Content.GetTexture("witch");
                     var enemy = new OmniShotRotate(
@@ -77,10 +77,10 @@ namespace VoidZero.States.Stages
                         energy: BulletEnergy.Blue
                     );
                     enemy.SetPosition(
-                        RelativeCenter(0.9f, 1.2f, enemy)
+                        RelativeCenter(-0.2f, 0.5f, enemy)
                     );
                     enemy.AddComponent(new MovementLifecycleComponent(
-                        entryMovement: new MovementTool(-Vector2.UnitY, 1500f, 0.45f),
+                        entryMovement: new MovementTool(Vector2.UnitX, 0f, 0f),
                         waitTime: 15f,
                         exitDirection: Vector2.UnitY,
                         exitSpeed: 1500f,
@@ -88,7 +88,70 @@ namespace VoidZero.States.Stages
                     ));
                     return enemy;
                 }),
-                new SpawnEnemyEvent(5f, state =>
+                new SpawnEnemyEvent(13f, state =>
+                {
+                    var enemyTex = GameServices.Instance.Content.GetTexture("witch");
+                    var enemy = new TripleShot(
+                        enemyTex,
+                        position: Vector2.Zero,
+                        bulletManager: state.Bullets,
+                        energy: BulletEnergy.Green
+                    );
+                    enemy.SetPosition(
+                        RelativeCenter(0.33f, -0.2f, enemy)
+                    );
+                    enemy.AddComponent(new MovementLifecycleComponent(
+                        entryMovement: new MovementTool(Vector2.UnitY, 1500f, 0.25f),
+                        waitTime: 15f,
+                        exitDirection: Vector2.UnitY,
+                        exitSpeed: 1500f,
+                        exitDuration: 0.5f
+                    ));
+                    return enemy;
+                }),
+                new SpawnEnemyEvent(13f, state =>
+                {
+                    var enemyTex = GameServices.Instance.Content.GetTexture("witch");
+                    var enemy = new TripleShot(
+                        enemyTex,
+                        position: Vector2.Zero,
+                        bulletManager: state.Bullets,
+                        energy: BulletEnergy.Green
+                    );
+                    enemy.SetPosition(
+                        RelativeCenter(0.66f, -0.2f, enemy)
+                    );
+                    enemy.AddComponent(new MovementLifecycleComponent(
+                        entryMovement: new MovementTool(Vector2.UnitY, 1500f, 0.25f),
+                        waitTime: 15f,
+                        exitDirection: Vector2.UnitY,
+                        exitSpeed: 1500f,
+                        exitDuration: 0.5f
+                    ));
+                    return enemy;
+                }),
+                new SpawnEnemyEvent(18f, state =>
+                {
+                    var enemyTex = GameServices.Instance.Content.GetTexture("witch");
+                    var enemy = new OmniShotRotate(
+                        enemyTex,
+                        position: Vector2.Zero,
+                        bulletManager: state.Bullets,
+                        energy: BulletEnergy.Blue
+                    );
+                    enemy.SetPosition(
+                        RelativeCenter(0.5f, -0.2f, enemy)
+                    );
+                    enemy.AddComponent(new MovementLifecycleComponent(
+                        entryMovement: new MovementTool(Vector2.UnitY, 1500f, 0.25f),
+                        waitTime: 15f,
+                        exitDirection: Vector2.UnitY,
+                        exitSpeed: 1500f,
+                        exitDuration: 0.5f
+                    ));
+                    return enemy;
+                }),
+                new SpawnEnemyEvent(22f, state =>
                 {
                     var enemyTex = GameServices.Instance.Content.GetTexture("witch");
                     var enemy = new OmniShotRotate(
@@ -98,17 +161,117 @@ namespace VoidZero.States.Stages
                         energy: BulletEnergy.Red
                     );
                     enemy.SetPosition(
-                        RelativeCenter(0.1f, 1.2f, enemy)
+                        RelativeCenter(1.2f, 0.5f, enemy)
                     );
                     enemy.AddComponent(new MovementLifecycleComponent(
-                        entryMovement: new MovementTool(-Vector2.UnitY, 1500f, 0.45f),
+                        entryMovement: new MovementTool(Vector2.UnitY, 0f, 0f),
                         waitTime: 15f,
                         exitDirection: Vector2.UnitY,
                         exitSpeed: 1500f,
                         exitDuration: 0.5f
                     ));
                     return enemy;
-                })
+                }),
+                new SpawnEnemyEvent(27f, state =>
+                {
+                    var enemyTex = GameServices.Instance.Content.GetTexture("witch");
+                    var enemy = new TripleShot(
+                        enemyTex,
+                        position: Vector2.Zero,
+                        bulletManager: state.Bullets,
+                        energy: BulletEnergy.Blue
+                    );
+                    enemy.SetPosition(
+                        RelativeCenter(0.33f, -0.2f, enemy)
+                    );
+                    enemy.AddComponent(new MovementLifecycleComponent(
+                        entryMovement: new MovementTool(Vector2.UnitY, 1500f, 0.4f),
+                        waitTime: 15f,
+                        exitDirection: Vector2.UnitY,
+                        exitSpeed: 1500f,
+                        exitDuration: 0.5f
+                    ));
+                    enemy.AddComponent(new RotationSequenceComponent(
+                        loop: true,
+                        new RotationComponent(MathF.PI / 4f, 0f, 1f)
+                        ));
+                    return enemy;
+                }),
+                new SpawnEnemyEvent(30f, state =>
+                {
+                    var enemyTex = GameServices.Instance.Content.GetTexture("witch");
+                    var enemy = new TripleShot(
+                        enemyTex,
+                        position: Vector2.Zero,
+                        bulletManager: state.Bullets,
+                        energy: BulletEnergy.Blue
+                    );
+                    enemy.SetPosition(
+                        RelativeCenter(0.66f, -0.2f, enemy)
+                    );
+                    enemy.AddComponent(new MovementLifecycleComponent(
+                        entryMovement: new MovementTool(Vector2.UnitY, 1500f, 0.2f),
+                        waitTime: 15f,
+                        exitDirection: Vector2.UnitY,
+                        exitSpeed: 1500f,
+                        exitDuration: 0.5f
+                    ));
+                    enemy.AddComponent(new RotationSequenceComponent(
+                        loop: true,
+                        new RotationComponent(MathF.PI / 4f, 0f, 1f)
+                        ));
+                    return enemy;
+                }),
+                new SpawnEnemyEvent(33f, state =>
+                {
+                    var enemyTex = GameServices.Instance.Content.GetTexture("witch");
+                    var enemy = new TripleShot(
+                        enemyTex,
+                        position: Vector2.Zero,
+                        bulletManager: state.Bullets,
+                        energy: BulletEnergy.Green
+                    );
+                    enemy.SetPosition(
+                        RelativeCenter(0.25f, -0.2f, enemy)
+                    );
+                    enemy.AddComponent(new MovementLifecycleComponent(
+                        entryMovement: new MovementTool(Vector2.UnitY, 1500f, 0.2f),
+                        waitTime: 15f,
+                        exitDirection: Vector2.UnitY,
+                        exitSpeed: 1500f,
+                        exitDuration: 0.5f
+                    ));
+                    enemy.AddComponent(new RotationSequenceComponent(
+                        loop: true,
+                        new RotationComponent(MathF.PI / 4f, 0f, 1f)
+                        ));
+                    return enemy;
+                }),
+                new SpawnEnemyEvent(36f, state =>
+                {
+                    var enemyTex = GameServices.Instance.Content.GetTexture("witch");
+                    var enemy = new TripleShot(
+                        enemyTex,
+                        position: Vector2.Zero,
+                        bulletManager: state.Bullets,
+                        energy: BulletEnergy.Green
+                    );
+                    enemy.SetPosition(
+                        RelativeCenter(0.75f, -0.2f, enemy)
+                    );
+                    enemy.AddComponent(new MovementLifecycleComponent(
+                        entryMovement: new MovementTool(Vector2.UnitY, 1500f, 0.5f),
+                        waitTime: 15f,
+                        exitDirection: Vector2.UnitY,
+                        exitSpeed: 1500f,
+                        exitDuration: 0.5f
+                    ));
+                    enemy.AddComponent(new RotationSequenceComponent(
+                        loop: true,
+                        new RotationComponent(MathF.PI / 4f, 0f, 1f)
+                        ));
+                    return enemy;
+                }),
             });
         }
     }

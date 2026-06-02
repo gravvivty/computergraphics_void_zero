@@ -38,7 +38,7 @@ namespace VoidZero.Game.Combat.Patterns
         public void Shoot(Entity shooter, BulletManager bullets, BulletOwner owner, float damage, BulletEnergy energy)
         {
             Vector2 spawnPos = new(
-                shooter.Position.X + shooter.Width / 4f,
+                shooter.Position.X + (owner == BulletOwner.Player ? 0 : shooter.Width / 4f),
                 shooter.Position.Y + (owner == BulletOwner.Player ? 0 : shooter.Height / 2f)
             );
 

@@ -29,8 +29,8 @@ namespace VoidZero.Game.Combat.Patterns
         )
         {
             Vector2 spawnPos = new(
-                shooter.Position.X + shooter.Width / 4f,
-                shooter.Position.Y + (owner == BulletOwner.Player ? 0 : shooter.Height/2f)
+                shooter.Position.X + (owner == BulletOwner.Player ? 0 : shooter.Width / 4f),
+                shooter.Position.Y + (owner == BulletOwner.Player ? 0 : shooter.Height / 2f)
             );
 
             bullets.Add(new Bullet(
