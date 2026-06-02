@@ -91,6 +91,7 @@ namespace VoidZero.States
                 bulletDt *= 0.6f;
 
             Bullets.Update(bulletDt);
+            GameServices.Instance.ParticleSystem.Update(dt);
 
             // No collisions once dying
             if (!_isDying)
@@ -128,8 +129,6 @@ namespace VoidZero.States
                 if (remove)
                     Entities.Remove(entity);
             }
-
-            GameServices.Instance.ParticleSystem.Update(dt);
         }
 
 

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VoidZero.Core;
+using VoidZero.Game;
 using VoidZero.Game.Input;
 using VoidZero.Graphics;
 
@@ -24,7 +25,10 @@ namespace VoidZero.States
             _gm = gm;
         }
 
-        public override void Update(float dt) { }
+        public override void Update(float dt)
+        {
+            GameServices.Instance.ParticleSystem.Update(dt);
+        }
 
         public override void Draw(SpriteBatch spriteBatch) { }
 
