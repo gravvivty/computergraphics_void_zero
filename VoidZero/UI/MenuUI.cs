@@ -237,10 +237,10 @@ namespace VoidZero.UI
 
             string[] lines =
             {
-                "Game Design by Steven & Finley",
-                "Programming by Steven & Finley",
-                "Art by Steven & Finley",
-                "Music will be by Steven"
+                "Game Design by Steven Gayer & Finley Hogan",
+                "Programming by Steven Gayer & Finley Hogan",
+                "Art by Steven Gayer & Finley Hogan (+ Content/Credit.txt)",
+                "Music will be by Steven Gayer"
             };
 
             float spacing = 10f;
