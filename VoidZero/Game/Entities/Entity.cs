@@ -28,7 +28,6 @@ namespace VoidZero.Game.Entities
         public bool IsDead { get; protected set; } = false;
         public bool IsDying { get; private set; } = false;
         protected virtual string DeathAnimationKey => "Death";
-        // How long before cleanup (fallback if animation length unknown)
         protected virtual float DeathDuration => 0.4f;
 
         protected float _deathTimer = 0f;
@@ -58,7 +57,9 @@ namespace VoidZero.Game.Entities
             get
             {
                 if (IsDying)
+                {
                     return RectangleF.Empty;
+                } 
 
                 float shrinkFactor = 0.25f; // 25%
                 float offsetX = Width * (shrinkFactor);

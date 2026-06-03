@@ -43,6 +43,9 @@ namespace VoidZero.Core
         public Vector2 ViewportOffset { get; private set; }
         public Vector2 ViewportSize { get; private set; }
         public RectangleF LetterboxRect { get; private set; }
+        public (float x, float y, float w, float h) GetViewportRect() =>
+            ((float)ViewportOffset.X, (float)ViewportOffset.Y,
+            (float)ViewportSize.X, (float)ViewportSize.Y);
 
         public GameManager(GameWindow window)
         {
@@ -64,28 +67,32 @@ namespace VoidZero.Core
                 GameServices.Instance.Content.LoadTexture("galaxies", "Content/Background/galaxy.png")
             );
 
+            // Enemies, Player, Bullets
             GameServices.Instance.Content.LoadTexture("player", "Content/Player/player.png");
             GameServices.Instance.Content.LoadTexture("VanillaBullet", "Content/Bullets/VanillaBullet.png");
             GameServices.Instance.Content.LoadTexture("witch", "Content/Enemies/Witch.png");
             GameServices.Instance.Content.LoadTexture("shield", "Content/Shield/shield.png");
             GameServices.Instance.Content.LoadTexture("death", "Content/Effects/death.png");
 
+            // UI
             GameServices.Instance.Content.LoadTexture("healthbar", "Content/UI/health/healthbar.png");
             GameServices.Instance.Content.LoadTexture("life1", "Content/UI/health/life1.png");
             GameServices.Instance.Content.LoadTexture("life2", "Content/UI/health/life2.png");
             GameServices.Instance.Content.LoadTexture("life3", "Content/UI/health/life3.png");
+            GameServices.Instance.Content.LoadTexture("graze", "Content/UI/graze/graze.png");
+            GameServices.Instance.Content.LoadTexture("graze_fill", "Content/UI/graze/graze_fill.png");
 
             _input = new InputManager();
             _spriteBatch = new SpriteBatch();
             _stateManager = new GameStateManager();
             _camera = new Camera();
             _imGui = new ImGuiController(_window.FramebufferSize.X, _window.FramebufferSize.Y);
-            LoadImGuiFont("Content/Fonts/lowrespixel.otf", 20f); // adjust path & size
+            LoadImGuiFont("Content/Fonts/lowrespixel.otf", 20f);
 
             // Start with MenuState
             _stateManager.ChangeState(new MenuState(_stateManager, _window, _input, _background, this));
 
-            // Gloval ImGui Style
+            // Global ImGui Style
             var style = ImGui.GetStyle();
 
             // Button shape
@@ -118,8 +125,9 @@ namespace VoidZero.Core
             {
                 _deathTimer += dt;
 
+                // Slow down logic during death
                 float t = Math.Clamp(_deathTimer / DeathSlowDuration, 0f, 1f);
-                t = t * t * (3f - 2f * t); // smoothstep
+                t = t * t * (3f - 2f * t);
 
                 timeScale = MathHelper.Lerp(1f, 0.3f, t);
             }
@@ -146,7 +154,6 @@ namespace VoidZero.Core
             ImGui.PushFont(_defaultFont);
             float targetGray = calculateGrayScale();
 
-            // Smooth transition
             _spriteBatch.Grayscale = MathHelper.Lerp(
                 _spriteBatch.Grayscale,
                 targetGray,
@@ -241,7 +248,7 @@ namespace VoidZero.Core
                 {
                     const float totalRegen = 3f;
                     const float fadeDuration = 1f;
-                    const float holdDuration = totalRegen - fadeDuration; // 2s
+                    const float holdDuration = totalRegen - fadeDuration;
 
                     float t = player.HealthRegenTimer;
 
@@ -254,7 +261,7 @@ namespace VoidZero.Core
                     {
                         // Fade back to color in last 0.5s
                         float fadeT = Math.Clamp((t - holdDuration) / fadeDuration, 0f, 1f);
-                        fadeT = fadeT * fadeT * (3f - 2f * fadeT); // smoothstep
+                        fadeT = fadeT * fadeT * (3f - 2f * fadeT);
                         targetGray = MathHelper.Lerp(1f, 0f, fadeT);
                     }
                 }
@@ -315,9 +322,5 @@ namespace VoidZero.Core
                 (int)renderHeight
             );
         }
-
-        public (float x, float y, float w, float h) GetViewportRect() =>
-            ((float)ViewportOffset.X, (float)ViewportOffset.Y,
-             (float)ViewportSize.X, (float)ViewportSize.Y);
     }
 }

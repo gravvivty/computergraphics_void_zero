@@ -238,8 +238,7 @@ namespace VoidZero.Core
             };
         }
 
-        // Returns the scale needed to make the space texture fill the screen
-        // without any gaps (same logic as CSS background-size: cover)
+        // Returns the scale needed to make the space texture fill the screen without any gaps
         private float SpaceFillScale()
         {
             return MathF.Max(

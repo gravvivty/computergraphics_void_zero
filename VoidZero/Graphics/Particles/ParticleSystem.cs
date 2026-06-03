@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace VoidZero.Graphics.Particles
 {
-    // Makeshifty Particleystem, pretty easy to understand but poorly coded for extending the system
-    // however we just need this small system unless u wanna do more
+    // Makeshifty Particleystem, pretty easy to understand
+    // however we just need this small system unless we have more ideas and want to be creative
     public class ParticleSystem
     {
         private readonly List<Particle> _particles = new();

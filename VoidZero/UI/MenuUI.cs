@@ -9,7 +9,7 @@ using System.Numerics;
 
 namespace VoidZero.UI
 {
-    // Good luck with this whole UI and ImGui bs
+    // Beautiful menu code
     public static class MenuUI
     {
         public enum MenuPage { Main, StageSelect, Options, Credits }

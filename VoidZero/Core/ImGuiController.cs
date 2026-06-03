@@ -10,9 +10,8 @@ using System.Diagnostics;
 using ErrorCode = OpenTK.Graphics.OpenGL4.ErrorCode;
 using VoidZero.Game;
 
-// Got this from here: https://github.com/adras/OpenTK-ImGUI
-// Ngl no clue what this all does but it basically helps with integrating ImGui with openTK
-// cuz UI is cancer
+// Most od this class has been used from here: https://github.com/adras/OpenTK-ImGUI
+// With additional changes to fit our game
 namespace VoidZero.Core
 {
     public class ImGuiController : IDisposable

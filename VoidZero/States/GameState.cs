@@ -7,6 +7,7 @@ using VoidZero.Graphics;
 
 namespace VoidZero.States
 {
+    // Why abstract? Good question, this is just an interface - should fix tbh
     public abstract class GameState
     {
         public virtual void Enter() { }

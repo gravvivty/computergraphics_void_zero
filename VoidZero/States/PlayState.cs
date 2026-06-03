@@ -6,11 +6,8 @@ using VoidZero.Game.Input;
 using OpenTK.Windowing.Desktop;
 using VoidZero.Core;
 using System.Drawing;
-using System.Collections.Generic;
 using VoidZero.Game.Combat;
-using System;
 using VoidZero.Game.Entities.Enemies;
-using System.Linq;
 using VoidZero.States.Stages;
 using VoidZero.States.Stages.VoidZero.States.Stages;
 using VoidZero.Game.Entities.Components;
@@ -85,19 +82,23 @@ namespace VoidZero.States
             if (_gameManager.CurrentMode == GameMode.Paused)
                 return;
 
-            // --- bullets always update (unless paused) ---
+            // bullets always update (unless paused)
             float bulletDt = dt;
             if (_isDying)
-                bulletDt *= 0.6f;
+            {
+                bulletDt *= BulletSlowFactor;
+            } 
 
             Bullets.Update(bulletDt);
             GameServices.Instance.ParticleSystem.Update(dt);
 
             // No collisions once dying
             if (!_isDying)
+            {
                 HandleBulletHits(dt);
+            }
 
-            // --- death sequence ---
+            // death sequence
             if (_isDying)
             {
                 _deathTimer += dt;
@@ -111,7 +112,9 @@ namespace VoidZero.States
 
                 // Update entities for death animation only
                 foreach (var entity in Entities.ToList())
+                {
                     entity.Update(dt);
+                }
 
                 return;
             }
@@ -127,7 +130,9 @@ namespace VoidZero.States
                     entity.Components.OfType<MovementLifecycleComponent>().Any(c => c.IsExpired);
 
                 if (remove)
+                {
                     Entities.Remove(entity);
+                }
             }
         }
 
@@ -298,6 +303,9 @@ namespace VoidZero.States
 
         public void DrawGrazingBar(SpriteBatch spritebatch)
         {
+            Texture2D barTex = GameServices.Instance.Content.GetTexture("graze");
+            Texture2D fillTex = GameServices.Instance.Content.GetTexture("graze_fill");
+
             float barX = 20f;
             float barY = 20f;
             float barWidth = 200f;
@@ -346,7 +354,9 @@ namespace VoidZero.States
 
             // Only draw the life overlay when the player actually has health
             if (hp > 0)
+            {
                 spriteBatch.Draw(lifeTex, pos, size, Vector4.One);
+            }
         }
     }
 }

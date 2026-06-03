@@ -15,7 +15,7 @@ namespace VoidZero.Game
         public int Height { get; set; } = 900;
         public int WorldWidth { get; } = 1920;
         public int WorldHeight { get; } = 1080;
-        // Change this value to adjust the scrolling speed of the main BG
+        // Change this value to adjust the scrolling speed of the main background
         public float BackgroundSpeedMultiplier { get; set; } = 6f;
         public float MasterVolume = 0.5f;
         public float SfxVolume = 0.5f;

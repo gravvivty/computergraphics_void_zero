@@ -21,11 +21,11 @@ namespace VoidZero.Graphics
         private readonly int _vbo;
         private readonly Shader _shader;
 
-        // 1×1 white texture used for solid-color primitives (rectangles, debug boxes).
+        // 1x1 white texture used for solid color primitives (rectangles, debug boxes).
         private readonly Texture2D _whiteTexture;
 
         // CPU-side vertex buffer
-        // 10 000 sprites × 6 vertices × 8 floats = 480 000 floats (~1.8 MB)
+        // 10 000 sprites * 6 vertices * 8 floats = 480 000 floats
         private const int MaxSprites = 10_000;
         private const int FloatsPerVertex = 8;
         private const int VerticesPerSprite = 6;
@@ -60,13 +60,13 @@ namespace VoidZero.Graphics
 
             int stride = FloatsPerVertex * sizeof(float);
             GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, stride, 0);
-            GL.EnableVertexAttribArray(0); // position  (xy)
+            GL.EnableVertexAttribArray(0); // position (xy)
 
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, stride, 2 * sizeof(float));
             GL.EnableVertexAttribArray(1); // tex coord (uv)
 
             GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, stride, 4 * sizeof(float));
-            GL.EnableVertexAttribArray(2); // color     (rgba)
+            GL.EnableVertexAttribArray(2); // color (rgba)
 
             _textureUniformLocation = GL.GetUniformLocation(_shader.Handle, "texture");
 

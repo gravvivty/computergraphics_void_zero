@@ -15,9 +15,6 @@ namespace VoidZero.Game.Entities
         public BulletOwner Owner { get; set; }
         public float Damage { get; set; }
         public bool IsExpired => Lifetime <= 0f;
-        // For later collision logic -> bullets should only hit once per hit
-        // Not implemented so as of now so for now a bullet can do a collision multiple times per enemy
-        // Should fix so collision only happens once per bullet per enemy
         public HashSet<Entity> HitEntities { get; } = new();
 
         public Bullet(
@@ -55,7 +52,7 @@ namespace VoidZero.Game.Entities
         public override void Draw(SpriteBatch batch)
         {
             base.Draw(batch);
-            // Debug grazing
+            // Debug grazing hitboxes
             //batch.DrawRectangle(GrazeHitbox, Color.White);
         }
 

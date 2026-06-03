@@ -41,7 +41,9 @@ namespace VoidZero.Game.Entities.Components
             IsExpired = false;
 
             if (_entryMovement != null)
+            {
                 entity.Movement = _entryMovement;
+            }
         }
 
         public void Update(Entity entity, float dt)

@@ -56,7 +56,9 @@ namespace VoidZero.Game.Entities.Components
         public void Update(Entity entity, float dt)
         {
             if (_finished && !_loop)
+            {
                 return;
+            }
 
             _elapsed += dt;
 

@@ -26,11 +26,10 @@ namespace VoidZero.Game.Entities
         public float _maxGrazeDamageAfter { get; private set; } = 1f;
         const float _grazeDecayTimer = 10f;
         public float MaxGrazeMultiplier { get; private set; } = 3f;
-        const float GrazeDecayRate = 1.5f;
         public float GrazeTimer { get; private set; } = 0f;
         private float _grazeBonus = 0f;
         public float DamageMultiplier => 1f + _grazeBonus;
-        private const float GrazeGainPerSecond = 2f; // tuning knob
+        private const float GrazeGainPerSecond = 2f;
         private float MaxGrazeBonus => MaxGrazeMultiplier - 1f;
         // Dashing
         private const float DashDistance = 200f;
@@ -131,11 +130,10 @@ namespace VoidZero.Game.Entities
             {
                 Animations.Update(dt);
 
-                // Optional: once animation finishes, mark dead or trigger game over
                 if (Animations.IsFinished)
                 {
                     IsDead = true;
-                    // trigger game over
+                    // game over, player is dead :(
                 }
 
                 return; // skip all normal update logic
@@ -384,7 +382,7 @@ namespace VoidZero.Game.Entities
 
             if (direction.LengthSquared == 0)
             {
-                return; // no direction, no dash
+                return; // no direction, no dash consumed ;)
             }
 
             direction = direction.Normalized();
@@ -475,7 +473,9 @@ namespace VoidZero.Game.Entities
             {
                 CurrentHealth += 1f;
                 if (CurrentHealth > MaxHealth)
+                {
                     CurrentHealth = MaxHealth;
+                }
 
                 _healthRegenTimer = 0f;
 
@@ -488,13 +488,21 @@ namespace VoidZero.Game.Entities
         {
             // Determine level
             if (_abilityBar >= Level3Threshold)
+            {
                 _currentAbilityLevel = 3;
+            }
             else if (_abilityBar >= Level2Threshold)
+            {
                 _currentAbilityLevel = 2;
+            }
             else if (_abilityBar >= Level1Threshold)
+            {
                 _currentAbilityLevel = 1;
+            }
             else
+            {
                 return; // not enough to activate
+            } 
 
             _abilityActive = true;
             _abilityTimer = AbilityDuration;
