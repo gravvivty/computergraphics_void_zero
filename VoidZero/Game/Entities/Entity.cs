@@ -7,7 +7,7 @@ using VoidZero.Utils;
 
 namespace VoidZero.Game.Entities
 {
-    // All the entity logic
+    // Contains all entity logic
     // Enemies, Player and Bullets inherit from this
     public abstract class Entity
     {
@@ -105,7 +105,7 @@ namespace VoidZero.Game.Entities
             Animations.Draw(batch, drawPos, Scale, tint, Rotation);
 
             // Debug hitbox
-            batch.DrawRectangle(Hitbox, Color.Red);
+            // batch.DrawRectangle(Hitbox, Color.Red);
         }
 
         public void SetPosition(Vector2 absolutePos)
@@ -138,7 +138,7 @@ namespace VoidZero.Game.Entities
 
             IsDying = true;
             Velocity = Vector2.Zero;
-            Components.Clear(); // prevents logic during death
+            Components.Clear(); // Ürevents logic during death
             Animations.Play(DeathAnimationKey);
 
             _deathTimer = DeathDuration;

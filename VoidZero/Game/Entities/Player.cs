@@ -11,12 +11,12 @@ using VoidZero.Game.Entities.Components;
 
 namespace VoidZero.Game.Entities
 {
-    // Bloated Player class with literally everything
+    // Player class
     public class Player : Entity
     {
         private readonly InputManager _input;
 
-        private readonly float _acceleration = 10000f; // low -> on ice
+        private readonly float _acceleration = 10000f; // Low -> On ice
         private readonly float _deceleration = 6000f;
         private readonly float _maxSpeed = 450f;
         private ShooterComponent _shooter;
@@ -98,7 +98,7 @@ namespace VoidZero.Game.Entities
             int spriteWidth = 32;
             int spriteHeight = spriteWidth;
 
-            // Do this for every entity
+            // Apply for every entity
             this.Scale = 3f;
             Width = spriteWidth * Scale;
             Height = spriteHeight * Scale;
@@ -133,10 +133,10 @@ namespace VoidZero.Game.Entities
                 if (Animations.IsFinished)
                 {
                     IsDead = true;
-                    // game over, player is dead :(
+                    // Game over
                 }
 
-                return; // skip all normal update logic
+                return; // Skip all usually update logic after death
             }
             if (_dashCooldownTimer > 0f)
             {
@@ -218,7 +218,7 @@ namespace VoidZero.Game.Entities
 
             if (_damageFlashTimer > 0f)
             {
-                tint = new Vector4(1f, 0.2f, 0.2f, 1f); // bright red
+                tint = new Vector4(1f, 0.2f, 0.2f, 1f); // Bright red
             }
 
             // Afterimages first
@@ -233,7 +233,7 @@ namespace VoidZero.Game.Entities
             Animations.Draw(batch, Position, Scale, tint);
 
             // Debug hitbox
-            batch.DrawRectangle(Hitbox, Color.Red);
+            // batch.DrawRectangle(Hitbox, Color.Red);
         }
 
         public void AddGraze(float dt)
@@ -279,7 +279,7 @@ namespace VoidZero.Game.Entities
             // Reset health regen
             _healthRegenTimer = 0f;
             _isRegeneratingHealth = false;
-            // Reset dmg mult and graze
+            // Reset damage multiplier and graze
             _grazeBonus = 0f;
         }
 
@@ -292,7 +292,7 @@ namespace VoidZero.Game.Entities
                     _healthRegenTimer = MathF.Min(_healthRegenTimer, HealthRegenDelay);
                     return Math.Clamp(_healthRegenTimer / HealthRegenDelay, 0f, 1f);
                 }
-                return 1f; // full color
+                return 1f; // Full color
             }
         }
 
@@ -333,10 +333,10 @@ namespace VoidZero.Game.Entities
                 {
                     _isDashing = false;
                     IsInvulnerable = false;
-                    Velocity = Vector2.Zero; // no sliding after dash
+                    Velocity = Vector2.Zero; // No sliding after dash
                 }
 
-                return; // skip normal movement
+                return; // Skip usual movement
             }
 
             if (input.LengthSquared > 0)
@@ -355,7 +355,7 @@ namespace VoidZero.Game.Entities
             }
             else
             {
-                Velocity *= 0.659f; // high value -> drifting on ice
+                Velocity *= 0.659f; // High value -> drifting on ice
             }
 
             if (Velocity.Length > _maxSpeed)
@@ -382,7 +382,7 @@ namespace VoidZero.Game.Entities
 
             if (direction.LengthSquared == 0)
             {
-                return; // no direction, no dash consumed ;)
+                return; // No direction -> no dash consumed
             }
 
             direction = direction.Normalized();
@@ -458,7 +458,7 @@ namespace VoidZero.Game.Entities
 
         private void UpdateHealthRegen(float dt)
         {
-            // Only regen if not at max
+            // Only regenerate if not at max health
             if (CurrentHealth >= MaxHealth)
             {
                 _healthRegenTimer = 0f;
@@ -479,7 +479,7 @@ namespace VoidZero.Game.Entities
 
                 _healthRegenTimer = 0f;
 
-                // If still not full, keep chaining regen
+                // If still not full, keep chaining regeneration
                 _isRegeneratingHealth = CurrentHealth < MaxHealth;
             }
         }
@@ -501,7 +501,7 @@ namespace VoidZero.Game.Entities
             }
             else
             {
-                return; // not enough to activate
+                return; // Not enough to activate
             } 
 
             _abilityActive = true;

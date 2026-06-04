@@ -4,7 +4,7 @@ using VoidZero.Graphics;
 
 namespace VoidZero.Game.Entities.Enemies
 {
-    // Enemy inherits Entity but doesn't change behavior
+    // Enemy inherits Entity but does not change desired behavior
     public abstract class Enemy : Entity
     {
         protected bool CanShoot => Components.OfType<MovementLifecycleComponent>().FirstOrDefault()?.IsActive ?? true;

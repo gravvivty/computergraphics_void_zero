@@ -68,7 +68,7 @@ namespace VoidZero.Game.Entities.Components
                         IsActive = false;
                         entity.Movement = new MovementTool(_exitDirection, _exitSpeed, _exitDuration);
 
-                        // flush any accumulated cooldown so the shooter doesn't
+                        // Flush any accumulated cooldown so the shooter doesn't
                         // fire one last shot on the first exiting frame
                         var shooter = entity.Components.OfType<ShooterComponent>().FirstOrDefault();
                         shooter?.ResetTimer();

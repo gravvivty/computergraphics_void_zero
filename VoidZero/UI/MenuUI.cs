@@ -9,7 +9,7 @@ using System.Numerics;
 
 namespace VoidZero.UI
 {
-    // Beautiful menu code
+    // Menu code
     public static class MenuUI
     {
         public enum MenuPage { Main, StageSelect, Options, Credits }
@@ -43,10 +43,10 @@ namespace VoidZero.UI
             ImGui.SetNextWindowSize(new Vector2(vpW, vpH));
 
             ImGui.Begin("Main Menu",
-                ImGuiWindowFlags.NoDecoration |   // no title bar, resize, move
-                ImGuiWindowFlags.NoMove |         // cannot drag
-                ImGuiWindowFlags.NoResize |       // cannot resize
-                ImGuiWindowFlags.NoSavedSettings |// don't save position/size
+                ImGuiWindowFlags.NoDecoration |   // No title bar, resize, move
+                ImGuiWindowFlags.NoMove |         // Cannot drag
+                ImGuiWindowFlags.NoResize |       // Cannot resize
+                ImGuiWindowFlags.NoSavedSettings |// Do not save position/size
                 ImGuiWindowFlags.NoBringToFrontOnFocus |
                 ImGuiWindowFlags.NoBackground
             );
@@ -171,10 +171,10 @@ namespace VoidZero.UI
             // Master Volume
             CenterNextItem(buttonWidth);
             ImGui.SetNextItemWidth(buttonWidth);
-            float master = settings.MasterVolume * 100f; // convert 0-1 to 0-100
+            float master = settings.MasterVolume * 100f; // Convert 0-1 to 0-100
             if (ImGui.SliderFloat("Master", ref master, 0f, 100f, "%.1f%%"))
             {
-                settings.MasterVolume = master / 100f; // store back as 0-1
+                settings.MasterVolume = master / 100f; // Store back as 0-1
             }
             // SFX Volume
             CenterNextItem(buttonWidth);

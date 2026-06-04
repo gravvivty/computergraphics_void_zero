@@ -7,7 +7,7 @@ using VoidZero.Graphics;
 
 namespace VoidZero.States
 {
-    // We seperate our game in different states -> Playing, Paused, MainMenu, Death
+    // Game is seperated in different states -> Playing, Paused, MainMenu, Death
     // the GameStates orchestrate what UI gets drawn and what can happen in each GameState
     public class GameStateManager
     {

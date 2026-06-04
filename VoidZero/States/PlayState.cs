@@ -82,7 +82,7 @@ namespace VoidZero.States
             if (_gameManager.CurrentMode == GameMode.Paused)
                 return;
 
-            // bullets always update (unless paused)
+            // Bullets always update (unless paused)
             float bulletDt = dt;
             if (_isDying)
             {
@@ -171,7 +171,7 @@ namespace VoidZero.States
                         {
                             if (enemy.IsDying)
                                 continue;
-                            if (bullet.HitEntities.Contains(enemy))  // already hit this enemy
+                            if (bullet.HitEntities.Contains(enemy))  // Already hit this enemy
                                 continue;
                             if (bullet.Hitbox.IntersectsWith(entity.Hitbox))
                             {

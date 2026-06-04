@@ -14,7 +14,7 @@ namespace VoidZero.Graphics.Particles
         public float Size;
 
         public Vector4 StartColor;
-        public Vector4 EndColor = new Vector4(0.3f, 0.3f, 0.3f, 1f); // gray
+        public Vector4 EndColor = new Vector4(0.3f, 0.3f, 0.3f, 1f); // Gray
         public Vector4 CurrentColor;
 
         public bool IsAlive => Lifetime < MaxLifetime;
@@ -24,7 +24,7 @@ namespace VoidZero.Graphics.Particles
             Lifetime += dt;
             Position += Velocity * dt;
 
-            // drag
+            // Drag
             Velocity *= 0.98f;
 
             // Color fade -> first 80% slow, last 20% fast
