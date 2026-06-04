@@ -1,13 +1,12 @@
 ﻿using OpenTK.Mathematics;
 using System.Drawing;
-using VoidZero.Game.Combat;
 using VoidZero.Game.Entities.Components;
 using VoidZero.Graphics;
 using VoidZero.Utils;
 
 namespace VoidZero.Game.Entities
 {
-    // All the entity logic
+    // Contains all entity logic
     // Enemies, Player and Bullets inherit from this
     public abstract class Entity
     {
@@ -59,7 +58,7 @@ namespace VoidZero.Game.Entities
                 if (IsDying)
                 {
                     return RectangleF.Empty;
-                } 
+                }
 
                 float shrinkFactor = 0.25f; // 25%
                 float offsetX = Width * (shrinkFactor);
@@ -105,7 +104,11 @@ namespace VoidZero.Game.Entities
             Animations.Draw(batch, drawPos, Scale, tint, Rotation);
 
             // Debug hitbox
-            batch.DrawRectangle(Hitbox, Color.Red);
+            if (GameServices.Instance.Settings.ShowHitboxes)
+            {
+                // Draw entity hitbox when enabled
+                batch.DrawRectangle(Hitbox, Color.Red);
+            }
         }
 
         public void SetPosition(Vector2 absolutePos)
@@ -138,7 +141,7 @@ namespace VoidZero.Game.Entities
 
             IsDying = true;
             Velocity = Vector2.Zero;
-            Components.Clear(); // prevents logic during death
+            Components.Clear(); // Ürevents logic during death
             Animations.Play(DeathAnimationKey);
 
             _deathTimer = DeathDuration;

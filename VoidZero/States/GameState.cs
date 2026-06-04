@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VoidZero.Graphics;
+﻿using VoidZero.Graphics;
 
 namespace VoidZero.States
 {
-    // Why abstract? Good question, this is just an interface - should fix tbh
     public abstract class GameState
     {
         public virtual void Enter() { }

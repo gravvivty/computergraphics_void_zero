@@ -1,8 +1,5 @@
-﻿using ImGuiNET;
-using OpenTK.Windowing.Desktop;
-using System;
+﻿using OpenTK.Windowing.Desktop;
 using VoidZero.Core;
-using VoidZero.Game;
 using VoidZero.Game.Input;
 using VoidZero.Graphics;
 using VoidZero.UI;

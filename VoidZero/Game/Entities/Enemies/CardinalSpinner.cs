@@ -1,11 +1,8 @@
 ﻿using OpenTK.Mathematics;
-using VoidZero.Graphics;
 using VoidZero.Game.Combat;
 using VoidZero.Game.Combat.Patterns;
-using VoidZero.Game.Entities;
-using System;
-using System.Runtime.CompilerServices;
 using VoidZero.Game.Entities.Components;
+using VoidZero.Graphics;
 
 namespace VoidZero.Game.Entities.Enemies
 {

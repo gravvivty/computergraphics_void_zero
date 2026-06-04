@@ -5,8 +5,8 @@ using VoidZero.Game.Entities;
 public class MovementTool
 {
     private Vector2 _direction;
-    private float _speed; // units per second
-    private float _duration; // seconds
+    private float _speed; // Units per second
+    private float _duration; // Seconds
     private float _timer;
 
     public bool Finished => _timer >= _duration;

@@ -1,6 +1,6 @@
-﻿using OpenTK.Windowing.Desktop;
+﻿using OpenTK.Mathematics;
+using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using OpenTK.Mathematics;
 
 namespace VoidZero.Game.Input
 {
@@ -79,6 +79,17 @@ namespace VoidZero.Game.Input
 
 
             ActivateAbilityPressed = _keyboard.IsKeyPressed(Keys.L) || (_gamepadConnected && _gamepad.Buttons[3] == 1); // Y, L
+
+            // Toggle debug graze hitbox drawing with F3
+            if (_keyboard.IsKeyPressed(Keys.F3))
+            {
+                GameServices.Instance.Settings.ShowGrazeHitboxes = !GameServices.Instance.Settings.ShowGrazeHitboxes;
+            }
+            // Toggle debug entity hitbox drawing with F4
+            if (_keyboard.IsKeyPressed(Keys.F4))
+            {
+                GameServices.Instance.Settings.ShowHitboxes = !GameServices.Instance.Settings.ShowHitboxes;
+            }
 
 
             bool startHeld = _gamepadConnected && _gamepad.Buttons[7] == 1; // Start, ESC

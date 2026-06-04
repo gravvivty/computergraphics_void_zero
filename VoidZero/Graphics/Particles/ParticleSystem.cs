@@ -1,14 +1,8 @@
 ﻿using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VoidZero.Graphics.Particles
 {
-    // Makeshifty Particleystem, pretty easy to understand
-    // however we just need this small system unless we have more ideas and want to be creative
+    // Particle system
     public class ParticleSystem
     {
         private readonly List<Particle> _particles = new();

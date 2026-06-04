@@ -1,8 +1,7 @@
 ﻿using OpenTK.Mathematics;
-using VoidZero.Graphics;
-using VoidZero.Game.Combat;
-using System.Collections.Generic;
 using System.Drawing;
+using VoidZero.Game.Combat;
+using VoidZero.Graphics;
 
 namespace VoidZero.Game.Entities
 {
@@ -53,14 +52,17 @@ namespace VoidZero.Game.Entities
         {
             base.Draw(batch);
             // Debug grazing hitboxes
-            //batch.DrawRectangle(GrazeHitbox, Color.White);
+            if (GameServices.Instance.Settings.ShowGrazeHitboxes)
+            {
+                batch.DrawRectangle(GrazeHitbox, Color.White);
+            }
         }
 
         public override RectangleF Hitbox
         {
             get
             {
-                float shrinkFactor = 0.3f; // shrink 30% from each side
+                float shrinkFactor = 0.3f; // Shrink 30% from each side
                 float offsetX = Width * shrinkFactor;
                 float offsetY = Height * shrinkFactor;
                 float hitboxWidth = Width * (1f - 2f * shrinkFactor);

@@ -1,9 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using VoidZero.Game.Entities;
-using VoidZero.Game.Combat;
-using System;
-using VoidZero.Graphics;
 using VoidZero.Game.Entities.Components;
+using VoidZero.Graphics;
 
 namespace VoidZero.Game.Combat.Patterns
 {

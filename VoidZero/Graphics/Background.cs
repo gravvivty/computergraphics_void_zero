@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using VoidZero.Game;
 using VoidZero.Graphics;
-using VoidZero.Graphics.Particles;
 using Vector2 = OpenTK.Mathematics.Vector2;
 
 namespace VoidZero.Core
@@ -13,7 +10,7 @@ namespace VoidZero.Core
 
         private class Planet
         {
-            public float XNorm; // horizontal position as 0..1, multiplied by screen width when drawing
+            public float XNorm; // Horizontal position as 0..1; multiplied by screen width when drawing
             public float Y;
             public float Speed;
             public float Scale;
@@ -83,7 +80,7 @@ namespace VoidZero.Core
         {
             float mult = GameServices.Instance.Settings.BackgroundSpeedMultiplier;
 
-            // Scroll the tiled space backdrop and wrap it when it's moved a full tile height
+            // Scroll the tiled space backdrop and wrap it when it is moved a full tile height
             _spaceOffset += BaseSpaceSpeed * dt * mult;
             float tileHeight = _spaceTexture.Height * SpaceFillScale();
             if (_spaceOffset >= tileHeight)
@@ -150,7 +147,7 @@ namespace VoidZero.Core
             float scale = SpaceFillScale();
             Vector2 size = new(_spaceTexture.Width * scale, _spaceTexture.Height * scale);
 
-            // Draw two tiles stacked vertically so there's never a gap while scrolling
+            // Draw two tiles stacked vertically so there is never a gap while scrolling
             batch.Draw(_spaceTexture, new Vector2(0, _spaceOffset), size, Vector4.One);
             batch.Draw(_spaceTexture, new Vector2(0, _spaceOffset - size.Y), size, Vector4.One);
         }

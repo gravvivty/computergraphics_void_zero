@@ -1,11 +1,7 @@
-﻿using ImGuiNET;
-using OpenTK.Windowing.Desktop;
-using VoidZero.Game;
-using VoidZero.Graphics;
-using VoidZero.Game.Input;
-using System;
-using VoidZero.UI;
+﻿using OpenTK.Windowing.Desktop;
 using VoidZero.Core;
+using VoidZero.Game.Input;
+using VoidZero.Graphics;
 using static VoidZero.UI.MenuUI;
 
 namespace VoidZero.States
@@ -16,7 +12,7 @@ namespace VoidZero.States
         private readonly GameWindow _window;
         private readonly InputManager _input;
         private readonly GameManager _gameManager;
-        public PlayState _pausedState { get; set; } // The PlayState we’re pausing
+        public PlayState _pausedState { get; set; } // The PlayState that we are pausing
         private MenuPage _currentPage = MenuPage.Main;
 
         public PauseState(GameStateManager gsm, GameWindow window, InputManager input, PlayState pausedState, GameManager gm)
@@ -24,7 +20,7 @@ namespace VoidZero.States
             _gameStateManager = gsm;
             _window = window;
             _input = input;
-            _pausedState = pausedState; // store the paused game
+            _pausedState = pausedState; // Store the paused game
             _gameManager = gm;
             _gameManager.EnterPause();
         }

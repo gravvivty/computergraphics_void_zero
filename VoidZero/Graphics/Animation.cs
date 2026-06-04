@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using System.Collections.Generic;
 
 namespace VoidZero.Graphics
 {
@@ -27,11 +26,11 @@ namespace VoidZero.Graphics
             FrameHeight = frameHeight;
             FrameWidth = frameWidth;
 
-            int x = column * frameWidth; // from the whole sprite - select 1 column i.e. one Animation loop e.g. Idle
+            int x = column * frameWidth; // From the whole sprite: Select one column i.e. one Animation loop e.g. Idle
 
             for (int i = 0; i < frameCount; i++)
             {
-                int y = i * frameHeight; // basically all each frame of a column
+                int y = i * frameHeight; // Each frame of a column
                 _frames.Add(new Rectangle(x, y, frameWidth, frameHeight));
             }
         }
@@ -46,7 +45,7 @@ namespace VoidZero.Graphics
             IsFinished = false;
         }
 
-        // this update works for looping through a single column i.e. Animation - "Idle", "Left", etc.
+        // This update works by looping through a single column i.e. Animation - "Idle", "Left", etc.
         public void Update(float dt)
         {
             if (!_playing || IsFinished) return;

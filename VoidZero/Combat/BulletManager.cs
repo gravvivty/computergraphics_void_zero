@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VoidZero.Game.Entities;
+﻿using VoidZero.Game.Entities;
 using VoidZero.Graphics;
 
 namespace VoidZero.Game.Combat
 {
-    // Should be an actual singleton really
+    // Acts as a Singleton
     // Singular object BulletManager that contains ALL bullets currently active (both enemies and player)
     public class BulletManager
     {

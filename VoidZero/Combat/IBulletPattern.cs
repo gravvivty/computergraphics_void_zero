@@ -1,6 +1,4 @@
-﻿using OpenTK.Mathematics;
-using VoidZero.Game.Entities;
-using VoidZero.Game.Combat;
+﻿using VoidZero.Game.Entities;
 
 namespace VoidZero.Game.Combat.Patterns
 {
