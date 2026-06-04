@@ -1,4 +1,5 @@
 ﻿using VoidZero.Graphics.Particles;
+using VoidZero.UI;
 
 namespace VoidZero.Game
 {
@@ -9,5 +10,6 @@ namespace VoidZero.Game
         public GameSettings Settings { get; } = new();
         private GameServices() { }
         public ParticleSystem ParticleSystem { get; } = new();
+        public DamageNumberManager DamageNumbers { get; } = new();
     }
 }

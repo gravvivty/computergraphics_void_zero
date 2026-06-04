@@ -191,6 +191,16 @@ namespace VoidZero.States
                                     entity.Kill();
                                 }
 
+                                Vector2 spawnPos = enemy.Position + new Vector2(
+                                    Random.Shared.NextSingle() * 60f,
+                                    Random.Shared.NextSingle() * 60f
+                                );
+
+                                GameServices.Instance.DamageNumbers.Spawn(
+                                    spawnPos,
+                                    bullet.Damage
+                                );
+
                                 break;
                             }
                         }

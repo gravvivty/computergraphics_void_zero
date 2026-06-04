@@ -137,6 +137,7 @@ namespace VoidZero.Core
             _background.Update(dt * timeScale);
 
             _stateManager.Update(dt * timeScale);
+            GameServices.Instance.DamageNumbers.Update(dt);
 
             _fpsTimer += dt;
             _frameCount++;
@@ -177,6 +178,7 @@ namespace VoidZero.Core
                 -1,
                 1));
             _stateManager.DrawUI(_spriteBatch, dt);
+            GameServices.Instance.DamageNumbers.Draw(WorldToScreen);
             _spriteBatch.End();
 
             DrawFPS();
@@ -321,6 +323,20 @@ namespace VoidZero.Core
                 (int)offset.Y,
                 (int)renderWidth,
                 (int)renderHeight
+            );
+        }
+
+        public System.Numerics.Vector2 WorldToScreen(Vector2 worldPos)
+        {
+            float worldWidth = GameServices.Instance.Settings.WorldWidth;
+            float worldHeight = GameServices.Instance.Settings.WorldHeight;
+
+            float nx = worldPos.X / worldWidth;
+            float ny = worldPos.Y / worldHeight;
+
+            return new System.Numerics.Vector2(
+                ViewportOffset.X + nx * ViewportSize.X,
+                ViewportOffset.Y + ny * ViewportSize.Y
             );
         }
     }
