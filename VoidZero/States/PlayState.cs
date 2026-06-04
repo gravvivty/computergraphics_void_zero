@@ -1,16 +1,16 @@
 ﻿using OpenTK.Mathematics;
-using VoidZero.Game;
-using VoidZero.Graphics;
-using VoidZero.Game.Entities;
-using VoidZero.Game.Input;
 using OpenTK.Windowing.Desktop;
-using VoidZero.Core;
 using System.Drawing;
+using VoidZero.Core;
+using VoidZero.Game;
 using VoidZero.Game.Combat;
+using VoidZero.Game.Entities;
+using VoidZero.Game.Entities.Components;
 using VoidZero.Game.Entities.Enemies;
+using VoidZero.Game.Input;
+using VoidZero.Graphics;
 using VoidZero.States.Stages;
 using VoidZero.States.Stages.VoidZero.States.Stages;
-using VoidZero.Game.Entities.Components;
 using static VoidZero.Core.GameManager;
 
 namespace VoidZero.States
@@ -87,7 +87,7 @@ namespace VoidZero.States
             if (_isDying)
             {
                 bulletDt *= BulletSlowFactor;
-            } 
+            }
 
             Bullets.Update(bulletDt);
             GameServices.Instance.ParticleSystem.Update(dt);
@@ -192,7 +192,7 @@ namespace VoidZero.States
                                 if (entity.CurrentHealth <= 0)
                                 {
                                     entity.Kill();
-                                }  
+                                }
 
                                 break;
                             }
@@ -240,7 +240,7 @@ namespace VoidZero.States
                             else
                             {
                                 _player.OnDamaged();
-                                _gameManager.Shake(0.25f,30f);
+                                _gameManager.Shake(0.25f, 30f);
                             }
                         }
 

@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using VoidZero.Game.Entities;
 
 namespace VoidZero.Game.Entities.Components
 {

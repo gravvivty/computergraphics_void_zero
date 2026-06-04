@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VoidZero.Graphics;
+﻿using VoidZero.Graphics;
 
 namespace VoidZero.States
 {
@@ -11,7 +6,7 @@ namespace VoidZero.States
     // the GameStates orchestrate what UI gets drawn and what can happen in each GameState
     public class GameStateManager
     {
-        public GameState _current {  get; private set; }
+        public GameState _current { get; private set; }
 
         public void ChangeState(GameState newState)
         {

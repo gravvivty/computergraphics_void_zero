@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using VoidZero.Game;
 using VoidZero.Graphics;
-using VoidZero.Graphics.Particles;
 using Vector2 = OpenTK.Mathematics.Vector2;
 
 namespace VoidZero.Core

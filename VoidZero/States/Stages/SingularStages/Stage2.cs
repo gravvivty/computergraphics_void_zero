@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using System.Runtime.CompilerServices;
 using VoidZero.Game;
 using VoidZero.Game.Combat;
 using VoidZero.Game.Entities.Components;

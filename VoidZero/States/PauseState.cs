@@ -1,11 +1,7 @@
-﻿using ImGuiNET;
-using OpenTK.Windowing.Desktop;
-using VoidZero.Game;
-using VoidZero.Graphics;
-using VoidZero.Game.Input;
-using System;
-using VoidZero.UI;
+﻿using OpenTK.Windowing.Desktop;
 using VoidZero.Core;
+using VoidZero.Game.Input;
+using VoidZero.Graphics;
 using static VoidZero.UI.MenuUI;
 
 namespace VoidZero.States

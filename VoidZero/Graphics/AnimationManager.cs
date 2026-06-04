@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using System.Collections.Generic;
 
 namespace VoidZero.Graphics
 {
@@ -73,7 +72,7 @@ namespace VoidZero.Graphics
             if (_currentKey != null)
             {
                 _animations[_currentKey].Draw(batch, position, scale, tint, rotation);
-            } 
+            }
         }
 
         public bool IsFinished => _currentKey != null && _animations[_currentKey].IsFinished;

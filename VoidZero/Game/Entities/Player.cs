@@ -1,13 +1,10 @@
 ﻿using OpenTK.Mathematics;
-using VoidZero.Graphics;
-using VoidZero.Game.Input;
-using System;
+using System.Drawing;
 using VoidZero.Game.Combat;
 using VoidZero.Game.Combat.Patterns;
-using System.Collections.Generic;
-using System.Linq;
-using System.Drawing;
 using VoidZero.Game.Entities.Components;
+using VoidZero.Game.Input;
+using VoidZero.Graphics;
 
 namespace VoidZero.Game.Entities
 {
@@ -117,7 +114,7 @@ namespace VoidZero.Game.Entities
 
             Animations.Add("Down", new Animation(texture, spriteWidth, spriteWidth, 3, 0.1f, 8));
             Animations.Add("DownShoot", new Animation(texture, spriteWidth, spriteWidth, 3, 0.1f, 9));
-            
+
 
             Animations.Play("Idle");
             AddDefaultDeathAnimation();
@@ -145,7 +142,7 @@ namespace VoidZero.Game.Entities
 
             Vector2 inputDirection = _input.MoveAxis;
             bool hasMovementInput = inputDirection.LengthSquared > 0;
-            bool movementPriority = hasMovementInput ||  _input.ShootHeld;
+            bool movementPriority = hasMovementInput || _input.ShootHeld;
 
             if (_input.DashPressed && !_isDashing && _dashCooldownTimer <= 0f)
             {
@@ -245,7 +242,7 @@ namespace VoidZero.Game.Entities
             if (GrazeTimer > _maxGrazeDamageAfter)
             {
                 GrazeTimer = _maxGrazeDamageAfter;
-            } 
+            }
         }
 
         public void UpdateGraze(float dt)
@@ -505,7 +502,7 @@ namespace VoidZero.Game.Entities
             else
             {
                 return; // Not enough to activate
-            } 
+            }
 
             _abilityActive = true;
             _abilityTimer = AbilityDuration;

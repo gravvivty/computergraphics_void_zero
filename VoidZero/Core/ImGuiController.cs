@@ -1,14 +1,11 @@
 ﻿using ImGuiNET;
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using ErrorCode = OpenTK.Graphics.OpenGL4.ErrorCode;
-using VoidZero.Game;
 
 // Most of this class has been inspired from here: https://github.com/adras/OpenTK-ImGUI
 // With additional changes to fit our game

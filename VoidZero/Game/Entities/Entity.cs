@@ -1,6 +1,5 @@
 ﻿using OpenTK.Mathematics;
 using System.Drawing;
-using VoidZero.Game.Combat;
 using VoidZero.Game.Entities.Components;
 using VoidZero.Graphics;
 using VoidZero.Utils;
@@ -59,7 +58,7 @@ namespace VoidZero.Game.Entities
                 if (IsDying)
                 {
                     return RectangleF.Empty;
-                } 
+                }
 
                 float shrinkFactor = 0.25f; // 25%
                 float offsetX = Width * (shrinkFactor);

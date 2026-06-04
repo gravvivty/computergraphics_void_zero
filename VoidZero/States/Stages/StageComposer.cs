@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace VoidZero.States.Stages
+﻿namespace VoidZero.States.Stages
 {
     // With this we can design levels 
     public class StageComposer

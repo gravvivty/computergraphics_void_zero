@@ -1,11 +1,10 @@
 ﻿using ImGuiNET;
 using OpenTK.Windowing.Desktop;
+using System.Numerics;
+using VoidZero.Core;
 using VoidZero.Game;
 using VoidZero.Game.Input;
 using VoidZero.States;
-using System;
-using VoidZero.Core;
-using System.Numerics;
 
 namespace VoidZero.UI
 {
@@ -260,7 +259,7 @@ namespace VoidZero.UI
             {
                 currentPage = MenuPage.Main;
                 _focusNextFrame = true;
-            } 
+            }
 
             ImGui.End();
         }

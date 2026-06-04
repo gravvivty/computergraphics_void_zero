@@ -1,8 +1,7 @@
 ﻿using OpenTK.Mathematics;
-using VoidZero.Graphics;
-using VoidZero.Game.Combat;
-using System.Collections.Generic;
 using System.Drawing;
+using VoidZero.Game.Combat;
+using VoidZero.Graphics;
 
 namespace VoidZero.Game.Entities
 {

@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using VoidZero.Graphics;
 using System.Drawing;
 
 namespace VoidZero.Graphics.Particles

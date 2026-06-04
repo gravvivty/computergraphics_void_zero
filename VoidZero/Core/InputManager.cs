@@ -1,7 +1,6 @@
-﻿using OpenTK.Windowing.Desktop;
+﻿using OpenTK.Mathematics;
+using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using OpenTK.Mathematics;
-using VoidZero.Game;
 
 namespace VoidZero.Game.Input
 {

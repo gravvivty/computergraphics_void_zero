@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VoidZero.Game.Entities;
+﻿using VoidZero.Game.Entities;
 using VoidZero.Graphics;
 
 namespace VoidZero.Game.Combat

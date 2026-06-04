@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace VoidZero.Game.Entities.Components
+﻿namespace VoidZero.Game.Entities.Components
 {
     // Gives an entity the ability to rotate
     // Acts as a helper for the more complex RotationSequenceComponent
