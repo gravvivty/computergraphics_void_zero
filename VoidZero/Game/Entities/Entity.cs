@@ -105,7 +105,11 @@ namespace VoidZero.Game.Entities
             Animations.Draw(batch, drawPos, Scale, tint, Rotation);
 
             // Debug hitbox
-            // batch.DrawRectangle(Hitbox, Color.Red);
+            if (GameServices.Instance.Settings.ShowHitboxes)
+            {
+                // Draw entity hitbox when enabled
+                batch.DrawRectangle(Hitbox, Color.Red);
+            }
         }
 
         public void SetPosition(Vector2 absolutePos)

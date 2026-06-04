@@ -233,7 +233,10 @@ namespace VoidZero.Game.Entities
             Animations.Draw(batch, Position, Scale, tint);
 
             // Debug hitbox
-            // batch.DrawRectangle(Hitbox, Color.Red);
+            if (GameServices.Instance.Settings.ShowHitboxes)
+            {
+                batch.DrawRectangle(Hitbox, Color.Red);
+            }
         }
 
         public void AddGraze(float dt)
