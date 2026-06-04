@@ -336,6 +336,9 @@ namespace VoidZero.Game.Entities
                     Velocity = Vector2.Zero; // No sliding after dash
                 }
 
+                // Ensure player stays within world bounds while dashing
+                ClampToWorldBounds();
+
                 return; // Skip usual movement
             }
 
@@ -364,6 +367,28 @@ namespace VoidZero.Game.Entities
             }
 
             Position += Velocity * dt;
+
+            // Clamp position to world bounds so the player cannot leave the playable area
+            ClampToWorldBounds();
+        }
+
+        // Prevent the player from moving outside the game world defined in settings
+        private void ClampToWorldBounds()
+        {
+            var settings = GameServices.Instance.Settings;
+
+            float minX = 0f;
+            float minY = 0f;
+            float maxX = settings.WorldWidth - Width;
+            float maxY = settings.WorldHeight - Height;
+
+            if (maxX < minX) maxX = minX;
+            if (maxY < minY) maxY = minY;
+
+            Position = new Vector2(
+                Math.Clamp(Position.X, minX, maxX),
+                Math.Clamp(Position.Y, minY, maxY)
+            );
         }
 
         private void CycleShield()
