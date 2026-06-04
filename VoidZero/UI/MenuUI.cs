@@ -302,6 +302,8 @@ namespace VoidZero.UI
                 "K - Switch shield",
                 "L - Activate ability",
                 "ESC - Pause/Resume",
+                "F3 - Debug Graze Registration Boxes",
+                "F4 - Debug Hitboxes"
             };
 
             string[] linesController =
