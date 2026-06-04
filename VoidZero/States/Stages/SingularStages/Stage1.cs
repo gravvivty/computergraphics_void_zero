@@ -52,7 +52,7 @@ namespace VoidZero.States.Stages
                         enemyTex,
                         position: Vector2.Zero,
                         bulletManager: state.Bullets,
-                        energy: BulletEnergy.Red
+                        energy: BulletEnergy.Yellow
                     );
                     enemy.SetPosition(
                         RelativeCenter(0.66f, -0.2f, enemy)
@@ -94,7 +94,7 @@ namespace VoidZero.States.Stages
                         enemyTex,
                         position: Vector2.Zero,
                         bulletManager: state.Bullets,
-                        energy: BulletEnergy.Green
+                        energy: BulletEnergy.Purple
                     );
                     enemy.SetPosition(
                         RelativeCenter(0.33f, -0.2f, enemy)
@@ -115,7 +115,7 @@ namespace VoidZero.States.Stages
                         enemyTex,
                         position: Vector2.Zero,
                         bulletManager: state.Bullets,
-                        energy: BulletEnergy.Green
+                        energy: BulletEnergy.Purple
                     );
                     enemy.SetPosition(
                         RelativeCenter(0.66f, -0.2f, enemy)
@@ -157,7 +157,7 @@ namespace VoidZero.States.Stages
                         enemyTex,
                         position: Vector2.Zero,
                         bulletManager: state.Bullets,
-                        energy: BulletEnergy.Red
+                        energy: BulletEnergy.Yellow
                     );
                     enemy.SetPosition(
                         RelativeCenter(1.2f, 0.5f, enemy)
@@ -228,7 +228,7 @@ namespace VoidZero.States.Stages
                         enemyTex,
                         position: Vector2.Zero,
                         bulletManager: state.Bullets,
-                        energy: BulletEnergy.Green
+                        energy: BulletEnergy.Purple
                     );
                     enemy.SetPosition(
                         RelativeCenter(0.25f, -0.2f, enemy)
@@ -253,7 +253,7 @@ namespace VoidZero.States.Stages
                         enemyTex,
                         position: Vector2.Zero,
                         bulletManager: state.Bullets,
-                        energy: BulletEnergy.Green
+                        energy: BulletEnergy.Purple
                     );
                     enemy.SetPosition(
                         RelativeCenter(0.75f, -0.2f, enemy)

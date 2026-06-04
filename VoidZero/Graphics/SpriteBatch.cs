@@ -109,6 +109,19 @@ namespace VoidZero.Graphics
                 uv: new Vector4(0f, 0f, 1f, 1f)); // u0, v0, u1, v1
         }
 
+        /// <summary>Draws a texture with explicit UV coordinates (for clipping fill bars etc.).</summary>
+        public void Draw(Texture2D texture, Vector2 position, Vector2 size, Vector4 uv, Vector4 color)
+        {
+            float x = position.X, y = position.Y;
+            float w = size.X, h = size.Y;
+            PushQuad(texture, color,
+                topLeft: new Vector2(x, y + h),
+                topRight: new Vector2(x + w, y),
+                bottomLeft: new Vector2(x, y),
+                bottomRight: new Vector2(x + w, y + h),
+                uv: uv);
+        }
+
         /// <summary>
         /// Draws a sub-rectangle (sprite sheet frame) with optional scale and rotation.
         /// Rotation is in radians, around the frame's center.

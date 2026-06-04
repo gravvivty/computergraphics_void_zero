@@ -20,7 +20,7 @@ namespace VoidZero.States.Stages
                         texture: spinnerTexture,
                         position: new Vector2(800, -10),
                         bulletManager: state.Bullets,
-                        energy: BulletEnergy.Red
+                        energy: BulletEnergy.Yellow
                     );
                     spinner.AddComponent(new MovementLifecycleComponent(
                         entryMovement: new MovementTool(Vector2.UnitY, 100f, 2f),

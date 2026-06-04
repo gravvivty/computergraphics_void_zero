@@ -80,6 +80,8 @@ namespace VoidZero.Core
             GameServices.Instance.Content.LoadTexture("life3", "Content/UI/health/life3.png");
             GameServices.Instance.Content.LoadTexture("graze", "Content/UI/graze/graze.png");
             GameServices.Instance.Content.LoadTexture("graze_fill", "Content/UI/graze/graze_fill.png");
+            GameServices.Instance.Content.LoadTexture("ability", "Content/UI/ability/ability.png");
+            GameServices.Instance.Content.LoadTexture("ability_fill", "Content/UI/ability/ability_fill.png");
 
             _input = new InputManager();
             _spriteBatch = new SpriteBatch();

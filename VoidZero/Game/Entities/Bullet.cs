@@ -76,7 +76,7 @@ namespace VoidZero.Game.Entities
         {
             get
             {
-                float expandFactor = 0.3f; // 30% outward
+                float expandFactor = 0.5f; // 50% outward
                 float expandX = Width * expandFactor;
                 float expandY = Height * expandFactor;
 

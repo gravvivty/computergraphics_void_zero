@@ -1,5 +1,6 @@
 ﻿using OpenTK.Windowing.Desktop;
 using VoidZero.Core;
+using VoidZero.Game;
 using VoidZero.Game.Input;
 using VoidZero.Graphics;
 using VoidZero.UI;
@@ -27,7 +28,10 @@ namespace VoidZero.States
             _gameManager.EnterMenu();
         }
 
-        public override void Update(float dt) { }
+        public override void Update(float dt)
+        {
+            GameServices.Instance.ParticleSystem.Update(dt);
+        }
         public override void Draw(SpriteBatch spriteBatch) { }
 
         public override void DrawUI(SpriteBatch spriteBatch, float dt)

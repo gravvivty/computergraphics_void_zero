@@ -20,7 +20,7 @@ namespace VoidZero.States.Stages
                         threeForkTexture,
                         position: new Vector2(600, -50),
                         bulletManager: state.Bullets,
-                        energy: BulletEnergy.Red
+                        energy: BulletEnergy.Yellow
                     );
                     threeFork.AddComponent(new MovementLifecycleComponent(
                         entryMovement: new MovementTool(Vector2.UnitY, 1000f, 0.5f),
@@ -38,7 +38,7 @@ namespace VoidZero.States.Stages
                         spinnerTexture,
                         position: new Vector2(200, -10),
                         bulletManager: state.Bullets,
-                        energy: BulletEnergy.Green
+                        energy: BulletEnergy.Purple
                     );
                     spinner.Components.Add(new MovementLifecycleComponent(
                         entryMovement : new MovementTool(Vector2.UnitY, 100f, 2f),

@@ -11,7 +11,7 @@ namespace VoidZero.UI
     // Menu code
     public static class MenuUI
     {
-        public enum MenuPage { Main, StageSelect, Options, Credits }
+        public enum MenuPage { Main, StageSelect, Options, Credits, Controls }
         private static bool _focusNextFrame = true;
 
         public static void DrawMenu(GameStateManager gsm, GameWindow window, InputManager input, ref MenuPage currentPage, Background bg, GameManager gm)
@@ -29,6 +29,9 @@ namespace VoidZero.UI
                     break;
                 case MenuPage.Credits:
                     DrawCreditsMenu(ref currentPage, gsm, window, input, gm);
+                    break;
+                case MenuPage.Controls:
+                    DrawControlsMenu(ref currentPage, gsm, window, input, gm);
                     break;
             }
         }
@@ -60,7 +63,7 @@ namespace VoidZero.UI
             float buttonHeight = 50f;
             float spacing = 15f;
 
-            string[] labels = { "Play", "Options", "Credits", "Exit" };
+            string[] labels = { "Play", "Options", "Credits", "Controls", "Exit" };
             float totalHeight = labels.Length * buttonHeight + (labels.Length - 1) * spacing + 80; // 80 for title space
 
             float windowHeight = ImGui.GetWindowHeight();
@@ -94,6 +97,10 @@ namespace VoidZero.UI
                             break;
                         case "Credits":
                             currentPage = MenuPage.Credits;
+                            _focusNextFrame = true;
+                            break;
+                        case "Controls":
+                            currentPage = MenuPage.Controls;
                             _focusNextFrame = true;
                             break;
                         case "Exit":
@@ -148,7 +155,7 @@ namespace VoidZero.UI
 
             ImGui.Dummy(new Vector2(0, spacing));
 
-            string[] resolutions = { "800x600", "1280x720", "1600x900", "1920x1080", "2560x1440" };
+            string[] resolutions = { "1280x720", "1600x900", "1920x1080", "2560x1440" };
             int currentIndex = Array.FindIndex(resolutions, r => r == $"{settings.Width}x{settings.Height}");
             if (currentIndex < 0) currentIndex = 0;
 
@@ -238,8 +245,9 @@ namespace VoidZero.UI
             {
                 "Game Design by Steven Gayer & Finley Hogan",
                 "Programming by Steven Gayer & Finley Hogan",
-                "Art by Steven Gayer & Finley Hogan (+ Content/Credit.txt)",
-                "Music will be by Steven Gayer"
+                "UI/Shield/Player Art by Steven Gayer",
+                "Font/Background/Enemy/Bullet Ressources by Content/Credits.txt",
+                "Music will be by Steven Gayer (no sound yet)"
             };
 
             float spacing = 10f;
@@ -255,6 +263,90 @@ namespace VoidZero.UI
             }
 
             CenterNextItem(200f);
+            if (ImGui.Button("Back", new Vector2(200, 50)))
+            {
+                currentPage = MenuPage.Main;
+                _focusNextFrame = true;
+            }
+
+            ImGui.End();
+        }
+
+        public static void DrawControlsMenu(ref MenuPage currentPage, GameStateManager gsm, GameWindow window, InputManager input, GameManager gm)
+        {
+            var io = ImGui.GetIO();
+            var (vpX, vpY, vpW, vpH) = gm.GetViewportRect();
+
+            ImGui.SetNextWindowPos(new Vector2(vpX, vpY));
+            ImGui.SetNextWindowSize(new Vector2(vpW, vpH));
+
+            ImGui.Begin("Controls",
+                ImGuiWindowFlags.NoDecoration |
+                ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoSavedSettings |
+                ImGuiWindowFlags.NoBackground
+            );
+
+            if (_focusNextFrame)
+            {
+                ImGui.SetItemDefaultFocus();
+                _focusNextFrame = false;
+            }
+
+            string[] linesKeyboard =
+            {
+                "Keyboard:",
+                "WASD - Movement",
+                "J - Shoot",
+                "K - Switch shield",
+                "L - Activate ability",
+                "ESC - Pause/Resume",
+            };
+
+            string[] linesController =
+            {
+                "Controller (XBOX/PS):",
+                "Left Joystick - Movement",
+                "RT/R2 - Shoot",
+                "X/Rectangle - Switch shield",
+                "Y/Triangle - Activate ability",
+                "Start - Pause/Resume",
+            };
+
+            float lineH = ImGui.GetTextLineHeight();
+            float spacing = 10f;
+            float colW = 300f;
+            float gapW = 60f;
+            float totalW = colW * 2 + gapW;
+            float totalH = linesKeyboard.Length * (lineH + spacing) + 120f;
+
+            // Center the whole block
+            float startX = (vpW - totalW) / 2f;
+            float startY = (vpH - totalH) / 2f;
+
+            // Left column: Keyboard
+            ImGui.SetCursorPos(new Vector2(startX, startY));
+            // Child window so lines stack naturally left-aligned
+            ImGui.BeginChild("col_keyboard", new Vector2(colW, totalH - 60f));
+            foreach (string line in linesKeyboard)
+            {
+                ImGui.Text(line);
+                ImGui.Dummy(new Vector2(0, spacing));
+            }
+            ImGui.EndChild();
+
+            // Right column: Controller
+            ImGui.SetCursorPos(new Vector2(startX + colW + gapW, startY));
+            ImGui.BeginChild("col_controller", new Vector2(colW, totalH - 60f));
+            foreach (string line in linesController)
+            {
+                ImGui.Text(line);
+                ImGui.Dummy(new Vector2(0, spacing));
+            }
+            ImGui.EndChild();
+
+            ImGui.SetCursorPos(new Vector2((vpW - 200f) / 2f, startY + totalH - 50f));
             if (ImGui.Button("Back", new Vector2(200, 50)))
             {
                 currentPage = MenuPage.Main;

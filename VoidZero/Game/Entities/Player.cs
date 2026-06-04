@@ -17,7 +17,7 @@ namespace VoidZero.Game.Entities
         private readonly float _deceleration = 6000f;
         private readonly float _maxSpeed = 450f;
         private ShooterComponent _shooter;
-        public BulletEnergy ActiveShield { get; private set; } = BulletEnergy.Red;
+        public BulletEnergy ActiveShield { get; private set; } = BulletEnergy.Yellow;
         // Grazing
         private bool _isCurrentlyGrazing = false;
         public float _maxGrazeDamageAfter { get; private set; } = 1f;
@@ -63,9 +63,9 @@ namespace VoidZero.Game.Entities
         public float AbsorbFillAmount { get; } = 2f; // per bullet absorbed
 
         // Ability levels thresholds
-        public float Level1Threshold { get; private set; } = 30f;
-        public float Level2Threshold { get; private set; } = 60f;
-        public float Level3Threshold { get; private set; } = 100f;
+        public float Level1Threshold { get; private set; } = 25f;
+        public float Level2Threshold { get; private set; } = 70f;
+        public float Level3Threshold { get; private set; } = 95f;
 
         // Active ability state
         private bool _abilityActive = false;
@@ -89,7 +89,7 @@ namespace VoidZero.Game.Entities
                 bulletManager,
                 BulletOwner.Player,
                 0.125f,
-                10f
+                20f
             );
             _shooter.BulletEnergy = BulletEnergy.Neutral;
             int spriteWidth = 32;
@@ -227,6 +227,9 @@ namespace VoidZero.Game.Entities
                 Animations.Draw(batch, image.Position, Scale, afterTint);
             }
 
+            DrawGrazingBar(batch);
+            DrawHealthBar(batch);
+            DrawAbilityBar(batch);
             Animations.Draw(batch, Position, Scale, tint);
 
             // Debug hitbox
@@ -395,9 +398,9 @@ namespace VoidZero.Game.Entities
         {
             ActiveShield = ActiveShield switch
             {
-                BulletEnergy.Blue => BulletEnergy.Red,
-                BulletEnergy.Red => BulletEnergy.Blue,
-                _ => BulletEnergy.Red
+                BulletEnergy.Blue => BulletEnergy.Yellow,
+                BulletEnergy.Yellow => BulletEnergy.Blue,
+                _ => BulletEnergy.Yellow
             };
         }
 
@@ -559,6 +562,155 @@ namespace VoidZero.Game.Entities
                         10, 2f, 2000f
                     ));
                     break;
+            }
+        }
+
+        public void DrawHealthBar(SpriteBatch spriteBatch)
+        {
+            Texture2D barTex = GameServices.Instance.Content.GetTexture("healthbar");
+            Texture2D life1Tex = GameServices.Instance.Content.GetTexture("life1");
+            Texture2D life2Tex = GameServices.Instance.Content.GetTexture("life2");
+            Texture2D life3Tex = GameServices.Instance.Content.GetTexture("life3");
+
+            const float Scale = 3f;
+
+            float barW = barTex.Width * Scale;
+            float barH = barTex.Height * Scale;
+            Vector2 size = new Vector2(barW, barH);
+            Vector2 pos = new Vector2(Position.X - Texture.Width / 8, Position.Y + Texture.Height / 1.2f);
+
+            // Empty base frame
+            spriteBatch.Draw(barTex, pos, size, Vector4.One);
+
+            // Overlay the sprite that matches current HP
+            int hp = (int)MathF.Round(CurrentHealth);
+            Texture2D lifeTex = hp switch
+            {
+                1 => life1Tex,
+                2 => life2Tex,
+                _ => life3Tex   // 3 or full
+            };
+
+            // Only draw the life overlay when the player actually has health
+            if (hp > 0)
+            {
+                spriteBatch.Draw(lifeTex, pos, size, Vector4.One);
+            }
+        }
+
+        public void DrawGrazingBar(SpriteBatch spriteBatch)
+        {
+            Texture2D barTex = GameServices.Instance.Content.GetTexture("graze");
+            Texture2D fillTex = GameServices.Instance.Content.GetTexture("graze_fill");
+
+            const float BarScale = 2f;
+            const float XOffset = -8f;
+
+            float barW = barTex.Width * BarScale;
+            float barH = barTex.Height * BarScale;
+
+            Vector2 pos = new Vector2(
+                Position.X - barW + XOffset,
+                Position.Y + (Height - barH) / 2f
+            );
+
+            Vector2 size = new Vector2(barW, barH);
+
+            // Draw background frame
+            spriteBatch.Draw(barTex, pos, size, Vector4.One);
+
+            // Calculate fill fraction
+            float grazeBonus = DamageMultiplier - 1f;
+            float maxBonus = MaxGrazeMultiplier - 1f;
+            float fill = Math.Clamp(grazeBonus / maxBonus, 0f, 1f);
+
+            if (fill > 0f)
+            {
+                int capPx = 8;  // Dead pixels at top and bottom
+
+                // In UV space, the active region runs from capTop to capBottom
+                float capTop = capPx / (float)fillTex.Height;
+                float capBottom = 1f - capPx / (float)fillTex.Height;
+
+                // Fill upward from capBottom
+                float activeRange = capBottom - capTop; // The clippable UV span
+                float v0 = capBottom - (activeRange * fill); // Top of clipped region
+                float v1 = capBottom; // Always anchor to bottom cap
+
+                // Destination height matches the clipped UV region
+                float activeBarH = (fillTex.Height - capPx * 2) * BarScale;
+                float destH = activeBarH * fill;
+                float destY = (pos.Y + capPx * BarScale) + (activeBarH - destH); // Anchored above bottom cap
+
+                spriteBatch.Draw(
+                    fillTex,
+                    new Vector2(pos.X, destY),
+                    new Vector2(barW, destH),
+                    new Vector4(0f, v0, 1f, v1),
+                    Vector4.One
+                );
+            }
+        }
+
+        public void DrawAbilityBar(SpriteBatch spriteBatch)
+        {
+            Texture2D barTex = GameServices.Instance.Content.GetTexture("ability");
+            Texture2D fillTex = GameServices.Instance.Content.GetTexture("ability_fill");
+
+            const float BarScale = 2f;
+            const float XOffset = 8f;  // gap to the right of the sprite
+
+            float barW = barTex.Width * BarScale;
+            float barH = barTex.Height * BarScale;
+
+            Vector2 pos = new Vector2(
+                Position.X + Width + XOffset,
+                Position.Y + (Height - barH) / 2f
+            );
+
+            // Draw background frame
+            spriteBatch.Draw(barTex, pos, new Vector2(barW, barH), Vector4.One);
+
+            int capPx = 8;
+            float capTop = capPx / (float)fillTex.Height;
+            float capBottom = 1f - capPx / (float)fillTex.Height;
+            float activeRange = capBottom - capTop;
+            float activeBarH = (fillTex.Height - capPx * 2) * BarScale;
+
+            // Gap settings — 3px gaps at level thresholds, drawn as dark slices over the fill
+            const float GapPx = 3f;
+            float[] thresholds = { Level1Threshold / MaxAbilityBar,
+                                  Level2Threshold / MaxAbilityBar };  // level3 is the top, no gap needed
+
+            float fill = Math.Clamp(_abilityBar / MaxAbilityBar, 0f, 1f);
+
+            if (fill > 0f)
+            {
+                float v0 = capBottom - (activeRange * fill);
+                float v1 = capBottom;
+                float destH = activeBarH * fill;
+                float destY = (pos.Y + capPx * BarScale) + (activeBarH - destH);
+
+                spriteBatch.Draw(
+                    fillTex,
+                    new Vector2(pos.X, destY),
+                    new Vector2(barW, destH),
+                    new Vector4(0f, v0, 1f, v1),
+                    Vector4.One
+                );
+            }
+
+            // Draw gaps over the fill at each threshold
+            // Each gap is a filled transparent rectangle sliced across the bar
+            foreach (float t in thresholds)
+            {
+                float gapCentreY = (pos.Y + capPx * BarScale) + activeBarH * (1f - t);
+
+                spriteBatch.DrawRectangle(
+                    new RectangleF(pos.X, gapCentreY - GapPx / 2f, barW, GapPx),
+                    Color.Transparent,
+                    filled: true
+                );
             }
         }
     }

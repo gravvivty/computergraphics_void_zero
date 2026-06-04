@@ -4,8 +4,8 @@
     public enum BulletEnergy
     {
         Blue,
-        Red,
-        Green,
+        Yellow,
+        Purple,
         Neutral
     }
 

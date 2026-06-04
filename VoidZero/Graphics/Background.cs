@@ -185,7 +185,7 @@ namespace VoidZero.Core
 
         private Planet SpawnPlanet(bool spawnAbove)
         {
-            float scale = _rng.NextSingle() * 1.5f + 0.5f;
+            float scale = _rng.NextSingle() * 1.5f + 0.2f;
 
             return new Planet
             {

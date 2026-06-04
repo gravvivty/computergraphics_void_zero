@@ -150,9 +150,6 @@ namespace VoidZero.States
 
         public override void DrawUI(SpriteBatch spriteBatch, float dt)
         {
-            DrawAbilityBar(spriteBatch);
-            DrawGrazingBar(spriteBatch);
-            DrawHealthBar(spriteBatch);
         }
 
         private void HandleBulletHits(float dt)
@@ -204,7 +201,7 @@ namespace VoidZero.States
                 {
                     bool shieldAbsorbs =
                         bullet.Energy == _player.ActiveShield &&
-                        bullet.Energy != BulletEnergy.Green;
+                        bullet.Energy != BulletEnergy.Purple;
 
                     bool damageHit = _player.Hitbox.IntersectsWith(bullet.Hitbox);
                     bool grazeHit = bullet.GrazeHitbox.IntersectsWith(_player.Hitbox) && !damageHit && !shieldAbsorbs;
@@ -260,103 +257,6 @@ namespace VoidZero.States
             _isDying = true;
             _playerShield.Kill();
             _gameManager.EnterDeath();
-        }
-
-        public void DrawAbilityBar(SpriteBatch spritebatch)
-        {
-            // Position and size
-            float barX = 20f;
-            float barY = 20f;
-            float barWidth = 200f;
-            float barHeight = 20f;
-
-            // Draw background
-            spritebatch.DrawRectangle(new RectangleF(barX, barY, barWidth, barHeight), Color.Gray, true);
-
-            // Determine fill color based on level
-            Color fillColor = Color.LightBlue;
-            if (_player._abilityBar >= _player.Level3Threshold)
-            {
-                fillColor = Color.Red;
-            }
-            else if (_player._abilityBar >= _player.Level2Threshold)
-            {
-                fillColor = Color.Orange;
-            }
-            else if (_player._abilityBar >= _player.Level1Threshold)
-            {
-                fillColor = Color.Yellow;
-            }
-
-            float fill = _player._abilityBar / _player.MaxAbilityBar;
-            spritebatch.DrawRectangle(new RectangleF(barX, barY, barWidth * fill, barHeight), Color.Cyan, true);
-
-            float[] thresholds = { _player.Level1Threshold, _player.Level2Threshold, _player.Level3Threshold };
-
-            foreach (float threshold in thresholds)
-            {
-                float markerX = barX + (threshold / _player.MaxAbilityBar) * barWidth;
-                // Draw a thin line as marker
-                spritebatch.DrawRectangle(new RectangleF(markerX - 1, barY, 2, barHeight), Color.Yellow, true);
-            }
-        }
-
-        public void DrawGrazingBar(SpriteBatch spritebatch)
-        {
-            Texture2D barTex = GameServices.Instance.Content.GetTexture("graze");
-            Texture2D fillTex = GameServices.Instance.Content.GetTexture("graze_fill");
-
-            float barX = 20f;
-            float barY = 20f;
-            float barWidth = 200f;
-            float barHeight = 20f;
-            float spacing = 10f;
-
-            float grazeBarY = barY + barHeight + spacing;
-            float grazeBonus = _player.DamageMultiplier - 1f;
-            float maxBonus = _player.MaxGrazeMultiplier - 1f;
-
-            float grazeFill = grazeBonus / maxBonus;
-            grazeFill = Math.Clamp(grazeFill, 0f, 1f);
-
-            // Draw background
-            spritebatch.DrawRectangle(new RectangleF(barX, grazeBarY, barWidth, barHeight), Color.DarkGray, true);
-
-            // Draw fill
-            spritebatch.DrawRectangle(new RectangleF(barX, grazeBarY, barWidth * grazeFill, barHeight), Color.LightBlue, true);
-        }
-
-        public void DrawHealthBar(SpriteBatch spriteBatch)
-        {
-            Texture2D barTex = GameServices.Instance.Content.GetTexture("healthbar");
-            Texture2D life1Tex = GameServices.Instance.Content.GetTexture("life1");
-            Texture2D life2Tex = GameServices.Instance.Content.GetTexture("life2");
-            Texture2D life3Tex = GameServices.Instance.Content.GetTexture("life3");
-
-            const float Scale = 6f;
-
-            float barW = barTex.Width * Scale;
-            float barH = barTex.Height * Scale;
-            Vector2 size = new Vector2(barW, barH);
-            Vector2 pos = new Vector2(0, 900);
-
-            // Empty base frame
-            spriteBatch.Draw(barTex, pos, size, Vector4.One);
-
-            // Overlay the sprite that matches current HP
-            int hp = (int)MathF.Round(_player.CurrentHealth);
-            Texture2D lifeTex = hp switch
-            {
-                1 => life1Tex,
-                2 => life2Tex,
-                _ => life3Tex   // 3 or full
-            };
-
-            // Only draw the life overlay when the player actually has health
-            if (hp > 0)
-            {
-                spriteBatch.Draw(lifeTex, pos, size, Vector4.One);
-            }
         }
     }
 }
