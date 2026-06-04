@@ -13,44 +13,8 @@ namespace VoidZero.States.Stages
         {
             return new StageComposer(new()
             {
-                new SpawnEnemyEvent(0f, state =>
-                {
-                    var spinnerTexture = GameServices.Instance.Content.GetTexture("witch");
-                    var spinner = new CardinalSpinner(
-                        texture: spinnerTexture,
-                        position: new Vector2(800, -10),
-                        bulletManager: state.Bullets,
-                        energy: BulletEnergy.Yellow
-                    );
-                    spinner.AddComponent(new MovementLifecycleComponent(
-                        entryMovement: new MovementTool(Vector2.UnitY, 100f, 2f),
-                        waitTime : 8f,
-                        exitDirection : -Vector2.UnitY,
-                        exitSpeed : 250f,
-                        exitDuration : 3f));
-                    spinner.AddComponent(new RotationSequenceComponent(
-                        loop: true,
-                        new RotationComponent(MathF.PI / 2f, 1f)
-                    ));
-                    return spinner;
-                }),
-                new SpawnEnemyEvent(0f, state =>
-                {
-                    var spinnerTexture = GameServices.Instance.Content.GetTexture("witch");
-                    var spinner = new CardinalSequencer(
-                        texture: spinnerTexture,
-                        position: new Vector2(300, -10),
-                        bulletManager: state.Bullets,
-                        energy: BulletEnergy.Blue
-                    );
-                    spinner.AddComponent(new MovementLifecycleComponent(
-                        entryMovement: new MovementTool(Vector2.UnitY, 1500f, 0.3f),
-                        waitTime : 8f,
-                        exitDirection : -Vector2.UnitY,
-                        exitSpeed : 1500f,
-                        exitDuration : 0.5f));
-                    return spinner;
-                })
+                EnemySpawn.At(0f).From(5,0).MoveTo(5,3).WithRotation(MathF.PI/2f, 1f).CardinalSpinner(BulletEnergy.Yellow),
+                EnemySpawn.At(0f).From(3,0).MoveTo(3,5).CardinalSequencer(BulletEnergy.Blue),
             });
         }
     }
