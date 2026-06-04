@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using ImGuiNET;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 using System.Drawing;
 using VoidZero.Core;
@@ -11,6 +12,8 @@ using VoidZero.Game.Input;
 using VoidZero.Graphics;
 using VoidZero.States.Stages;
 using VoidZero.States.Stages.VoidZero.States.Stages;
+using VoidZero.UI;
+using VoidZero.Utils;
 using static VoidZero.Core.GameManager;
 
 namespace VoidZero.States
@@ -34,6 +37,12 @@ namespace VoidZero.States
         private float _deathTimer = 0f;
         private const float DeathAnimDuration = 1f;
         private const float BulletSlowFactor = 0.6f;
+
+        public StageStats Stats { get; } = new();
+        private bool _stageCompleted;
+        private bool _focusVictoryNextFrame;
+
+        private float _rainbowTimer = 0f;
 
 
 
@@ -70,6 +79,8 @@ namespace VoidZero.States
 
         public override void Update(float dt)
         {
+            _rainbowTimer += dt;
+
             if (!_isDying && _input.ConsumePausePressed())
             {
                 _gameManager.EnterPause();
@@ -134,6 +145,8 @@ namespace VoidZero.States
                     Entities.Remove(entity);
                 }
             }
+
+            Stats.Update(dt);
         }
 
 
@@ -150,6 +163,10 @@ namespace VoidZero.States
 
         public override void DrawUI(SpriteBatch spriteBatch, float dt)
         {
+            if (_stageCompleted)
+            {
+                DrawStageCompleteUI();
+            }
         }
 
         private void HandleBulletHits(float dt)
@@ -189,11 +206,18 @@ namespace VoidZero.States
                                 if (entity.CurrentHealth <= 0)
                                 {
                                     entity.Kill();
+                                    _player.IncreaseScore(entity.Score);
+                                    Stats.RegisterKill(entity);
+
+                                    if (entity.IsBoss)
+                                    {
+                                        OnBossKilled();
+                                    }
                                 }
 
                                 Vector2 spawnPos = enemy.Position + new Vector2(
-                                    Random.Shared.NextSingle() * 60f,
-                                    Random.Shared.NextSingle() * 60f
+                                    Random.Shared.NextSingle() * 100f,
+                                    Random.Shared.NextSingle() * 100f
                                 );
 
                                 GameServices.Instance.DamageNumbers.Spawn(
@@ -237,6 +261,7 @@ namespace VoidZero.States
                         else
                         {
                             _player.CurrentHealth -= bullet.Damage;
+                            Stats.RegisterHit();
 
                             if (_player.CurrentHealth <= 0)
                             {
@@ -267,6 +292,97 @@ namespace VoidZero.States
             _isDying = true;
             _playerShield.Kill();
             _gameManager.EnterDeath();
+        }
+
+        private void OnBossKilled()
+        {
+            Stats.Complete();
+            _stageCompleted = true;
+            _focusVictoryNextFrame = true;
+            StageHighScores.Instance.Submit(StageIndex, Stats);
+        }
+
+        private void DrawStageCompleteUI()
+        {
+            var io = ImGui.GetIO();
+
+            ImGui.SetNextWindowPos(
+                new System.Numerics.Vector2(
+                    io.DisplaySize.X * 0.5f - 250,
+                    io.DisplaySize.Y * 0.35f));
+
+            ImGui.SetNextWindowSize(
+                new System.Numerics.Vector2(500, 350));
+
+            ImGui.Begin(
+                "Stage Complete",
+                ImGuiWindowFlags.NoDecoration |
+                ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoSavedSettings |
+                ImGuiWindowFlags.NoBackground
+            );
+
+            ImGuiHelpers.BeginCenteredBlock(350);
+
+            ImGuiHelpers.CenterColoredText(
+                "STAGE COMPLETE",
+                new Vector4(0.2f, 1f, 0.2f, 1f));
+
+            ImGui.Spacing();
+            ImGui.Spacing();
+
+            ImGuiHelpers.CenterText($"Time:            {TimeSpan.FromSeconds(Stats.CompletionTime):mm\\:ss}");
+            ImGuiHelpers.CenterText($"Enemies Killed:  {Stats.EnemiesKilled}");
+            ImGuiHelpers.CenterText($"Hits Taken:      {Stats.HitsTaken}");
+
+            if (Stats.HitsTaken == 0)
+            {
+                ImGui.Spacing();
+                ImGuiHelpers.CenterRainbowText("FLAWLESS!!!", _rainbowTimer);
+            }
+
+            ImGui.Spacing();
+
+            ImGuiHelpers.CenterColoredText($"Time Bonus:   x{Stats.TimeMultiplier:F2}", new Vector4(1f, 0.85f, 0.2f, 1f));
+            ImGuiHelpers.CenterColoredText($"Kill Bonus:   x{Stats.KillMultiplier:F2}", new Vector4(1f, 0.85f, 0.2f, 1f));
+            ImGuiHelpers.CenterColoredText($"Hit Bonus:    x{Stats.HitMultiplier:F2}", new Vector4(1f, 0.85f, 0.2f, 1f));
+
+            ImGui.Spacing();
+            ImGui.Separator();
+            ImGui.Spacing();
+
+            ImGuiHelpers.CenterColoredText(
+                $"FINAL SCORE: {Stats.FinalScore:N0}",
+                new Vector4(0.2f, 1f, 0.2f, 1f));
+
+            ImGui.Spacing();
+            ImGui.Spacing();
+
+            ImGuiHelpers.CenterNextItem(180);
+
+            if (ImGui.Button("Back To Main Menu",
+                new System.Numerics.Vector2(180, 60)))
+            {
+                _gameManager.EnterMenu();
+
+                _gameStateManager.ChangeState(
+                    new MenuState(
+                        _gameStateManager,
+                        Window,
+                        _input,
+                        _background,
+                        _gameManager));
+            }
+
+
+            if (_focusVictoryNextFrame)
+            {
+                ImGui.SetItemDefaultFocus();
+                _focusVictoryNextFrame = false;
+            }
+
+            ImGui.End();
         }
     }
 }

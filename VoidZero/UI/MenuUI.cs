@@ -5,6 +5,7 @@ using VoidZero.Core;
 using VoidZero.Game;
 using VoidZero.Game.Input;
 using VoidZero.States;
+using VoidZero.Utils;
 
 namespace VoidZero.UI
 {
@@ -13,6 +14,8 @@ namespace VoidZero.UI
     {
         public enum MenuPage { Main, StageSelect, Options, Credits, Controls }
         private static bool _focusNextFrame = true;
+        private static float _rainbowTimer = 0f;
+        public static void TickRainbow(float dt) => _rainbowTimer += dt;
 
         public static void DrawMenu(GameStateManager gsm, GameWindow window, InputManager input, ref MenuPage currentPage, Background bg, GameManager gm)
         {
@@ -141,11 +144,11 @@ namespace VoidZero.UI
             float spacing = 15f;
 
             float totalHeight = 3 * buttonHeight + 2 * spacing + 60;
-            BeginCenteredBlock(totalHeight);
+            ImGuiHelpers.BeginCenteredBlock(totalHeight);
 
             GameSettings settings = GameServices.Instance.Settings;
 
-            CenterNextItem(buttonWidth);
+            ImGuiHelpers.CenterNextItem(buttonWidth);
             bool fullscreen = settings.Fullscreen;
             if (ImGui.Checkbox("Fullscreen", ref fullscreen))
             {
@@ -159,7 +162,7 @@ namespace VoidZero.UI
             int currentIndex = Array.FindIndex(resolutions, r => r == $"{settings.Width}x{settings.Height}");
             if (currentIndex < 0) currentIndex = 0;
 
-            CenterNextItem(buttonWidth);
+            ImGuiHelpers.CenterNextItem(buttonWidth);
             ImGui.SetNextItemWidth(buttonWidth);
             if (ImGui.Combo("Resolution", ref currentIndex, resolutions, resolutions.Length))
             {
@@ -172,10 +175,10 @@ namespace VoidZero.UI
             ImGui.Dummy(new Vector2(0, spacing));
 
             // Audio sliders
-            CenterNextItem(buttonWidth);
+            ImGuiHelpers.CenterNextItem(buttonWidth);
             ImGui.Text("Audio Settings");
             // Master Volume
-            CenterNextItem(buttonWidth);
+            ImGuiHelpers.CenterNextItem(buttonWidth);
             ImGui.SetNextItemWidth(buttonWidth);
             float master = settings.MasterVolume * 100f; // Convert 0-1 to 0-100
             if (ImGui.SliderFloat("Master", ref master, 0f, 100f, "%.1f%%"))
@@ -183,7 +186,7 @@ namespace VoidZero.UI
                 settings.MasterVolume = master / 100f; // Store back as 0-1
             }
             // SFX Volume
-            CenterNextItem(buttonWidth);
+            ImGuiHelpers.CenterNextItem(buttonWidth);
             ImGui.SetNextItemWidth(buttonWidth);
             float sfx = settings.SfxVolume * 100f;
             if (ImGui.SliderFloat("SFX", ref sfx, 0f, 100f, "%.1f%%"))
@@ -191,7 +194,7 @@ namespace VoidZero.UI
                 settings.SfxVolume = sfx / 100f;
             }
             // Music Volume
-            CenterNextItem(buttonWidth);
+            ImGuiHelpers.CenterNextItem(buttonWidth);
             ImGui.SetNextItemWidth(buttonWidth);
             float music = settings.MusicVolume * 100f;
             if (ImGui.SliderFloat("Music", ref music, 0f, 100f, "%.1f%%"))
@@ -199,7 +202,7 @@ namespace VoidZero.UI
                 settings.MusicVolume = music / 100f;
             }
             // UI Volume
-            CenterNextItem(buttonWidth);
+            ImGuiHelpers.CenterNextItem(buttonWidth);
             ImGui.SetNextItemWidth(buttonWidth);
             float ui = settings.UiVolume * 100f;
             if (ImGui.SliderFloat("UI", ref ui, 0f, 100f, "%.1f%%"))
@@ -209,7 +212,7 @@ namespace VoidZero.UI
 
             ImGui.Dummy(new Vector2(0, spacing));
 
-            CenterNextItem(buttonWidth);
+            ImGuiHelpers.CenterNextItem(buttonWidth);
             if (ImGui.Button("Back", new Vector2(buttonWidth, buttonHeight)))
             {
                 currentPage = MenuPage.Main;
@@ -252,17 +255,17 @@ namespace VoidZero.UI
 
             float spacing = 10f;
             float totalHeight = lines.Length * ImGui.GetTextLineHeight() + spacing * 4 + 60;
-            BeginCenteredBlock(totalHeight);
+            ImGuiHelpers.BeginCenteredBlock(totalHeight);
 
             foreach (string line in lines)
             {
                 float textWidth = ImGui.CalcTextSize(line).X;
-                CenterNextItem(textWidth);
+                ImGuiHelpers.CenterNextItem(textWidth);
                 ImGui.Text(line);
                 ImGui.Dummy(new Vector2(0, spacing));
             }
 
-            CenterNextItem(200f);
+            ImGuiHelpers.CenterNextItem(200f);
             if (ImGui.Button("Back", new Vector2(200, 50)))
             {
                 currentPage = MenuPage.Main;
@@ -397,9 +400,9 @@ namespace VoidZero.UI
             float spacing = 15f;
 
             float totalHeight = 3 * buttonHeight + 2 * spacing;
-            BeginCenteredBlock(totalHeight);
+            ImGuiHelpers.BeginCenteredBlock(totalHeight);
 
-            CenterNextItem(buttonWidth);
+            ImGuiHelpers.CenterNextItem(buttonWidth);
             if (ImGui.Button("Resume", new Vector2(buttonWidth, buttonHeight)))
             {
                 gm.ExitPause();
@@ -408,7 +411,7 @@ namespace VoidZero.UI
 
             ImGui.Dummy(new Vector2(0, spacing));
 
-            CenterNextItem(buttonWidth);
+            ImGuiHelpers.CenterNextItem(buttonWidth);
             if (ImGui.Button("Options", new Vector2(buttonWidth, buttonHeight)))
             {
                 currentPage = MenuPage.Options;
@@ -416,7 +419,7 @@ namespace VoidZero.UI
 
             ImGui.Dummy(new Vector2(0, spacing));
 
-            CenterNextItem(buttonWidth);
+            ImGuiHelpers.CenterNextItem(buttonWidth);
             if (ImGui.Button("Main Menu", new Vector2(buttonWidth, buttonHeight)))
             {
                 gm.ExitPause();
@@ -456,6 +459,8 @@ namespace VoidZero.UI
 
             float buttonWidth = 180f;
             float buttonHeight = 60f;
+            float cardWidth = 180f;
+            float cardHeight = 120f; // record info above the button
             float spacing = 20f;
 
             int stageCount = 3;
@@ -471,6 +476,44 @@ namespace VoidZero.UI
 
             for (int stage = 1; stage <= stageCount; stage++)
             {
+                float colX = startX + (stage - 1) * (cardWidth + spacing);
+                StageRecord rec = StageHighScores.Instance.GetRecord(stage);
+                // --- Record card ---
+                ImGui.SetCursorPos(new Vector2(colX, centerY));
+                ImGui.BeginChild($"record_{stage}", new Vector2(cardWidth, cardHeight));
+
+                if (rec == null)
+                {
+                    ImGuiHelpers.CenterText("No record yet");
+                }
+                else
+                {
+                    ImGuiHelpers.CenterColoredText(
+                        $"Score: {rec.FinalScore:N0}",
+                        new OpenTK.Mathematics.Vector4(0.2f, 1f, 0.2f, 1f));
+
+                    ImGui.Spacing();
+
+                    ImGuiHelpers.CenterText(
+                        $"Time: {TimeSpan.FromSeconds(rec.CompletionTime):mm\\:ss}");
+
+                    ImGuiHelpers.CenterText(
+                        $"Kills: {rec.EnemiesKilled}");
+
+                    if (rec.HitsTaken == 0)
+                    {
+                        ImGuiHelpers.CenterRainbowText("Hits: 0", _rainbowTimer);
+                    }
+                    else
+                    {
+                        ImGuiHelpers.CenterText($"Hits: {rec.HitsTaken}");
+                    }
+                }
+
+                ImGui.EndChild();
+
+                ImGui.SetCursorPos(new Vector2(colX, centerY + cardHeight));
+
                 if (ImGui.Button($"Stage {stage}", new Vector2(buttonWidth, buttonHeight)))
                 {
                     gm.EnterPlay();
@@ -488,8 +531,9 @@ namespace VoidZero.UI
             }
 
             // Back button
-            ImGui.Dummy(new Vector2(0, 80f));
-            CenterNextItem(200f);
+            ImGui.SetCursorPos(new Vector2((vpW - 200f) / 2f, centerY + cardHeight + buttonHeight + 30f));
+
+            ImGuiHelpers.CenterNextItem(200f);
             if (ImGui.Button("Back", new Vector2(200, 50)))
             {
                 currentPage = MenuPage.Main;
@@ -511,17 +555,6 @@ namespace VoidZero.UI
 
                 window.Size = new OpenTK.Mathematics.Vector2i(settings.Width, settings.Height);
             }
-        }
-
-        private static void BeginCenteredBlock(float totalHeight)
-        {
-            float windowHeight = ImGui.GetWindowHeight();
-            ImGui.SetCursorPosY((windowHeight - totalHeight) / 2f);
-        }
-        private static void CenterNextItem(float itemWidth)
-        {
-            float available = ImGui.GetWindowWidth();
-            ImGui.SetCursorPosX((available - itemWidth) / 2f);
         }
     }
 }

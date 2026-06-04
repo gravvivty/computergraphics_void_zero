@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using System.Drawing;
 using VoidZero.Game;
@@ -41,7 +42,6 @@ namespace VoidZero.Core
 
         public Vector2 ViewportOffset { get; private set; }
         public Vector2 ViewportSize { get; private set; }
-        public RectangleF LetterboxRect { get; private set; }
         public (float x, float y, float w, float h) GetViewportRect() =>
             ((float)ViewportOffset.X, (float)ViewportOffset.Y,
             (float)ViewportSize.X, (float)ViewportSize.Y);
@@ -114,6 +114,7 @@ namespace VoidZero.Core
         public void Update(float dt)
         {
             _input.Update(_window);
+
             _imGui.Update(_window, dt, _input.GamepadConnected, _input.GamepadState);
 
             float timeScale = 1f;

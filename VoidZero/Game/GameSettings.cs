@@ -7,8 +7,8 @@
         public bool Borderless { get; set; } = false;
         public int Width { get; set; } = 1600;
         public int Height { get; set; } = 900;
-        public int WorldWidth { get; } = 1920;
-        public int WorldHeight { get; } = 1080;
+        public int WorldWidth { get; } = 2560;
+        public int WorldHeight { get; } = 1440;
         // Change this value to adjust the scrolling speed of the main background
         public float BackgroundSpeedMultiplier { get; set; } = 6f;
         // Toggle debug drawing of graze hitboxes (F3)

@@ -9,7 +9,7 @@ namespace VoidZero.Game.Entities
     public class Bullet : Entity
     {
         public Vector2 Direction { get; set; }
-        public float Lifetime { get; set; } = 5f;
+        public float Lifetime { get; set; } = 7.5f;
         public BulletEnergy Energy { get; set; }
         public BulletOwner Owner { get; set; }
         public float Damage { get; set; }
@@ -76,7 +76,7 @@ namespace VoidZero.Game.Entities
         {
             get
             {
-                float expandFactor = 0.5f; // 50% outward
+                float expandFactor = 0.65f; // 65% outward
                 float expandX = Width * expandFactor;
                 float expandY = Height * expandFactor;
 

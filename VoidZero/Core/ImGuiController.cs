@@ -65,6 +65,9 @@ namespace VoidZero.Core
             io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad;
             io.BackendFlags |= ImGuiBackendFlags.HasGamepad;
 
+            var style = ImGui.GetStyle();
+            ImGui.GetStyle().Colors[(int)ImGuiCol.NavCursor] = new System.Numerics.Vector4(0.8f, 0.8f, 0.8f, 1);
+
             CreateDeviceResources();
 
             SetPerFrameImGuiData(1f / 60f);

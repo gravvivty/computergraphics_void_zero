@@ -4,6 +4,7 @@ using VoidZero.Game.Combat;
 using VoidZero.Game.Entities;
 using VoidZero.Game.Entities.Components;
 using VoidZero.Game.Entities.Enemies;
+using VoidZero.Game.Entities.Enemies.Bosses;
 
 namespace VoidZero.States.Stages
 {
@@ -55,7 +56,8 @@ namespace VoidZero.States.Stages
             CardinalSpinner,
             CardinalSpinnerSpread,
             SpreadShot,
-            SpreadShotFast
+            SpreadShotFast,
+            DummyBoss
         }
         private Kind _kind;
         private BulletEnergy _energy;
@@ -103,6 +105,13 @@ namespace VoidZero.States.Stages
         }
 
         // ── enemy kind ───────────────────────────────────────────────────────
+
+        public SpawnEnemyEvent DummyBoss(BulletEnergy energy)
+        {
+            _kind = Kind.DummyBoss;
+            _energy = energy;
+            return Build();
+        }
 
         public SpawnEnemyEvent TripleShot(BulletEnergy energy)
         {
@@ -219,6 +228,7 @@ namespace VoidZero.States.Stages
                     Kind.CardinalSequencerFast => new CardinalSpinner(tex, Vector2.Zero, bullets, energy),
                     Kind.CardinalSeperatorFull => new CardinalSeperatorFull(tex, Vector2.Zero, bullets, energy),
                     Kind.CardinalSeperatorWeave => new CardinalSeperatorWeave(tex, Vector2.Zero, bullets, energy),
+                    Kind.DummyBoss => new DummyBoss(tex, Vector2.Zero, bullets, energy),
                     _ => throw new InvalidOperationException("Unknown enemy kind")
                 };
 

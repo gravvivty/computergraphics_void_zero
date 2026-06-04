@@ -15,6 +15,8 @@ namespace VoidZero.Game.Entities
         public float Rotation { get; set; }
         public float MaxHealth { get; set; } = 100f;
         public float CurrentHealth { get; set; }
+        public int Score { get; protected set; } = 100;
+        public bool IsBoss { get; protected set; } = false;
         public float Scale { get; set; } = 6f;
         public MovementTool Movement { get; set; }
         public Vector2 Velocity;

@@ -3,8 +3,10 @@ using System.Drawing;
 using VoidZero.Game.Combat;
 using VoidZero.Game.Combat.Patterns;
 using VoidZero.Game.Entities.Components;
+using VoidZero.Game.Entities.Enemies;
 using VoidZero.Game.Input;
 using VoidZero.Graphics;
+using VoidZero.States.Stages;
 
 namespace VoidZero.Game.Entities
 {
@@ -15,8 +17,9 @@ namespace VoidZero.Game.Entities
 
         private readonly float _acceleration = 10000f; // Low -> On ice
         private readonly float _deceleration = 6000f;
-        private readonly float _maxSpeed = 450f;
+        private readonly float _maxSpeed = 650f;
         private ShooterComponent _shooter;
+        public int currentScore { get; private set; } = 0;
         public BulletEnergy ActiveShield { get; private set; } = BulletEnergy.Yellow;
         // Grazing
         private bool _isCurrentlyGrazing = false;
@@ -29,7 +32,7 @@ namespace VoidZero.Game.Entities
         private const float GrazeGainPerSecond = 2f;
         private float MaxGrazeBonus => MaxGrazeMultiplier - 1f;
         // Dashing
-        private const float DashDistance = 200f;
+        private const float DashDistance = 300f;
         private const float DashCooldown = 0.5f;
         private const float DashDuration = 0.08f;
         private float _dashCooldownTimer = 0f;
@@ -85,7 +88,7 @@ namespace VoidZero.Game.Entities
 
             var bulletTex = GameServices.Instance.Content.GetTexture("VanillaBullet");
             _shooter = new ShooterComponent(
-                new FixedDirectionPattern(bulletTex, -Vector2.UnitY),
+                new FixedDirectionPattern(bulletTex, -Vector2.UnitY, 2500),
                 bulletManager,
                 BulletOwner.Player,
                 0.125f,
@@ -712,6 +715,12 @@ namespace VoidZero.Game.Entities
                     filled: true
                 );
             }
+        }
+
+        public void IncreaseScore(int score)
+        {
+            currentScore += score;
+            Console.WriteLine($"[SCORE] previousScore={currentScore - score} | enemyScore={score} | newScore={currentScore}");
         }
     }
 }

@@ -31,12 +31,19 @@ namespace VoidZero.UI
         public void Draw(Func<Vector2, System.Numerics.Vector2> worldToScreen)
         {
             var drawList = ImGui.GetForegroundDrawList();
+            var font = ImGui.GetFont();
 
             foreach (var n in _numbers)
             {
                 string text = n.Damage.ToString("0.0");
                 uint color = ImGui.ColorConvertFloat4ToU32(new Vector4(1f, 1f, 1f, n.Alpha));
-                drawList.AddText(worldToScreen(n.Position), color, text);
+                drawList.AddText(
+                    font,
+                    30f,
+                    worldToScreen(n.Position),
+                    color,
+                    text
+                );
             }
         }
     }

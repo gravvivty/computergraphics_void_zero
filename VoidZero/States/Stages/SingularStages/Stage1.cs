@@ -23,6 +23,8 @@ namespace VoidZero.States.Stages
             EnemySpawn.At(30f).From(8,0).MoveTo(8,4).WithRotation(MathF.PI/4f, 1f).TripleShot(BulletEnergy.Blue),
             EnemySpawn.At(33f).From(5,0).MoveTo(5,6).WithRotation(MathF.PI/4f, 1f).TripleShot(BulletEnergy.Purple),
             EnemySpawn.At(36f).From(7,0).MoveTo(7,5).WithRotation(MathF.PI/4f, 1f).TripleShot(BulletEnergy.Purple),
+
+            EnemySpawn.At(40f).From(6,0).MoveTo(6,3).DummyBoss(BulletEnergy.Purple),
         });
     }
 }

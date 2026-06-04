@@ -30,6 +30,7 @@ namespace VoidZero.States
 
         public override void Update(float dt)
         {
+            MenuUI.TickRainbow(dt);
             GameServices.Instance.ParticleSystem.Update(dt);
         }
         public override void Draw(SpriteBatch spriteBatch) { }
