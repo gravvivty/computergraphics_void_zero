@@ -1,9 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using VoidZero.Game;
 using VoidZero.Game.Combat;
-using VoidZero.Game.Entities.Components;
-using VoidZero.Game.Entities.Enemies;
-using VoidZero.States.Stages.VoidZero.States.Stages;
 
 namespace VoidZero.States.Stages
 {
@@ -15,6 +12,7 @@ namespace VoidZero.States.Stages
             {
                 EnemySpawn.At(0f).From(5,0).MoveTo(5,3).WithRotation(MathF.PI/2f, 1f).CardinalSpinner(BulletEnergy.Yellow),
                 EnemySpawn.At(0f).From(3,0).MoveTo(3,5).CardinalSequencer(BulletEnergy.Blue),
+                EnemySpawn.At(10f).From(6,0).MoveTo(6,3).DummyBoss(BulletEnergy.Purple),
             });
         }
     }

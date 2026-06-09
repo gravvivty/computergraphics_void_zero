@@ -1,4 +1,5 @@
 ﻿using VoidZero.Game.Entities;
+using VoidZero.States.GameStates;
 
 namespace VoidZero.States.Stages
 {

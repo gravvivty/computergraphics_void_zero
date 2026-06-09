@@ -1,5 +1,4 @@
 ﻿using VoidZero.Game.Combat;
-using VoidZero.States.Stages.VoidZero.States.Stages;
 
 namespace VoidZero.States.Stages
 {

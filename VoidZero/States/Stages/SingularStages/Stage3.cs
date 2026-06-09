@@ -1,9 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using VoidZero.Game;
 using VoidZero.Game.Combat;
-using VoidZero.Game.Entities.Components;
-using VoidZero.Game.Entities.Enemies;
-using VoidZero.States.Stages.VoidZero.States.Stages;
 
 namespace VoidZero.States.Stages
 {
@@ -13,7 +10,7 @@ namespace VoidZero.States.Stages
         {
             return new StageComposer(new()
             {
-                
+                EnemySpawn.At(10f).From(6,0).MoveTo(6,3).DummyBoss(BulletEnergy.Purple),
             });
         }
     }

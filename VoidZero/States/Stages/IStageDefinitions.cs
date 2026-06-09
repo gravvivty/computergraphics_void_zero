@@ -1,10 +1,7 @@
 ﻿namespace VoidZero.States.Stages
 {
-    namespace VoidZero.States.Stages
+    public interface IStageDefinition
     {
-        public interface IStageDefinition
-        {
-            StageComposer Build();
-        }
+        StageComposer Build();
     }
 }

@@ -17,9 +17,13 @@ namespace VoidZero.Game.Input
         private const float StickDeadZone = 0.2f;
         private bool _prevShieldButton;
         private bool _prevStartButton;
+        private bool _prevDashButton;
 
         private bool _pausePressed;
         private bool _pauseConsumed;
+        // Gamepad
+        private bool _confirmWasPressed = false;
+        private bool _cancelWasPressed = false;
 
         public Vector2 MoveAxis { get; private set; }
         public bool ShootHeld { get; private set; }
@@ -73,6 +77,10 @@ namespace VoidZero.Game.Input
             ShootHeld = _keyboard.IsKeyDown(Keys.J) || (_gamepadConnected && _gamepad.Axes[5] > 0.5f); // RT, J
             DashPressed = _keyboard.IsKeyPressed(Keys.Space) || (_gamepadConnected && _gamepad.Buttons[0] == 1); // A, Space
 
+            bool dashButtonHeld = _gamepadConnected && _gamepad.Buttons[0] == 1;
+            DashPressed = _keyboard.IsKeyPressed(Keys.Space) || (dashButtonHeld && !_prevDashButton); // Space, A
+            _prevDashButton = dashButtonHeld;
+
             bool shieldHeld = _gamepadConnected && _gamepad.Buttons[2] == 1;
             SwitchShieldPressed = _keyboard.IsKeyPressed(Keys.K) || (shieldHeld && !_prevShieldButton);  // X, K
             _prevShieldButton = shieldHeld;
@@ -100,6 +108,7 @@ namespace VoidZero.Game.Input
             }
 
             _prevStartButton = startHeld;
+            UpdateGamepadActions();
         }
 
         public bool ConsumePausePressed()
@@ -116,7 +125,59 @@ namespace VoidZero.Game.Input
         {
             _pausePressed = false;
             _pauseConsumed = false;
-            // Reset any other per-frame flags
+            _confirmPressed = false;
+            _cancelPressed = false;
+            _prevDashButton = false;
+            _prevShieldButton = false;
+            _prevStartButton = false;
+        }
+
+        // Call this inside your existing Update() after reading GamepadState
+        private unsafe void UpdateGamepadActions()
+        {
+            if (!GamepadConnected) return;
+
+            bool confirmDown = _gamepad.Buttons[0] == 1; // A
+            bool cancelDown = _gamepad.Buttons[1] == 1; // B
+
+            _confirmPressed = confirmDown && !_confirmWasPressed;
+            _cancelPressed = cancelDown && !_cancelWasPressed;
+
+            _confirmWasPressed = confirmDown;
+            _cancelWasPressed = cancelDown;
+        }
+
+        private bool _confirmPressed = false;
+        private bool _cancelPressed = false;
+
+        public unsafe System.Numerics.Vector2 GetLeftStick()
+        {
+            if (!GamepadConnected)
+                return System.Numerics.Vector2.Zero;
+
+            GamepadState state = _gamepad; // local copy — fixed buffers require local/field access
+            float x = state.Axes[0];
+            float y = state.Axes[1];
+
+            const float deadZone = 0.2f;
+            if (MathF.Abs(x) < deadZone) x = 0f;
+            if (MathF.Abs(y) < deadZone) y = 0f;
+
+            return new System.Numerics.Vector2(x, y);
+        }
+
+        public bool ConsumeConfirmPressed()
+        {
+            if (!_confirmPressed) return false;
+            _confirmPressed = false;
+            return true;
+        }
+
+        public bool ConsumeCancelPressed()
+        {
+            if (!_cancelPressed) return false;
+            _cancelPressed = false;
+            return true;
         }
     }
 }

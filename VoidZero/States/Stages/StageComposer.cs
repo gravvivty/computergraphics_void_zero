@@ -1,4 +1,6 @@
-﻿namespace VoidZero.States.Stages
+﻿using VoidZero.States.GameStates;
+
+namespace VoidZero.States.Stages
 {
     // With this we can design levels 
     public class StageComposer

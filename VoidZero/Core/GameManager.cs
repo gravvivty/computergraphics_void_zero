@@ -8,6 +8,7 @@ using VoidZero.Game;
 using VoidZero.Game.Input;
 using VoidZero.Graphics;
 using VoidZero.States;
+using VoidZero.States.GameStates;
 
 namespace VoidZero.Core
 {
@@ -155,6 +156,10 @@ namespace VoidZero.Core
         {
 
             ImGui.PushFont(_defaultFont);
+            ImGui.GetIO().FontGlobalScale = MathF.Min(
+                ViewportSize.X / 1600f,
+                ViewportSize.Y / 900f
+            );
             float targetGray = calculateGrayScale();
 
             _spriteBatch.Grayscale = MathHelper.Lerp(
@@ -276,10 +281,15 @@ namespace VoidZero.Core
 
         private void DrawFPS()
         {
+            var (vpX, vpY, vpW, vpH) = GetViewportRect();
+            float scaleX = vpW / 1600f;
+            float scaleY = vpH / 900f;
+            float scale = MathF.Min(scaleX, scaleY);
+
             var io = ImGui.GetIO();
-            float padding = 10f;
-            float windowWidth = 80f;
-            float windowHeight = 20f;
+            float padding = 10f * scale;
+            float windowWidth = 80f * scale;
+            float windowHeight = 20f * scale;
 
             ImGui.SetNextWindowPos(
                 new System.Numerics.Vector2(

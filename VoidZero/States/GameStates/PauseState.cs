@@ -4,7 +4,7 @@ using VoidZero.Game.Input;
 using VoidZero.Graphics;
 using static VoidZero.UI.MenuUI;
 
-namespace VoidZero.States
+namespace VoidZero.States.GameStates
 {
     public class PauseState : GameState
     {

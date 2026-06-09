@@ -10,7 +10,7 @@
         public int WorldWidth { get; } = 2560;
         public int WorldHeight { get; } = 1440;
         // Change this value to adjust the scrolling speed of the main background
-        public float BackgroundSpeedMultiplier { get; set; } = 6f;
+        public float BackgroundSpeedMultiplier { get; set; } = 10f;
         // Toggle debug drawing of graze hitboxes (F3)
         public bool ShowGrazeHitboxes { get; set; } = false;
         // Toggle debug drawing of entity hitboxes (F4)

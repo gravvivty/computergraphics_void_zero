@@ -5,7 +5,9 @@ using VoidZero.Core;
 using VoidZero.Game;
 using VoidZero.Game.Input;
 using VoidZero.States;
+using VoidZero.States.GameStates;
 using VoidZero.Utils;
+using VoidZero.States.Graph;
 
 namespace VoidZero.UI
 {
@@ -43,6 +45,9 @@ namespace VoidZero.UI
         {
             var io = ImGui.GetIO();
             var (vpX, vpY, vpW, vpH) = gm.GetViewportRect();
+            float scaleX = vpW / 1920;
+            float scaleY = vpH / 1080;
+            float scale = MathF.Min(scaleX, scaleY);
 
             ImGui.SetNextWindowPos(new Vector2(vpX, vpY));
             ImGui.SetNextWindowSize(new Vector2(vpW, vpH));
@@ -62,12 +67,12 @@ namespace VoidZero.UI
                 _focusNextFrame = false;
             }
 
-            float buttonWidth = 200f;
-            float buttonHeight = 50f;
-            float spacing = 15f;
+            float buttonWidth = 200f * scale;
+            float buttonHeight = 50f * scale;
+            float spacing = 15f * scale;
 
             string[] labels = { "Play", "Options", "Credits", "Controls", "Exit" };
-            float totalHeight = labels.Length * buttonHeight + (labels.Length - 1) * spacing + 80; // 80 for title space
+            float totalHeight = labels.Length * buttonHeight + (labels.Length - 1) * spacing + 80 * scale; // 80 for title space
 
             float windowHeight = ImGui.GetWindowHeight();
             ImGui.SetCursorPosY((windowHeight - totalHeight) / 2f);
@@ -91,8 +96,18 @@ namespace VoidZero.UI
                     switch (label)
                     {
                         case "Play":
-                            currentPage = MenuPage.StageSelect;
-                            _focusNextFrame = true;
+                            var graph = WorldGraphBuilder.Generate();
+                            gsm.ChangeState(
+                                new MapState(
+                                    gsm,
+                                    window,
+                                    input,
+                                    bg,
+                                    gm,
+                                    graph,
+                                    justCompleted: null
+                                )
+                            );
                             break;
                         case "Options":
                             currentPage = MenuPage.Options;
@@ -121,6 +136,9 @@ namespace VoidZero.UI
         {
             var io = ImGui.GetIO();
             var (vpX, vpY, vpW, vpH) = gm.GetViewportRect();
+            float scaleX = vpW / 1920;
+            float scaleY = vpH / 1080;
+            float scale = MathF.Min(scaleX, scaleY);
 
             ImGui.SetNextWindowPos(new Vector2(vpX, vpY));
             ImGui.SetNextWindowSize(new Vector2(vpW, vpH));
@@ -139,11 +157,11 @@ namespace VoidZero.UI
                 _focusNextFrame = false;
             }
 
-            float buttonWidth = 250f;
-            float buttonHeight = 50f;
-            float spacing = 15f;
+            float buttonWidth = 250f * scale;
+            float buttonHeight = 50f * scale;
+            float spacing = 15f * scale;
 
-            float totalHeight = 3 * buttonHeight + 2 * spacing + 60;
+            float totalHeight = 3 * buttonHeight + 2 * spacing + 60 * scale;
             ImGuiHelpers.BeginCenteredBlock(totalHeight);
 
             GameSettings settings = GameServices.Instance.Settings;
@@ -226,6 +244,9 @@ namespace VoidZero.UI
         {
             var io = ImGui.GetIO();
             var (vpX, vpY, vpW, vpH) = gm.GetViewportRect();
+            float scaleX = vpW / 1920;
+            float scaleY = vpH / 1080;
+            float scale = MathF.Min(scaleX, scaleY);
 
             ImGui.SetNextWindowPos(new Vector2(vpX, vpY));
             ImGui.SetNextWindowSize(new Vector2(vpW, vpH));
@@ -253,8 +274,8 @@ namespace VoidZero.UI
                 "Music will be by Steven Gayer (no sound yet)"
             };
 
-            float spacing = 10f;
-            float totalHeight = lines.Length * ImGui.GetTextLineHeight() + spacing * 4 + 60;
+            float spacing = 10f * scale;
+            float totalHeight = lines.Length * ImGui.GetTextLineHeight() + spacing * 4 + 60 * scale;
             ImGuiHelpers.BeginCenteredBlock(totalHeight);
 
             foreach (string line in lines)
@@ -279,6 +300,9 @@ namespace VoidZero.UI
         {
             var io = ImGui.GetIO();
             var (vpX, vpY, vpW, vpH) = gm.GetViewportRect();
+            float scaleX = vpW / 1920;
+            float scaleY = vpH / 1080;
+            float scale = MathF.Min(scaleX, scaleY);
 
             ImGui.SetNextWindowPos(new Vector2(vpX, vpY));
             ImGui.SetNextWindowSize(new Vector2(vpW, vpH));
@@ -320,15 +344,15 @@ namespace VoidZero.UI
             };
 
             float lineH = ImGui.GetTextLineHeight();
-            float spacing = 10f;
-            float colW = 300f;
-            float gapW = 60f;
+            float spacing = 10f * scale;
+            float colW = 400f * scale;
+            float gapW = 60f * scale;
             float totalW = colW * 2 + gapW;
             float totalH = linesKeyboard.Length * (lineH + spacing) + 120f;
 
             // Center the whole block
-            float startX = (vpW - totalW) / 2f;
-            float startY = (vpH - totalH) / 2f;
+            float startX = (vpW - totalW) / 2;
+            float startY = (vpH - totalH) / 2;
 
             // Left column: Keyboard
             ImGui.SetCursorPos(new Vector2(startX, startY));
@@ -377,6 +401,9 @@ namespace VoidZero.UI
 
             var io = ImGui.GetIO();
             var (vpX, vpY, vpW, vpH) = gm.GetViewportRect();
+            float scaleX = vpW / 1920;
+            float scaleY = vpH / 1080;
+            float scale = MathF.Min(scaleX, scaleY);
 
             ImGui.SetNextWindowPos(new Vector2(vpX, vpY));
             ImGui.SetNextWindowSize(new Vector2(vpW, vpH));
@@ -395,9 +422,9 @@ namespace VoidZero.UI
                 _focusNextFrame = false;
             }
 
-            float buttonWidth = 200f;
-            float buttonHeight = 50f;
-            float spacing = 15f;
+            float buttonWidth = 200f * scale;
+            float buttonHeight = 50f * scale;
+            float spacing = 15f * scale;
 
             float totalHeight = 3 * buttonHeight + 2 * spacing;
             ImGuiHelpers.BeginCenteredBlock(totalHeight);
@@ -439,6 +466,9 @@ namespace VoidZero.UI
         {
             var io = ImGui.GetIO();
             var (vpX, vpY, vpW, vpH) = gm.GetViewportRect();
+            float scaleX = vpW / 1920;
+            float scaleY = vpH / 1080;
+            float scale = MathF.Min(scaleX, scaleY);
 
             ImGui.SetNextWindowPos(new Vector2(vpX, vpY));
             ImGui.SetNextWindowSize(new Vector2(vpW, vpH));
@@ -457,11 +487,11 @@ namespace VoidZero.UI
                 _focusNextFrame = false;
             }
 
-            float buttonWidth = 180f;
-            float buttonHeight = 60f;
-            float cardWidth = 180f;
-            float cardHeight = 120f; // record info above the button
-            float spacing = 20f;
+            float buttonWidth = 180f * scale;
+            float buttonHeight = 60f * scale;
+            float cardWidth = 180f * scale;
+            float cardHeight = 120f * scale; // record info above the button
+            float spacing = 20f * scale;
 
             int stageCount = 3;
             float totalWidth =

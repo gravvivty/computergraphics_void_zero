@@ -4,7 +4,7 @@ using VoidZero.Core;
 using VoidZero.Game;
 using VoidZero.Graphics;
 
-namespace VoidZero.States
+namespace VoidZero.States.GameStates
 {
     public class DeathState : GameState
     {

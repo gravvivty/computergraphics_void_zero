@@ -1,4 +1,6 @@
-﻿namespace VoidZero.States.Stages
+﻿using VoidZero.States.GameStates;
+
+namespace VoidZero.States.Stages
 {
     public abstract class StageEvent
     {

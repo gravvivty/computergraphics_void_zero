@@ -5,7 +5,7 @@ using VoidZero.Game.Input;
 using VoidZero.Graphics;
 using VoidZero.UI;
 
-namespace VoidZero.States
+namespace VoidZero.States.GameStates
 {
     public class MenuState : GameState
     {
