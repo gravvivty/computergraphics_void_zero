@@ -176,7 +176,7 @@ namespace VoidZero.UI
 
             ImGui.Dummy(new Vector2(0, spacing));
 
-            string[] resolutions = { "1280x720", "1600x900", "1920x1080", "2560x1440" };
+            string[] resolutions = { "1280x720", "1600x900", "1920x1080", "2560x1440", "3840x2160" };
             int currentIndex = Array.FindIndex(resolutions, r => r == $"{settings.Width}x{settings.Height}");
             if (currentIndex < 0) currentIndex = 0;
 
