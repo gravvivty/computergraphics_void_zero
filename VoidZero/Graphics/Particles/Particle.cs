@@ -15,6 +15,7 @@ namespace VoidZero.Graphics.Particles
         public Vector4 StartColor;
         public Vector4 EndColor = new Vector4(0.3f, 0.3f, 0.3f, 1f); // Gray
         public Vector4 CurrentColor;
+        public float GlowIntensity;
 
         public bool IsAlive => Lifetime < MaxLifetime;
 
@@ -37,6 +38,9 @@ namespace VoidZero.Graphics.Particles
                 float tFast = (t - 0.8f) / 0.2f;
                 CurrentColor = Vector4.Lerp(StartColor, EndColor, 0.8f + tFast * 0.2f);
             }
+
+            // Glow fade -> hot flash on spawn, fully cooled by 20% of lifetime
+            GlowIntensity = t < 0.2f ? MathHelper.Lerp(1f, 0f, t / 0.2f) : 0f;
         }
 
         public void Draw(SpriteBatch batch)
@@ -49,7 +53,8 @@ namespace VoidZero.Graphics.Particles
             batch.DrawRectangle(
                 new RectangleF(Position.X, Position.Y, Size, Size),
                 Color.FromArgb(a, r, g, b),
-                filled: true
+                filled: true,
+                glow: GlowIntensity
             );
         }
     }
