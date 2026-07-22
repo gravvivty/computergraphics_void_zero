@@ -9,8 +9,8 @@ namespace VoidZero.Graphics
     /// All sprites sharing the same texture are packed into one <see cref="_vertexData"/>
     /// array and sent to the GPU in one <see cref="GL.DrawArrays"/> call.
     ///
-    /// Vertex layout (8 floats per vertex, 6 vertices per quad = 2 triangles):
-    ///   [x, y,  u, v,  r, g, b, a]
+    /// Vertex layout (9 floats per vertex, 6 vertices per quad = 2 triangles):
+    ///   [x, y,  u, v,  r, g, b, a,  glow]
     /// GPUs draw triangles natively; quads are always decomposed into two triangles.
     /// </summary>
     public class SpriteBatch
@@ -24,9 +24,9 @@ namespace VoidZero.Graphics
         private readonly Texture2D _whiteTexture;
 
         // CPU-side vertex buffer
-        // 10 000 sprites * 6 vertices * 8 floats = 480 000 floats
+        // 10 000 sprites * 6 vertices * 9 floats = 540 000 floats
         private const int MaxSprites = 10_000;
-        private const int FloatsPerVertex = 8;
+        private const int FloatsPerVertex = 9;
         private const int VerticesPerSprite = 6;
         private readonly float[] _vertexData = new float[MaxSprites * VerticesPerSprite * FloatsPerVertex];
         private int _head; // write cursor into _vertexData
@@ -37,9 +37,6 @@ namespace VoidZero.Graphics
 
         /// <summary>Applied as a multiplicative tint on top of every draw call's color.</summary>
         public Vector4 GlobalTint { get; set; } = Vector4.One;
-
-        /// <summary>0 = full color, 1 = fully grayscale.</summary>
-        public float Grayscale { get; set; } = 0f;
 
         public SpriteBatch()
         {
@@ -67,18 +64,18 @@ namespace VoidZero.Graphics
             GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, stride, 4 * sizeof(float));
             GL.EnableVertexAttribArray(2); // color (rgba)
 
+            GL.VertexAttribPointer(3, 1, VertexAttribPointerType.Float, false, stride, 8 * sizeof(float));
+            GL.EnableVertexAttribArray(3); // glow intensity
+
             _textureUniformLocation = GL.GetUniformLocation(_shader.Handle, "texture");
 
             _whiteTexture = new Texture2D(1, 1, [255, 255, 255, 255]);
         }
 
-        public void Begin(Matrix4 projection, float grayscale = 0f)
+        public void Begin(Matrix4 projection)
         {
-            Grayscale = grayscale;
-
             _shader.Use();
             _shader.SetMatrix4("projection", projection);
-            _shader.SetFloat("grayscale", Grayscale);
             _shader.SetFloat("glowPower", 3f);
 
             GL.ActiveTexture(TextureUnit.Texture0);
@@ -97,7 +94,7 @@ namespace VoidZero.Graphics
         public void End() => Flush();
 
         /// <summary>Draws a texture stretched over an axis-aligned rectangle.</summary>
-        public void Draw(Texture2D texture, Vector2 position, Vector2 size, Vector4 color)
+        public void Draw(Texture2D texture, Vector2 position, Vector2 size, Vector4 color, float glow = 0f)
         {
             float x = position.X, y = position.Y;
             float w = size.X, h = size.Y;
@@ -106,7 +103,8 @@ namespace VoidZero.Graphics
                 topRight: new Vector2(x + w, y),
                 bottomLeft: new Vector2(x, y),
                 bottomRight: new Vector2(x + w, y + h),
-                uv: new Vector4(0f, 0f, 1f, 1f)); // u0, v0, u1, v1
+                uv: new Vector4(0f, 0f, 1f, 1f), // u0, v0, u1, v1
+                glow: glow);
         }
 
         /// <summary>Draws a texture with explicit UV coordinates (for clipping fill bars etc.).</summary>
@@ -158,21 +156,21 @@ namespace VoidZero.Graphics
         }
 
         /// <summary>Draws a filled or outlined axis-aligned rectangle using the white texture.</summary>
-        public void DrawRectangle(RectangleF rect, Color color, bool filled = false, float thickness = 2f)
+        public void DrawRectangle(RectangleF rect, Color color, bool filled = false, float thickness = 2f, float glow = 0f)
         {
             Vector4 c = ColorToVec4(color);
 
             if (filled)
             {
-                Draw(_whiteTexture, new Vector2(rect.X, rect.Y), new Vector2(rect.Width, rect.Height), c);
+                Draw(_whiteTexture, new Vector2(rect.X, rect.Y), new Vector2(rect.Width, rect.Height), c, glow);
                 return;
             }
 
             // Top / Bottom / Left / Right edges
-            Draw(_whiteTexture, new Vector2(rect.X, rect.Y), new Vector2(rect.Width, thickness), c);
-            Draw(_whiteTexture, new Vector2(rect.X, rect.Y + rect.Height - thickness), new Vector2(rect.Width, thickness), c);
-            Draw(_whiteTexture, new Vector2(rect.X, rect.Y), new Vector2(thickness, rect.Height), c);
-            Draw(_whiteTexture, new Vector2(rect.X + rect.Width - thickness, rect.Y), new Vector2(thickness, rect.Height), c);
+            Draw(_whiteTexture, new Vector2(rect.X, rect.Y), new Vector2(rect.Width, thickness), c, glow);
+            Draw(_whiteTexture, new Vector2(rect.X, rect.Y + rect.Height - thickness), new Vector2(rect.Width, thickness), c, glow);
+            Draw(_whiteTexture, new Vector2(rect.X, rect.Y), new Vector2(thickness, rect.Height), c, glow);
+            Draw(_whiteTexture, new Vector2(rect.X + rect.Width - thickness, rect.Y), new Vector2(thickness, rect.Height), c, glow);
         }
 
         /// <summary>
@@ -187,7 +185,8 @@ namespace VoidZero.Graphics
             Texture2D texture, Vector4 color,
             Vector2 topLeft, Vector2 topRight,
             Vector2 bottomLeft, Vector2 bottomRight,
-            Vector4 uv) // (u0, v0, u1, v1)
+            Vector4 uv, // (u0, v0, u1, v1)
+            float glow = 0f)
         {
             if (_currentTexture != null && texture != _currentTexture)
                 Flush();
@@ -201,13 +200,13 @@ namespace VoidZero.Graphics
             float u0 = uv.X, v0 = uv.Y, u1 = uv.Z, v1 = uv.W;
 
             // Triangle 1
-            PushVertex(topLeft.X, topLeft.Y, u0, v1, tinted);
-            PushVertex(topRight.X, topRight.Y, u1, v0, tinted);
-            PushVertex(bottomLeft.X, bottomLeft.Y, u0, v0, tinted);
+            PushVertex(topLeft.X, topLeft.Y, u0, v1, tinted, glow);
+            PushVertex(topRight.X, topRight.Y, u1, v0, tinted, glow);
+            PushVertex(bottomLeft.X, bottomLeft.Y, u0, v0, tinted, glow);
             // Triangle 2
-            PushVertex(topLeft.X, topLeft.Y, u0, v1, tinted);
-            PushVertex(bottomRight.X, bottomRight.Y, u1, v1, tinted);
-            PushVertex(topRight.X, topRight.Y, u1, v0, tinted);
+            PushVertex(topLeft.X, topLeft.Y, u0, v1, tinted, glow);
+            PushVertex(bottomRight.X, bottomRight.Y, u1, v1, tinted, glow);
+            PushVertex(topRight.X, topRight.Y, u1, v0, tinted, glow);
         }
 
         private void Flush()
@@ -231,7 +230,7 @@ namespace VoidZero.Graphics
             _currentTexture = null;
         }
 
-        private void PushVertex(float x, float y, float u, float v, Vector4 c)
+        private void PushVertex(float x, float y, float u, float v, Vector4 c, float glow)
         {
             _vertexData[_head++] = x;
             _vertexData[_head++] = y;
@@ -241,6 +240,7 @@ namespace VoidZero.Graphics
             _vertexData[_head++] = c.Y;
             _vertexData[_head++] = c.Z;
             _vertexData[_head++] = c.W;
+            _vertexData[_head++] = glow;
         }
 
         private static Vector4 ColorToVec4(Color c) =>

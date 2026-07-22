@@ -2,18 +2,17 @@
 
 in vec2 TexCoord;
 in vec4 VertexColor;
+in float GlowIntensity;
 
 out vec4 FragColor;
 
 uniform sampler2D texture0;
-uniform float grayscale;
+uniform float glowPower;
 
 void main()
 {
     vec4 color = texture(texture0, TexCoord) * VertexColor;
-
-    float gray = dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
-    color.rgb = mix(color.rgb, vec3(gray), grayscale);
+    color.rgb += color.rgb * GlowIntensity * glowPower;
 
     FragColor = color;
 }
