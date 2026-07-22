@@ -160,16 +160,8 @@ namespace VoidZero.Core
                 ViewportSize.X / 1600f,
                 ViewportSize.Y / 900f
             );
-            float targetGray = calculateGrayScale();
-
-            _spriteBatch.Grayscale = MathHelper.Lerp(
-                _spriteBatch.Grayscale,
-                targetGray,
-                dt * 6f
-            );
-
             // Draw world objects
-            _spriteBatch.Begin(_camera.GetTransform(), targetGray);
+            _spriteBatch.Begin(_camera.GetTransform());
             _background.Draw(_spriteBatch);
             _stateManager.Draw(_spriteBatch); // only draws state-specific sprites
             GameServices.Instance.ParticleSystem.Draw(_spriteBatch);
@@ -243,40 +235,6 @@ namespace VoidZero.Core
         public void Shake(float duration, float strength)
         {
             _camera.Shake(duration, strength);
-        }
-
-        private float calculateGrayScale()
-        {
-            float targetGray = 0f;
-
-            if (_stateManager._current is PlayState playState)
-            {
-                var player = playState._player;
-
-                if (player.IsCriticalHealth)
-                {
-                    const float totalRegen = 3f;
-                    const float fadeDuration = 1f;
-                    const float holdDuration = totalRegen - fadeDuration;
-
-                    float t = player.HealthRegenTimer;
-
-                    if (t < holdDuration)
-                    {
-                        // Stay fully gray
-                        targetGray = 1f;
-                    }
-                    else
-                    {
-                        // Fade back to color in last 0.5s
-                        float fadeT = Math.Clamp((t - holdDuration) / fadeDuration, 0f, 1f);
-                        fadeT = fadeT * fadeT * (3f - 2f * fadeT);
-                        targetGray = MathHelper.Lerp(1f, 0f, fadeT);
-                    }
-                }
-            }
-
-            return targetGray;
         }
 
         private void DrawFPS()

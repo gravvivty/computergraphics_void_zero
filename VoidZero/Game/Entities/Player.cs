@@ -55,10 +55,8 @@ namespace VoidZero.Game.Entities
         // Health
         private const float HealthRegenDelay = 2f;
         private float _healthRegenTimer = 0f;
-        public float HealthRegenTimer => _healthRegenTimer;
 
         private bool _isRegeneratingHealth = false;
-        public bool IsCriticalHealth => CurrentHealth <= 1f;
         // Ability bar
         public float _abilityBar { get; private set; } = 0f; // current progress
         public float MaxAbilityBar { get; } = 100f; // full bar
